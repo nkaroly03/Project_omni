@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Lex\Lex.csproj" />
+    <ProjectReference Include="..\Parse\Parse.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

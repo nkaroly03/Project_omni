@@ -1,8 +1,14 @@
 ﻿namespace Lex;
 
+static class Extensions{
+    extension(string self){
+        public string colour_str(byte r, byte g, byte b) => $"\x1b[38;2;{r};{g};{b}m{self}\x1b[0m";
+    }
+}
+
 public readonly struct Token{
     public enum Type{
-        IDENTIFIER,
+        ID,
 
         INT_LIT,
         FLOAT_LIT,
@@ -49,8 +55,11 @@ public readonly struct Token{
         RETURN
     }
 
+    public required readonly int line_number{ get; init; }
     public required readonly Type type{ get; init; }
     public required readonly string id{ get; init; }
+
+    public override string ToString() => $"{{.line_number = {line_number}, .type = {type}, .id = {id}}}";
 }
 
 public sealed class Lexer{
@@ -60,12 +69,18 @@ public sealed class Lexer{
         tokens = new();
 
         if (!path.EndsWith(".omni"))
-            throw new Exception("Bad file extension");
+            throw new Exception("Bad file extension".colour_str(255, 0, 0));
 
         string file_lines = File.ReadAllText(path);
-        if (file_lines.Count((c) => c == '"') % 2 != 0)
-            throw new Exception("String literal was not closed");
 
+        if (file_lines.Count((c) => c == '"') % 2 != 0)
+            throw new Exception("String literal was not closed".colour_str(255, 0, 0));
+        if (file_lines.Count((c) => c == '(') != file_lines.Count((c) => c == ')'))
+            throw new Exception("The number of opening and closing parenthesis' must match".colour_str(255, 0, 0));
+        if (file_lines.Count((c) => c == '{') != file_lines.Count((c) => c == '}'))
+            throw new Exception("The number of opening and closing braces must match".colour_str(255, 0, 0));
+
+        int line_number = 0;
         foreach (string line in file_lines.Split('\n')){
             List<string> line_splitted = System.Text.RegularExpressions.Regex.Split(
                 line,
@@ -124,15 +139,16 @@ public sealed class Lexer{
                             token_type = Token.Type.FLOAT_LIT;
                         else if (s[0] == '"')
                             token_type = Token.Type.STR_LIT;
-                        else if (s.All((c) => char.IsAsciiLetter(c) || c == '_'))
-                            token_type = Token.Type.IDENTIFIER;
+                        else if (!char.IsDigit(s[0]) && s.All((c) => char.IsAsciiLetter(c) || char.IsDigit(c) || c == '_'))
+                            token_type = Token.Type.ID;
                         else
-                            throw new Exception($"{s} is not a valid token");
+                            throw new Exception($"Found invalid token <{s}> on line <{line_number + 1}>".colour_str(255, 0, 0));
                         break;
                 }
 
-                tokens.Add(new(){type = token_type, id = s});
+                tokens.Add(new(){type = token_type, id = s, line_number = line_number + 1});
             }
+            ++line_number;
         }
     }
 

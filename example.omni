@@ -4,13 +4,13 @@ let b: float = 3.14;
 print(a);
 print(b);
 
-let c: int = scan("Input: ");
+let c44: int = scan("Input: ");
 
 if (c < 10){
     print("c < 10");
 }
 else if (c == 10){
-    print("(c == 10) == (not (c != 10)) or false");
+    print("(c == 10) == (not (c != 10)) or false and true");
 }
 else{
     print("c >= 10");
@@ -20,7 +20,7 @@ if (c >= 10){
     return c;
 }
 else{
-    while (c < 10 and c >= 0){
+    while (c < 10 and (c >= 0 or false and true)){
         print(c);
         c = c + 1;
     }

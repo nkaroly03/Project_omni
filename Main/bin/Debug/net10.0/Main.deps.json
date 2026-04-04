@@ -8,7 +8,8 @@
     ".NETCoreApp,Version=v10.0": {
       "Main/1.0.0": {
         "dependencies": {
-          "Lex": "1.0.0"
+          "Lex": "1.0.0",
+          "Parse": "1.0.0"
         },
         "runtime": {
           "Main.dll": {}
@@ -17,6 +18,14 @@
       "Lex/1.0.0": {
         "runtime": {
           "Lex.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "Parse/1.0.0": {
+        "runtime": {
+          "Parse.dll": {
             "assemblyVersion": "1.0.0.0",
             "fileVersion": "1.0.0.0"
           }
@@ -31,6 +40,11 @@
       "sha512": ""
     },
     "Lex/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Parse/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
