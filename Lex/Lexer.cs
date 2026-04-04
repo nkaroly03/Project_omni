@@ -63,10 +63,10 @@ public readonly struct Token{
 }
 
 public sealed class Lexer{
-    List<Token> tokens;
+    List<Token> m_tokens;
 
     public Lexer(string path){
-        tokens = new();
+        m_tokens = new();
 
         if (!path.EndsWith(".omni"))
             throw new Exception("Bad file extension".colour_str(255, 0, 0));
@@ -146,11 +146,11 @@ public sealed class Lexer{
                         break;
                 }
 
-                tokens.Add(new(){type = token_type, id = s, line_number = line_number + 1});
+                m_tokens.Add(new(){type = token_type, id = s, line_number = line_number + 1});
             }
             ++line_number;
         }
     }
 
-    public List<Token> get_tokens() => new(tokens);
+    public List<Token> get_tokens() => new(m_tokens);
 }

@@ -1,5 +1,5 @@
 let a: int = 10;
-let b: float = 3.14;
+let b: float = 3.14 + a * (a + a);
 
 print(a);
 print(b);
