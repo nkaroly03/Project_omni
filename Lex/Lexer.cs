@@ -54,34 +54,25 @@ public readonly struct Token{
 }
 
 public sealed class Lexer{
-    List<Token> m_tokens;
+    List<Token> tokens;
 
     public Lexer(string path){
-        m_tokens = new();
+        tokens = new();
 
-        foreach (string line in File.ReadLines(path)){
+        if (!path.EndsWith(".omni"))
+            throw new Exception("Bad file extension");
+
+        string file_lines = File.ReadAllText(path);
+        if (file_lines.Count((c) => c == '"') % 2 != 0)
+            throw new Exception("String literal was not closed");
+
+        foreach (string line in file_lines.Split('\n')){
             List<string> line_splitted = System.Text.RegularExpressions.Regex.Split(
                 line,
-                @"([:;(){}""<>!=+*/%-]|\blet\b|\bbool\b|\bfalse\b|\btrue\b|\bint\b|\bfloat\b|\bprint\b|\bscan\b|\bif\b|\belse\b|\bwhile\b|\band\b|\bor\b|\bnot\b|\breturn\b)"
+                @"([:;(){}<>!=+*/%-]|""(?:.*)""|\blet\b|\bbool\b|\bfalse\b|\btrue\b|\bint\b|\bfloat\b|\bprint\b|\bscan\b|\bif\b|\belse\b|\bwhile\b|\band\b|\bor\b|\bnot\b|\breturn\b)"
             )
-            .Where((s) => !string.IsNullOrWhiteSpace(s)).ToList();
-
-            for (int i = 0, j; i < line_splitted.Count && (j = line_splitted.FindIndex(i, (s) => (s.Trim() == "\""))) >= 0; i = j + 1){
-                List<string> remaining_tokens = line_splitted[(j + 1)..];
-
-                int tokens_to_concat = remaining_tokens.IndexOf("\"") + 1;
-                if (tokens_to_concat == 0)
-                    throw new Exception("String literal was not closed");
-
-                string str_lit = line_splitted[j];
-                for (int k = 0; k < tokens_to_concat; ++k)
-                    str_lit += remaining_tokens[k];
-
-                line_splitted.RemoveRange(j, tokens_to_concat + 1);
-                line_splitted.Insert(j, str_lit);
-            }
-
-            line_splitted = line_splitted.Select((s) => s.Trim()).ToList();
+            .Where((s) => !string.IsNullOrWhiteSpace(s)).ToList()
+            .Select((s) => s.Trim()).ToList();
 
             foreach (string s in line_splitted){
                 Token.Type token_type;
@@ -127,20 +118,23 @@ public sealed class Lexer{
                     case "return": token_type = Token.Type.RETURN;           break;
 
                     default:
-                        if (char.IsAsciiLetter(s[0]))
-                            token_type = Token.Type.IDENTIFIER;
-                        else if (s.All((c) => char.IsDigit(c)))
+                        if (s.All((c) => char.IsDigit(c)))
                             token_type = Token.Type.INT_LIT;
                         else if (s.Count((c) => c == '.') == 1 && s[0] != '.' && s.All((c) => char.IsDigit(c) || c == '.'))
                             token_type = Token.Type.FLOAT_LIT;
                         else if (s[0] == '"')
                             token_type = Token.Type.STR_LIT;
+                        else if (s.All((c) => char.IsAsciiLetter(c) || c == '_'))
+                            token_type = Token.Type.IDENTIFIER;
                         else
-                            throw new Exception($"{s}");
+                            throw new Exception($"{s} is not a valid token");
                         break;
                 }
-                m_tokens.Add(new(){type = token_type, id = s});
+
+                tokens.Add(new(){type = token_type, id = s});
             }
         }
     }
+
+    public List<Token> get_tokens() => new(tokens);
 }

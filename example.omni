@@ -10,7 +10,7 @@ if (c < 10){
     print("c < 10");
 }
 else if (c == 10){
-    print("c == 10");
+    print("(c == 10) == (not (c != 10)) or false");
 }
 else{
     print("c >= 10");
@@ -20,7 +20,7 @@ if (c >= 10){
     return c;
 }
 else{
-    while (c < 10){
+    while (c < 10 and c >= 0){
         print(c);
         c = c + 1;
     }
