@@ -1,0 +1,11 @@
+let a: int = 0;
+let b: int = 1;
+
+while (a < 255){
+    let c: int = a + b;
+    print(a);
+    a = b;
+    b = c;
+}
+
+return a;

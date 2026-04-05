@@ -162,10 +162,10 @@ public sealed class Lexer{
                     case "print":  token_type = Token.Type.PRINT;           break;
                     case "scan":   token_type = Token.Type.SCAN;            break;
 
-                    case "if":     token_type = Token.Type.SCAN;            break;
+                    case "if":     token_type = Token.Type.IF;              break;
                     case "else":   token_type = Token.Type.ELSE;            break;
 
-                    case "while":  token_type = Token.Type.IF;              break;
+                    case "while":  token_type = Token.Type.WHILE;           break;
 
                     case "and":    token_type = Token.Type.AND;             break;
                     case "or":     token_type = Token.Type.OR;              break;

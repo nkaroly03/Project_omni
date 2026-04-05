@@ -64,47 +64,62 @@ public sealed class Parser{
     List<Node> m_nodes;
 
     public Parser(List<Token> tokens){
+        tokens.Reverse();
+
         m_nodes = new(); 
+
+        Stack<Token> token_stack = new(tokens);
 
         if (tokens.Count((t) => t.type == Token.Type.LPAREN) != tokens.Count((t) => t.type == Token.Type.RPAREN))
             throw new Exception("The number of opening and closing parenthesis' must match".colour_str());
         if (tokens.Count((t) => t.type == Token.Type.LBRACE) != tokens.Count((t) => t.type == Token.Type.RBRACE))
             throw new Exception("The number of opening and closing braces must match".colour_str());
 
-        // tokens.RemoveRange(0, 19);
-        // tokens.RemoveRange(0, 5);
-        // System.Console.WriteLine(parse_arithm_expr(tokens, 0.0f));
-        System.Console.WriteLine(parse_expr(tokens));
-        System.Console.WriteLine(parse_expr(tokens));
+        while (token_stack.Count > 0)
+            m_nodes.Add(parse_expr(token_stack));
     }
     public Parser(Lexer lexer) : this(lexer.get_tokens()){}
 
-    Node parse_arithm_expr(List<Token> tokens, float min_rhs_binding_power){
-        Token tok = tokens[0];
-        tokens.RemoveAt(0);
-
+    Node parse_arithm_expr(Stack<Token> tokens, float min_rhs_binding_power){
         Node lhs = new();
 
+        Token tok = tokens.Pop();
         if (tok.type.is_atom())
             lhs = new(){token = tok};
+        else if (tok.type == Token.Type.SCAN){
+            lhs.token = tok;
+
+            tok = tokens.Pop();
+            if (tok.type != Token.Type.LPAREN)
+                throw new Exception($"On line <{tok.line_number}> <scan> must be followed by <(>".colour_str());
+
+            tok = tokens.Pop();
+            if (tok.type != Token.Type.STR_LIT)
+                throw new Exception($"On line <{tok.line_number}> <scan> must contain a string literal".colour_str());
+
+            lhs.sub_nodes.Add(new(){token = tok});
+
+            tok = tokens.Pop();
+            if (tok.type != Token.Type.RPAREN)
+                throw new Exception($"On line <{tok.line_number}> <scan> must be closed by <)>".colour_str());
+        }
         else if (tok.type == Token.Type.LPAREN){
             Node temp = parse_arithm_expr(tokens, 0.0f);
 
-            if (tokens[0].type != Token.Type.RPAREN)
-                throw new Exception($"On line <{tokens[0].line_number}> expected <)>".colour_str());
-            tokens.RemoveAt(0);
+            Token t = tokens.Pop();
+            if (t.type != Token.Type.RPAREN)
+                throw new Exception($"On line <{t.line_number}> expected <)>".colour_str());
 
             lhs = temp;
         }
         else if (tok.type == Token.Type.PLUS || tok.type == Token.Type.MINUS){
-            switch (tokens[0].type){
+            switch (tokens.Peek().type){
                 case Token.Type.ID:
                 case Token.Type.FALSE:
                 case Token.Type.TRUE:
                 case Token.Type.INT_LIT:
                 case Token.Type.FLOAT_LIT:
-                    lhs = new(){token = tok, sub_nodes = [new(){token = tokens[0]}]};;
-                    tokens.RemoveAt(0);
+                    lhs = new(){token = tok, sub_nodes = [new(){token = tokens.Pop()}]};;
                     break;
                 case Token.Type.LPAREN:
                     return new(){token = tok, sub_nodes = [parse_arithm_expr(tokens, 0.0f)]};
@@ -113,20 +128,20 @@ public sealed class Parser{
             }
         }
         else
-            throw new Exception($"On line <{tokens[0].line_number}> found invalid token <{tokens[0].id}>".colour_str());
+            throw new Exception($"On line <{tokens.Peek().line_number}> found invalid token <{tokens.Peek().id}>".colour_str());
 
         Token op;
         while (true){
-            op = tokens[0];
-            if (op.type == Token.Type.RPAREN || op.type == Token.Type.SEMICOLON)
+            op = tokens.Peek();
+            if (op.type == Token.Type.RPAREN || op.type == Token.Type.LBRACE || op.type == Token.Type.SEMICOLON)
                 break;
             else if (!op.type.is_operation())
-                throw new Exception($"On line <{tokens[0].line_number}> found invalid token <{tokens[0].id}>".colour_str());
+                throw new Exception($"On line <{op.line_number}> found invalid token <{op.id}>".colour_str());
 
             (float l_bp, float r_bp) = op.type.binding_powers();
             if (l_bp < min_rhs_binding_power)
                 break;
-            tokens.RemoveAt(0);
+            tokens.Pop();
 
             Node rhs = parse_arithm_expr(tokens, r_bp);
             lhs = new(){token = op, sub_nodes = [lhs, rhs]};
@@ -134,71 +149,131 @@ public sealed class Parser{
 
         return lhs;
     }
-    Node parse_expr(List<Token> tokens){
+    Node parse_expr(Stack<Token> tokens){
         Node node = new();
 
-        switch (tokens[0].type){
-            case Token.Type.STR_LIT:
-                break;
+        if (tokens.TryPop(out Token tok)){
+            node.token = tok;
+            switch (tok.type){
+                case Token.Type.ID:
+                    tokens.Push(tok);
 
-            case Token.Type.LBRACE:
-                break;
-            case Token.Type.RBRACE:
-                break;
+                    node = parse_arithm_expr(tokens, 0.0f);
 
-            case Token.Type.LET_DECL:
-                node.token = new(){type = Token.Type.LET_DECL, id = "let"};
-                tokens.RemoveAt(0);
+                    tok = tokens.Pop();
+                    if (tok.type != Token.Type.SEMICOLON)
+                        throw new Exception($"On line <{tok.line_number}> <id> expression must be closed by <;>".colour_str());
 
-                if (tokens[0].type != Token.Type.ID)
-                    throw new Exception($"On line <{tokens[0].line_number}> <let> must be followed by an identifier".colour_str());
+                    break;
 
-                node.sub_nodes.Add(new(){token = tokens[0]});
-                tokens.RemoveAt(0);
+                case Token.Type.LET_DECL:
+                    tok = tokens.Peek();
+                    if (tok.type != Token.Type.ID)
+                        throw new Exception($"On line <{tok.line_number}> <let> must be followed by an identifier".colour_str());
 
-                if (tokens[0].type != Token.Type.COLON)
-                    throw new Exception($"On line <{tokens[0].line_number}> <{tokens[0].id}> must be followed by <:>".colour_str());
+                    node.sub_nodes.Add(new(){token = tokens.Pop()});
 
-                tokens.RemoveAt(0);
+                    tok = tokens.Peek();
+                    if (tok.type != Token.Type.COLON)
+                        throw new Exception($"On line <{tok.line_number}> <{tok.id}> must be followed by <:>".colour_str());
 
-                if (
-                    tokens[0].type != Token.Type.BOOL &&
-                    tokens[0].type != Token.Type.INT &&
-                    tokens[0].type != Token.Type.FLOAT
-                )
-                    throw new Exception($"On line <{tokens[0].line_number}> <:> must be followed by a valid type".colour_str());
+                    tokens.Pop();
 
-                node.sub_nodes.Add(new(){token = tokens[0]});
-                tokens.RemoveAt(0);
+                    tok = tokens.Peek();
+                    if (tok.type != Token.Type.BOOL && tok.type != Token.Type.INT && tok.type != Token.Type.FLOAT)
+                        throw new Exception($"On line <{tok.line_number}> <:> must be followed by a valid type".colour_str());
 
-                if (tokens[0].type != Token.Type.EQ)
-                    throw new Exception($"On line <{tokens[0].line_number}> type must be followed by <=>".colour_str());
-                tokens.RemoveAt(0);
+                    node.sub_nodes.Add(new(){token = tokens.Pop()});
 
-                node.sub_nodes[1].sub_nodes.Add(parse_arithm_expr(tokens, 0.0f));
-                tokens.RemoveAt(0);
+                    tok = tokens.Peek();
+                    if (tok.type != Token.Type.EQ)
+                        throw new Exception($"On line <{tok.line_number}> type must be followed by <=>".colour_str());
+                    tok = tokens.Peek();
 
-                break;
+                    if (tok.type == Token.Type.SCAN)
+                        node.sub_nodes[1].sub_nodes.Add(parse_expr(tokens));
+                    else{
+                        tokens.Pop();
+                        node.sub_nodes[1].sub_nodes.Add(parse_arithm_expr(tokens, 0.0f));
+                    }
+                    
+                    tok = tokens.Pop();
 
-            case Token.Type.PRINT:
-                break;
-            case Token.Type.SCAN:
-                break;
+                    break;
 
-            case Token.Type.IF:
-                break;
-            case Token.Type.ELSE:
-                break;
+                case Token.Type.PRINT:
+                    tok = tokens.Pop();
+                    if (tok.type != Token.Type.LPAREN)
+                        throw new Exception($"On line <{tok.line_number}> <print> must be followed by <(>".colour_str());
 
-            case Token.Type.WHILE:
-                break;
+                    tok = tokens.Peek();
+                    if (tok.type == Token.Type.STR_LIT){
+                        node.sub_nodes.Add(new(){token = tok});
+                        tokens.Pop();
+                    }
+                    else
+                        node.sub_nodes.Add(parse_arithm_expr(tokens, 0.0f));
 
-            case Token.Type.RETURN:
-                break;
+                    tok = tokens.Pop();
+                    if (tok.type != Token.Type.RPAREN)
+                        throw new Exception($"On line <{tok.line_number}> <print> must be closed by <)>".colour_str());
 
-            default:
-                throw new Exception($"On line <{tokens[0].line_number}> found invalid token <{tokens[0].id}>".colour_str());
+                    tok = tokens.Pop();
+                    if (tok.type != Token.Type.SEMICOLON)
+                        throw new Exception($"On line <{tok.line_number}> <print> statement must be close by <;>".colour_str());
+
+                    break;
+                case Token.Type.SCAN:
+                    throw new Exception($"On line <{tok.line_number}> not storing the result of <scan> statement is a bug".colour_str());
+
+                case Token.Type.IF:
+                case Token.Type.WHILE:
+                    node.sub_nodes.Add(parse_arithm_expr(tokens, 0.0f));
+
+                    tok = tokens.Pop();
+                    if (tok.type != Token.Type.LBRACE)
+                        throw new Exception($"On line <{tok.line_number}> <if> statement body must be put inside <{{>".colour_str());
+
+                    while (tokens.Peek().type != Token.Type.RBRACE)
+                        node.sub_nodes.Add(parse_expr(tokens));
+
+                    tok = tokens.Pop();
+                    if (tok.type != Token.Type.RBRACE)
+                        throw new Exception($"On line <{tok.line_number}> <if> statement body must closed by <}}>".colour_str());
+
+                    break;
+                case Token.Type.ELSE:
+                    tok = tokens.Peek();
+                    if (tok.type == Token.Type.LBRACE){
+                        tokens.Pop();
+
+                        while (tokens.Peek().type != Token.Type.RBRACE)
+                            node.sub_nodes.Add(parse_expr(tokens));
+
+                        tok = tokens.Pop();
+                        if (tok.type != Token.Type.RBRACE)
+                            throw new Exception($"On line <{tok.line_number}> <else> statement body must closed by <}}>".colour_str());
+                    }
+                    else
+                        node.sub_nodes.Add(parse_expr(tokens));
+
+                    break;
+
+                case Token.Type.RETURN:
+                    node.sub_nodes.Add(parse_arithm_expr(tokens, 0.0f));
+
+                    tok = tokens.Pop();
+                    if (tok.type != Token.Type.SEMICOLON)
+                        throw new Exception($"On line <{tok.line_number}> <return> statement body must closed by <;>".colour_str());
+
+                    break;
+
+                default:
+                    throw new Exception($"On line <{tok.line_number}> found invalid token <{tok.id}>".colour_str());
+            }
         }
+        else
+            node = new(){token = new(){type = Token.Type.RETURN, id = "return"}, sub_nodes = [new(){token = new(){type = Token.Type.INT_LIT, id = "0"}}]};
 
         return node;
     }
