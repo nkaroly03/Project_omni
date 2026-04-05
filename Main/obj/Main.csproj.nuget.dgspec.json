@@ -704,7 +704,11 @@
         "frameworks": {
           "net10.0": {
             "targetAlias": "net10.0",
-            "projectReferences": {}
+            "projectReferences": {
+              "C:\\Users\\giganibba840\\Desktop\\C#\\Project_omni\\Lex\\Lex.csproj": {
+                "projectPath": "C:\\Users\\giganibba840\\Desktop\\C#\\Project_omni\\Lex\\Lex.csproj"
+              }
+            }
           }
         },
         "warningProperties": {

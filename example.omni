@@ -1,5 +1,5 @@
-let a: int = 10;
-let b: float = 3.14 + a * (a + a);
+let a: int = (-(10 + 2) * -4);
+let b: float = -3.14 + -a * (a + -a);
 
 print(a);
 print(b);
@@ -9,8 +9,8 @@ let c44: int = scan("Input: ");
 if (c < 10){
     print("c < 10");
 }
-else if (c == 10){
-    print("(c == 10) == (not (c != 10)) or false and true");
+else if (c != 10){
+    print("(c != 10) == (not (c == 10)) or false and true");
 }
 else{
     print("c >= 10");

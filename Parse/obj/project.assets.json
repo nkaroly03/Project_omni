@@ -1,11 +1,30 @@
 {
   "version": 3,
   "targets": {
-    "net10.0": {}
+    "net10.0": {
+      "Lex/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v10.0",
+        "compile": {
+          "bin/placeholder/Lex.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Lex.dll": {}
+        }
+      }
+    }
   },
-  "libraries": {},
+  "libraries": {
+    "Lex/1.0.0": {
+      "type": "project",
+      "path": "../Lex/Lex.csproj",
+      "msbuildProject": "../Lex/Lex.csproj"
+    }
+  },
   "projectFileDependencyGroups": {
-    "net10.0": []
+    "net10.0": [
+      "Lex >= 1.0.0"
+    ]
   },
   "packageFolders": {
     "C:\\Users\\giganibba840\\.nuget\\packages\\": {}
@@ -33,7 +52,11 @@
       "frameworks": {
         "net10.0": {
           "targetAlias": "net10.0",
-          "projectReferences": {}
+          "projectReferences": {
+            "C:\\Users\\giganibba840\\Desktop\\C#\\Project_omni\\Lex\\Lex.csproj": {
+              "projectPath": "C:\\Users\\giganibba840\\Desktop\\C#\\Project_omni\\Lex\\Lex.csproj"
+            }
+          }
         }
       },
       "warningProperties": {

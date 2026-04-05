@@ -24,6 +24,9 @@
         }
       },
       "Parse/1.0.0": {
+        "dependencies": {
+          "Lex": "1.0.0"
+        },
         "runtime": {
           "Parse.dll": {
             "assemblyVersion": "1.0.0.0",
