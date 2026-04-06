@@ -3,7 +3,7 @@
 public static class Lex_extensions{
     extension(string self){
         public string colour_str(byte r, byte g, byte b) => $"\x1b[38;2;{r};{g};{b}m{self}\x1b[0m";
-        public string colour_str() => $"\x1b[38;2;255;0;0m{self}\x1b[0m";
+        public string colour_str() => self.colour_str(255, 0, 0);
     }
 }
 
