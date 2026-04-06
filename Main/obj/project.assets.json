@@ -2,6 +2,19 @@
   "version": 3,
   "targets": {
     "net10.0": {
+      "Interpret/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v10.0",
+        "dependencies": {
+          "Parse": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/Interpret.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Interpret.dll": {}
+        }
+      },
       "Lex/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v10.0",
@@ -28,6 +41,11 @@
     }
   },
   "libraries": {
+    "Interpret/1.0.0": {
+      "type": "project",
+      "path": "../Interpret/Interpret.csproj",
+      "msbuildProject": "../Interpret/Interpret.csproj"
+    },
     "Lex/1.0.0": {
       "type": "project",
       "path": "../Lex/Lex.csproj",
@@ -41,6 +59,7 @@
   },
   "projectFileDependencyGroups": {
     "net10.0": [
+      "Interpret >= 1.0.0",
       "Lex >= 1.0.0",
       "Parse >= 1.0.0"
     ]
@@ -72,6 +91,9 @@
         "net10.0": {
           "targetAlias": "net10.0",
           "projectReferences": {
+            "C:\\Users\\giganibba840\\Desktop\\C#\\Project_omni\\Interpret\\Interpret.csproj": {
+              "projectPath": "C:\\Users\\giganibba840\\Desktop\\C#\\Project_omni\\Interpret\\Interpret.csproj"
+            },
             "C:\\Users\\giganibba840\\Desktop\\C#\\Project_omni\\Lex\\Lex.csproj": {
               "projectPath": "C:\\Users\\giganibba840\\Desktop\\C#\\Project_omni\\Lex\\Lex.csproj"
             },

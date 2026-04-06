@@ -8,11 +8,23 @@
     ".NETCoreApp,Version=v10.0": {
       "Main/1.0.0": {
         "dependencies": {
+          "Interpret": "1.0.0",
           "Lex": "1.0.0",
           "Parse": "1.0.0"
         },
         "runtime": {
           "Main.dll": {}
+        }
+      },
+      "Interpret/1.0.0": {
+        "dependencies": {
+          "Parse": "1.0.0"
+        },
+        "runtime": {
+          "Interpret.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
         }
       },
       "Lex/1.0.0": {
@@ -38,6 +50,11 @@
   },
   "libraries": {
     "Main/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Interpret/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

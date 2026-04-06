@@ -80,9 +80,6 @@ public sealed class Parser{
             nodes.Add(parse_expr(token_stack));
         if (nodes.Last().token.type != Token.Type.RETURN)
             nodes.Add(new(){token = new(){type = Token.Type.RETURN, id = "return"}, sub_nodes = [new(){token = new(){type = Token.Type.INT_LIT, id = "0"}}]});
-
-        foreach (Node n in nodes)
-            Console.WriteLine(n);
     }
     public Parser(Lexer lexer) : this(lexer.get_tokens()){}
 
