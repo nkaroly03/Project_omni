@@ -1,11 +1,10 @@
-﻿Lex.Lexer lexer = new("../fib.omni");
+﻿string[] argv = Environment.GetCommandLineArgs();
 
-// foreach (Lex.Token tok in lexer.get_tokens())
-    // Console.WriteLine(tok);
-
+Lex.Lexer lexer = new(argv[1]);
 Parse.Parser parser = new Parse.Parser(lexer);
-// foreach (Parse.Node node in parser.nodes)
-    // Console.WriteLine(node);
+Interpret.AST_Interpreter interpreter = new(parser);
 
-Interpret.Interpreter interpreter = new(parser);
-System.Console.WriteLine($"return {interpreter.run()}");
+foreach (Parse.Node node in parser.nodes)
+    Console.WriteLine(node);
+
+// System.Console.WriteLine($"return {interpreter.run()}");

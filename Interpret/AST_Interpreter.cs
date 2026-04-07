@@ -5,7 +5,7 @@ using Parse;
 using System.Diagnostics;
 using System.Globalization;
 
-public sealed class Interpreter{
+public sealed class AST_Interpreter{
     Dictionary<string, Value> m_ids;
     Dictionary<string, int> m_id_counts;
     List<Node> m_nodes;
@@ -86,12 +86,11 @@ public sealed class Interpreter{
                     try{ return new(Convert.ToInt32(s)); }
                     catch (FormatException){ return new(Convert.ToSingle(s, CultureInfo.InvariantCulture)); }
                 }
+
             case Token.Type.AND:
+                return new(calculate_expr(node.sub_nodes[0]).to_bool() && calculate_expr(node.sub_nodes[1]).to_bool());
             case Token.Type.OR:
-                return (node.token.type == Token.Type.AND)
-                    ? new(calculate_expr(node.sub_nodes[0]).to_bool() && calculate_expr(node.sub_nodes[1]).to_bool())
-                    : new(calculate_expr(node.sub_nodes[0]).to_bool() || calculate_expr(node.sub_nodes[1]).to_bool())
-                ;
+                return new(calculate_expr(node.sub_nodes[0]).to_bool() || calculate_expr(node.sub_nodes[1]).to_bool());
             case Token.Type.NOT:
                 return new(!calculate_expr(node.sub_nodes[0]).to_bool());
 
@@ -170,7 +169,9 @@ public sealed class Interpreter{
         return result!;
     }
 
-    public Interpreter(Parser parser) => (m_ids, m_id_counts, m_nodes) = (new(), new(), parser.nodes);
+    public AST_Interpreter(Parser parser) => (m_ids, m_id_counts, m_nodes) = (new(), new(), parser.nodes);
+    public AST_Interpreter(Lexer lexer) : this(new Parser(lexer)){}
+    public AST_Interpreter(string path) : this(new Parser(path)){}
 
     public Value run(){
         Value? temp = null;

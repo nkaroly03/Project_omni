@@ -62,27 +62,6 @@ public sealed class Node{
 }
 
 public sealed class Parser{
-    public List<Node> nodes{ get; init; }
-
-    public Parser(List<Token> tokens){
-        tokens.Reverse();
-
-        nodes = new(); 
-
-        Stack<Token> token_stack = new(tokens);
-
-        if (tokens.Count((t) => t.type == Token.Type.LPAREN) != tokens.Count((t) => t.type == Token.Type.RPAREN))
-            throw new Exception("The number of opening and closing parenthesis' must match".colour_str());
-        if (tokens.Count((t) => t.type == Token.Type.LBRACE) != tokens.Count((t) => t.type == Token.Type.RBRACE))
-            throw new Exception("The number of opening and closing braces must match".colour_str());
-
-        while (token_stack.Count > 0)
-            nodes.Add(parse_expr(token_stack));
-        if (nodes.Last().token.type != Token.Type.RETURN)
-            nodes.Add(new(){token = new(){type = Token.Type.RETURN, id = "return"}, sub_nodes = [new(){token = new(){type = Token.Type.INT_LIT, id = "0"}}]});
-    }
-    public Parser(Lexer lexer) : this(lexer.get_tokens()){}
-
     Node parse_arithm_expr(Stack<Token> tokens, float min_rhs_binding_power){
         Node lhs = new();
 
@@ -125,7 +104,8 @@ public sealed class Parser{
                     lhs = new(){token = tok, sub_nodes = [new(){token = tokens.Pop()}]};;
                     break;
                 case Token.Type.LPAREN:
-                    return new(){token = tok, sub_nodes = [parse_arithm_expr(tokens, 0.0f)]};
+                    lhs = new(){token = tok, sub_nodes = [parse_arithm_expr(tokens, Token.Type.NOT.binding_powers().Item2)]};
+                    break;
                 default:
                     throw new Exception($"On line <{tok.line_number}> found invalid token <{tok.id}>".colour_str());
             }
@@ -283,6 +263,28 @@ public sealed class Parser{
 
         return node;
     }
+
+    public List<Node> nodes{ get; init; }
+
+    public Parser(List<Token> tokens){
+        tokens.Reverse();
+
+        nodes = new(); 
+
+        Stack<Token> token_stack = new(tokens);
+
+        if (tokens.Count((t) => t.type == Token.Type.LPAREN) != tokens.Count((t) => t.type == Token.Type.RPAREN))
+            throw new Exception("The number of opening and closing parenthesis' must match".colour_str());
+        if (tokens.Count((t) => t.type == Token.Type.LBRACE) != tokens.Count((t) => t.type == Token.Type.RBRACE))
+            throw new Exception("The number of opening and closing braces must match".colour_str());
+
+        while (token_stack.Count > 0)
+            nodes.Add(parse_expr(token_stack));
+        if (nodes.Last().token.type != Token.Type.RETURN)
+            nodes.Add(new(){token = new(){type = Token.Type.RETURN, id = "return"}, sub_nodes = [new(){token = new(){type = Token.Type.INT_LIT, id = "0"}}]});
+    }
+    public Parser(Lexer lexer) : this(lexer.get_tokens()){}
+    public Parser(string path) : this(new Lexer(path)){}
 
     /*
     -----------------------------------------------------------------------

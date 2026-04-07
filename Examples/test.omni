@@ -30,4 +30,4 @@ else{
     }
 }
 
-return b - -2.0 / 1.1;
+return b - -2 / 1.1;
