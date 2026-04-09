@@ -2,6 +2,20 @@
   "version": 3,
   "targets": {
     "net10.0": {
+      "Compile/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v10.0",
+        "dependencies": {
+          "Lex": "1.0.0",
+          "Parse": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/Compile.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Compile.dll": {}
+        }
+      },
       "Interpret/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v10.0",
@@ -41,6 +55,11 @@
     }
   },
   "libraries": {
+    "Compile/1.0.0": {
+      "type": "project",
+      "path": "../Compile/Compile.csproj",
+      "msbuildProject": "../Compile/Compile.csproj"
+    },
     "Interpret/1.0.0": {
       "type": "project",
       "path": "../Interpret/Interpret.csproj",
@@ -59,6 +78,7 @@
   },
   "projectFileDependencyGroups": {
     "net10.0": [
+      "Compile >= 1.0.0",
       "Interpret >= 1.0.0",
       "Lex >= 1.0.0",
       "Parse >= 1.0.0"
@@ -91,6 +111,9 @@
         "net10.0": {
           "targetAlias": "net10.0",
           "projectReferences": {
+            "C:\\Users\\giganibba840\\Desktop\\C#\\Project_omni\\Compile\\Compile.csproj": {
+              "projectPath": "C:\\Users\\giganibba840\\Desktop\\C#\\Project_omni\\Compile\\Compile.csproj"
+            },
             "C:\\Users\\giganibba840\\Desktop\\C#\\Project_omni\\Interpret\\Interpret.csproj": {
               "projectPath": "C:\\Users\\giganibba840\\Desktop\\C#\\Project_omni\\Interpret\\Interpret.csproj"
             },

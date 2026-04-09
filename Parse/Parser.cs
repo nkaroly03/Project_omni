@@ -61,8 +61,8 @@ public sealed class Node{
     public override string ToString() => tostring_helper();
 }
 
-public sealed class Parser{
-    Node parse_arithm_expr(Stack<Token> tokens, float min_rhs_binding_power){
+public static class Parser{
+    static Node parse_arithm_expr(Stack<Token> tokens, float min_rhs_binding_power){
         Node lhs = new();
 
         Token tok = tokens.Pop();
@@ -132,7 +132,7 @@ public sealed class Parser{
 
         return lhs;
     }
-    Node parse_expr(Stack<Token> tokens){
+    static Node parse_expr(Stack<Token> tokens){
         Node node = new();
 
         Token tok = tokens.Pop();
@@ -148,6 +148,9 @@ public sealed class Parser{
                     throw new Exception($"On line <{tok.line_number}> <id> expression must be closed by <;>".colour_str());
 
                 break;
+
+            case Token.Type.SEMICOLON:
+                throw new Exception($"On line <{tok.line_number}> use of empty statement is a bug");
 
             case Token.Type.LET_DECL:
                 tok = tokens.Peek();
@@ -207,7 +210,7 @@ public sealed class Parser{
 
                 break;
             case Token.Type.SCAN:
-                throw new Exception($"On line <{tok.line_number}> not storing the result of <scan> statement is a bug".colour_str());
+                throw new Exception($"On line <{tok.line_number}> discarding the result of <scan> statement is a bug".colour_str());
 
             case Token.Type.IF:
             case Token.Type.WHILE:
@@ -264,12 +267,10 @@ public sealed class Parser{
         return node;
     }
 
-    public List<Node> nodes{ get; init; }
-
-    public Parser(List<Token> tokens){
+    public static List<Node> build_AST(List<Token> tokens){
         tokens.Reverse();
 
-        nodes = new(); 
+        List<Node> nodes = new(); 
 
         Stack<Token> token_stack = new(tokens);
 
@@ -282,9 +283,9 @@ public sealed class Parser{
             nodes.Add(parse_expr(token_stack));
         if (nodes.Last().token.type != Token.Type.RETURN)
             nodes.Add(new(){token = new(){type = Token.Type.RETURN, id = "return"}, sub_nodes = [new(){token = new(){type = Token.Type.INT_LIT, id = "0"}}]});
+
+        return nodes;
     }
-    public Parser(Lexer lexer) : this(lexer.get_tokens()){}
-    public Parser(string path) : this(new Lexer(path)){}
 
     /*
     -----------------------------------------------------------------------

@@ -4,6 +4,7 @@
     <ProjectReference Include="..\Lex\Lex.csproj" />
     <ProjectReference Include="..\Parse\Parse.csproj" />
     <ProjectReference Include="..\Interpret\Interpret.csproj" />
+    <ProjectReference Include="..\Compile\Compile.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

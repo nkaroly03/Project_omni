@@ -65,11 +65,9 @@ public readonly struct Token{
     public override string ToString() => $"{{.line_number = {line_number}, .type = {type}, .id = {id}}}";
 }
 
-public sealed class Lexer{
-    List<Token> m_tokens;
-
-    public Lexer(string path){
-        m_tokens = new();
+public static class Lexer{
+    public static List<Token> tokenize(string path){
+        List<Token> tokens = new();
 
         if (!path.EndsWith(".omni"))
             throw new Exception("Bad file extension".colour_str());
@@ -187,11 +185,11 @@ public sealed class Lexer{
                         break;
                 }
 
-                m_tokens.Add(new(){type = token_type, id = s, line_number = line_number + 1});
+                tokens.Add(new(){type = token_type, id = s, line_number = line_number + 1});
             }
             ++line_number;
         }
-    }
 
-    public List<Token> get_tokens() => new(m_tokens);
+        return tokens;
+    }
 }

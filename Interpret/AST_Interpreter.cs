@@ -8,7 +8,7 @@ using System.Globalization;
 public sealed class AST_Interpreter{
     Dictionary<string, Value> m_ids;
     Dictionary<string, int> m_id_counts;
-    List<Node> m_nodes;
+    List<Node> m_AST;
 
     void increment_id_counts(){
         List<string> keys = m_ids.Keys.ToList();
@@ -169,14 +169,14 @@ public sealed class AST_Interpreter{
         return result!;
     }
 
-    public AST_Interpreter(Parser parser) => (m_ids, m_id_counts, m_nodes) = (new(), new(), parser.nodes);
-    public AST_Interpreter(Lexer lexer) : this(new Parser(lexer)){}
-    public AST_Interpreter(string path) : this(new Parser(path)){}
+    public AST_Interpreter(List<Node> AST) => (m_ids, m_id_counts, m_AST) = (new(), new(), AST);
+    public AST_Interpreter(List<Token> tokens) : this(Parser.build_AST(tokens)){}
+    public AST_Interpreter(string path) : this(Lexer.tokenize(path)){}
 
     public Value run(){
         Value? temp = null;
 
-        temp = run(m_nodes, ref temp);
+        temp = run(m_AST, ref temp);
 
         m_ids = new();
         m_id_counts = new();

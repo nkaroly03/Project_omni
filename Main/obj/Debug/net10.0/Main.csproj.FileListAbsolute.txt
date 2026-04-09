@@ -21,3 +21,5 @@ C:\Users\giganibba840\Desktop\C#\Project_omni\Main\bin\Debug\net10.0\Parse.dll
 C:\Users\giganibba840\Desktop\C#\Project_omni\Main\bin\Debug\net10.0\Parse.pdb
 C:\Users\giganibba840\Desktop\C#\Project_omni\Main\bin\Debug\net10.0\Interpret.dll
 C:\Users\giganibba840\Desktop\C#\Project_omni\Main\bin\Debug\net10.0\Interpret.pdb
+C:\Users\giganibba840\Desktop\C#\Project_omni\Main\bin\Debug\net10.0\Compile.dll
+C:\Users\giganibba840\Desktop\C#\Project_omni\Main\bin\Debug\net10.0\Compile.pdb

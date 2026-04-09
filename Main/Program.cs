@@ -1,10 +1,18 @@
-﻿string[] argv = Environment.GetCommandLineArgs();
+﻿using Compile;
+using Lex;
+using Parse;
 
-Lex.Lexer lexer = new(argv[1]);
-Parse.Parser parser = new Parse.Parser(lexer);
-Interpret.AST_Interpreter interpreter = new(parser);
+string[] argv = Environment.GetCommandLineArgs();
 
-foreach (Parse.Node node in parser.nodes)
-    Console.WriteLine(node);
+List<Token> tokens = Lexer.tokenize(argv[1]);
+List<Node> AST = Parser.build_AST(tokens);
+
+Interpret.AST_Interpreter interpreter = new(AST);
+
+// foreach (Node node in AST)
+    // Console.WriteLine(node);
+
+// Console.WriteLine(AST);
+Console.WriteLine(Compiler.to_IR(AST));
 
 // System.Console.WriteLine($"return {interpreter.run()}");
