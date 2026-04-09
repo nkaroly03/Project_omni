@@ -243,7 +243,7 @@ public static class Parser{
                 }
                 else if (tok.type == Token.Type.IF){
                     node.sub_nodes.Add(parse_expr(tokens));
-                    if (tokens.Peek().type == Token.Type.ELSE)
+                    if (tokens.Count > 0 && tokens.Peek().type == Token.Type.ELSE)
                         node.sub_nodes.Add(parse_expr(tokens));
                 }
                 else
