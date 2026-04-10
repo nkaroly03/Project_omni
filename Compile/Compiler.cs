@@ -264,6 +264,7 @@ public static class Compiler{
                 break;
 
             case Token.Type.RETURN:
+                to_IR(current_AST_node.sub_nodes[0], null, stack_info, sb, ref stack_size, ref let_decl_counter);
                 sb.add_instruction($"{stack_size - 1} ; RET");
                 --stack_size;
                 break;
@@ -346,7 +347,7 @@ public static class Compiler{
             switch (lhs){
                 case "PUSH":
                     if (rhs.StartsWith("SP")){
-                        as_bytes = BitConverter.GetBytes(Convert.ToInt32(rhs[3..(rhs.Length - 1)]));
+                        as_bytes = BitConverter.GetBytes(int.Parse(rhs[3..(rhs.Length - 1)]));
                         bytecode.Add((byte)Op_code.PUSH_FROM_SP);
                         bytecode.AddRange(as_bytes);
                     }
@@ -355,12 +356,12 @@ public static class Compiler{
                     else if (rhs == "TRUE")
                         bytecode.Add((byte)Op_code.PUSH_TRUE);
                     else if (rhs.IndexOf('.') < 0){
-                        as_bytes = BitConverter.GetBytes(Convert.ToInt32(rhs));
+                        as_bytes = BitConverter.GetBytes(int.Parse(rhs));
                         bytecode.Add((byte)Op_code.PUSH_INT);
                         bytecode.AddRange(as_bytes);
                     }
                     else{
-                        as_bytes = BitConverter.GetBytes(Convert.ToSingle(rhs, System.Globalization.CultureInfo.InvariantCulture));
+                        as_bytes = BitConverter.GetBytes(float.Parse(rhs, System.Globalization.CultureInfo.InvariantCulture));
                         bytecode.Add((byte)Op_code.PUSH_FLOAT);
                         bytecode.AddRange(as_bytes);
                     }
@@ -372,13 +373,13 @@ public static class Compiler{
                     bytecode.Add((byte)Op_code.RET);
                     break;
                 case "MOV":
-                    as_bytes = BitConverter.GetBytes(Convert.ToInt32(rhs[3..(rhs.Length - 1)]));
+                    as_bytes = BitConverter.GetBytes(int.Parse(rhs[3..(rhs.Length - 1)]));
                     bytecode.Add((byte)Op_code.MOV);
                     bytecode.AddRange(as_bytes);
                     break;
                 case "JMP":
                 case "JMPZ":
-                    int jmp_count = Convert.ToInt32(rhs);
+                    int jmp_count = int.Parse(rhs);
                     int jmp_byte_count = (jmp_count >= 0)
                         ? count_bytes_in_instructions(instructions[(i + 1)..][..(jmp_count - 1)]) - 1
                         : -(count_bytes_in_instructions(instructions[(i + jmp_count)..][..(1 - jmp_count)]) + 1)

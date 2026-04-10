@@ -31,6 +31,7 @@
       },
       "Interpret/1.0.0": {
         "dependencies": {
+          "Compile": "1.0.0",
           "Parse": "1.0.0"
         },
         "runtime": {

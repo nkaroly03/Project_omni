@@ -1,4 +1,5 @@
 ﻿using Compile;
+using Interpret;
 using Lex;
 using Parse;
 
@@ -7,21 +8,28 @@ string[] argv = Environment.GetCommandLineArgs();
 List<Token> tokens = Lexer.tokenize(argv[1]);
 List<Node> AST = Parser.build_AST(tokens);
 
-Interpret.AST_Interpreter interpreter = new(AST);
+AST_Interpreter interpreter = new(AST);
 
-// foreach (Node node in AST)
-    // Console.WriteLine(node);
+foreach (Node node in AST)
+    Console.WriteLine(node);
 
-// Console.WriteLine(new string('-', 20));
+Console.WriteLine(new string('-', 40));
 
 string IR = Compiler.to_IR(AST);
 Console.WriteLine(IR);
-Console.WriteLine(new string('-', 20));
-foreach ((int i, byte instruction) in Compiler.to_bytecode(IR).Index()){
+Console.WriteLine(new string('-', 40));
+
+byte[] bytecode = Compiler.to_bytecode(IR);
+foreach ((int i, byte instruction) in bytecode.Index()){
     Console.Write($"{instruction.ToString().PadLeft(3)}, ");
     if ((i + 1) % 10 == 0)
         Console.WriteLine();
 }
+
+Console.WriteLine();
+Console.WriteLine(new string('-', 40));
+
+Console.WriteLine($"return value: {Interpreter.run(bytecode)}");
 
 // System.Console.WriteLine($"return {interpreter.run()}");
 

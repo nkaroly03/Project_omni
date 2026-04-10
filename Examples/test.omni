@@ -6,10 +6,8 @@ print(b + 3.25);
 
 let c44: int = scan("Input: ") + 1;
 
-c44 = a + b;
-
 if (c44 < 10){
-    let d: bool = not false;
+    let e: bool = not false;
     print("else if");
     print((c44 == 10) == (not (c44 != 10)));
 }
@@ -18,4 +16,15 @@ else{
     print("c44 == 10");
 }
 
-while (true){}
+while (c44 < 20){
+    if (c44 % 2 == 0){
+        print("Even");
+    }
+    else if (c44 % 2 == 1){
+        print("Odd");
+    }
+    else{
+        print("unreachable");
+    }
+    c44 = c44 + 1;
+}
