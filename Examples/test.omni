@@ -18,18 +18,4 @@ else{
     print("c44 == 10");
 }
 
-while (c44 < 10){
-    let f: int = 0;
-    if (c44 % 2 == 0){
-        print("even");
-    }
-    else if (c44 % 2 == 1){
-        print("odd");
-    }
-    else if (a + b * a + b >= 30){
-        print("a + b * a + b >= 30");
-    }
-    else{
-        print("unreachable");
-    }
-}
+while (true){}

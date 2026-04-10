@@ -185,7 +185,7 @@ public static class Lexer{
                         break;
                 }
 
-                tokens.Add(new(){type = token_type, id = s, line_number = line_number + 1});
+                tokens.Add(new(){type = token_type, id = (token_type != Token.Type.STR_LIT) ? s : s.Trim('"'), line_number = line_number + 1});
             }
             ++line_number;
         }

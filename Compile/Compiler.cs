@@ -7,11 +7,54 @@ using System.Text;
 static class Compiler_extensions{
     extension(StringBuilder self){
         public void add_instruction(string str) => self.AppendLine(Compiler.M_INDENT + str);
-        public int count_instructions() => self.ToString().Split('\n').Length;
+        public int count_instructions() => self.ToString().Split(Environment.NewLine).Length;
     }
 }
 
 public static class Compiler{
+    public enum Op_code : byte{
+        PUSH_FROM_SP,
+        PUSH_FALSE,
+        PUSH_TRUE,
+        PUSH_INT,
+        PUSH_FLOAT,
+
+        POP,
+
+        RET,
+
+        MOV,
+
+        JMP,
+        JMPZ,
+
+        PRINT_STR,
+        PRINT,
+
+        SCAN,
+
+        TO_BOOL,
+        TO_INT,
+        TO_FLOAT,
+
+        ADD,
+        SUB,
+        MUL,
+        DIV,
+        MOD,
+
+        NEG,
+        AND,
+        OR,
+
+        CMP_LE,
+        CMP_LEQ,
+        CMP_GE,
+        CMP_GEQ,
+        CMP_EQ,
+        CMP_NEQ,
+    }
+
     internal const string M_INDENT = "    ";
 
     static bool to_IR(Node current_AST_node, Node? next_AST_node, OrderedDictionary<string, int> stack_info, StringBuilder sb, ref int stack_size, ref int let_decl_counter){
@@ -137,7 +180,7 @@ public static class Compiler{
             case Token.Type.PRINT:
                 Node print_sub_node = current_AST_node.sub_nodes[0];
                 if (print_sub_node.token.type == Token.Type.STR_LIT)
-                    sb.add_instruction($"{stack_size} ; PRINT {print_sub_node.token.id}");
+                    sb.add_instruction($"{stack_size} ; PRINT \"{print_sub_node.token.id}\"");
                 else{
                     to_IR(print_sub_node, null, stack_info, sb, ref stack_size, ref let_decl_counter);
                     sb.add_instruction($"{stack_size - 1} ; PRINT");
@@ -145,7 +188,7 @@ public static class Compiler{
                 }
                 break;
             case Token.Type.SCAN:
-                sb.add_instruction($"{stack_size + 1} ; SCAN {current_AST_node.token.id}");
+                sb.add_instruction($"{stack_size + 1} ; SCAN \"{current_AST_node.sub_nodes[0].token.id}\"");
                 ++stack_size;
                 break;
 
@@ -217,7 +260,7 @@ public static class Compiler{
                 while_condition_sb.add_instruction($"{stack_size} ; JMPZ {while_sb.count_instructions() + 1}");
                 sb.Append(while_condition_sb);
                 sb.Append(while_sb);
-                sb.add_instruction($"{stack_size} : JMP -{while_condition_sb.count_instructions() + while_sb.count_instructions() - 2}");
+                sb.add_instruction($"{stack_size} ; JMP -{while_condition_sb.count_instructions() + while_sb.count_instructions() - 2}");
                 break;
 
             case Token.Type.RETURN:
@@ -239,8 +282,12 @@ public static class Compiler{
 
         bool was_if = false;
         foreach ((Node current_AST_node, Node next_AST_node) in AST[..(AST.Count - 1)].Zip(AST[1..])){
-            was_if = (!was_if) ? to_IR(current_AST_node, next_AST_node, stack_info, sb, ref stack_size, ref let_decl_counter) : false;
-            sb.AppendLine();
+            if (!was_if){
+                was_if = to_IR(current_AST_node, next_AST_node, stack_info, sb, ref stack_size, ref let_decl_counter);
+                sb.AppendLine();
+            }
+            else
+                was_if = false;
         }
         to_IR(AST.Last(), null, stack_info, sb, ref stack_size, ref let_decl_counter);
 
@@ -251,4 +298,165 @@ public static class Compiler{
     }
     public static string to_IR(List<Token> tokens) => to_IR(Parser.build_AST(tokens));
     public static string to_IR(string path) => to_IR(Lexer.tokenize(path));
+
+    static int count_bytes_in_instructions(string[] instructions){
+        int instruction_byte_count = 0;
+
+        foreach (string instruction in instructions){
+            instruction_byte_count += sizeof(Op_code);
+            string[] split_instruction = [
+                instruction.Split(' ', StringSplitOptions.TrimEntries)[0],
+                (instruction.IndexOf(' ') >= 0) ? instruction[(instruction.IndexOf(' ') + 1)..].Trim() : ""
+            ];
+            (string lhs, string rhs) = (split_instruction[0], split_instruction[1]);
+            switch (lhs){
+                case "PUSH":
+                    if (rhs != "FALSE" && rhs != "TRUE")
+                        instruction_byte_count += ((rhs.StartsWith("SP") || rhs.IndexOf('.') < 0) ? sizeof(int) : sizeof(float));
+                    break;
+                case "MOV":
+                case "JMP":
+                case "JMPZ":
+                    instruction_byte_count += sizeof(int);
+                    break;
+                case "PRINT":
+                    instruction_byte_count += (Convert.ToInt32(rhs.Length > 0) * (sizeof(int) + Encoding.UTF8.GetBytes(rhs.Trim('"')).Length));
+                    break;
+                case "SCAN":
+                    instruction_byte_count += (sizeof(int) + Encoding.UTF8.GetBytes(rhs).Length);
+                    break;
+            }
+        }
+
+        return instruction_byte_count;
+    }
+
+    public static byte[] to_bytecode(string IR){
+        List<byte> bytecode = new();
+        string[] instructions = IR.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
+        for (int i = 0; i < instructions.Length; ++i)
+            instructions[i] = instructions[i].Split(';')[1].Trim();
+        foreach ((int i, string instruction) in instructions.Index()){
+            string[] split_instruction = [
+                instruction.Split(' ', StringSplitOptions.TrimEntries)[0],
+                (instruction.IndexOf(' ') >= 0) ? instruction[(instruction.IndexOf(' ') + 1)..].Trim() : ""
+            ];
+            (string lhs, string rhs) = (split_instruction[0], split_instruction[1]);
+            byte[] as_bytes;
+            switch (lhs){
+                case "PUSH":
+                    if (rhs.StartsWith("SP")){
+                        as_bytes = BitConverter.GetBytes(Convert.ToInt32(rhs[3..(rhs.Length - 1)]));
+                        bytecode.Add((byte)Op_code.PUSH_FROM_SP);
+                        bytecode.AddRange(as_bytes);
+                    }
+                    else if (rhs == "FALSE")
+                        bytecode.Add((byte)Op_code.PUSH_FALSE);
+                    else if (rhs == "TRUE")
+                        bytecode.Add((byte)Op_code.PUSH_TRUE);
+                    else if (rhs.IndexOf('.') < 0){
+                        as_bytes = BitConverter.GetBytes(Convert.ToInt32(rhs));
+                        bytecode.Add((byte)Op_code.PUSH_INT);
+                        bytecode.AddRange(as_bytes);
+                    }
+                    else{
+                        as_bytes = BitConverter.GetBytes(Convert.ToSingle(rhs, System.Globalization.CultureInfo.InvariantCulture));
+                        bytecode.Add((byte)Op_code.PUSH_FLOAT);
+                        bytecode.AddRange(as_bytes);
+                    }
+                    break;
+                case "POP":
+                    bytecode.Add((byte)Op_code.POP);
+                    break;
+                case "RET":
+                    bytecode.Add((byte)Op_code.RET);
+                    break;
+                case "MOV":
+                    as_bytes = BitConverter.GetBytes(Convert.ToInt32(rhs[3..(rhs.Length - 1)]));
+                    bytecode.Add((byte)Op_code.MOV);
+                    bytecode.AddRange(as_bytes);
+                    break;
+                case "JMP":
+                case "JMPZ":
+                    int jmp_count = Convert.ToInt32(rhs);
+                    int jmp_byte_count = (jmp_count >= 0)
+                        ? count_bytes_in_instructions(instructions[(i + 1)..][..(jmp_count - 1)]) - 1
+                        : -(count_bytes_in_instructions(instructions[(i + jmp_count)..][..(1 - jmp_count)]) + 1)
+                    ;
+                    as_bytes = BitConverter.GetBytes(jmp_byte_count);
+                    bytecode.Add((lhs == "JMP") ? (byte)Op_code.JMP : (byte)Op_code.JMPZ);
+                    bytecode.AddRange(as_bytes);
+                    break;
+                case "PRINT":
+                    if (rhs.Length > 0){
+                        as_bytes = Encoding.UTF8.GetBytes(rhs.Trim('"'));
+                        bytecode.Add((byte)Op_code.PRINT_STR);
+                        bytecode.AddRange(BitConverter.GetBytes(as_bytes.Length));
+                        bytecode.AddRange(as_bytes);
+                    }
+                    else
+                        bytecode.Add((byte)Op_code.PRINT);
+                    break;
+                case "SCAN":
+                    as_bytes = Encoding.UTF8.GetBytes(rhs.Trim('"'));
+                    bytecode.Add((byte)Op_code.SCAN);
+                    bytecode.AddRange(BitConverter.GetBytes(as_bytes.Length));
+                    bytecode.AddRange(as_bytes);
+                    break;
+                case "TO_BOOL":
+                    bytecode.Add((byte)Op_code.TO_BOOL);
+                    break;
+                case "TO_INT":
+                    bytecode.Add((byte)Op_code.TO_INT);
+                    break;
+                case "TO_FLOAT":
+                    bytecode.Add((byte)Op_code.TO_FLOAT);
+                    break;
+                case "ADD":
+                    bytecode.Add((byte)Op_code.ADD);
+                    break;
+                case "SUB":
+                    bytecode.Add((byte)Op_code.SUB);
+                    break;
+                case "MUL":
+                    bytecode.Add((byte)Op_code.MUL);
+                    break;
+                case "DIV":
+                    bytecode.Add((byte)Op_code.DIV);
+                    break;
+                case "MOD":
+                    bytecode.Add((byte)Op_code.MOD);
+                    break;
+                case "NEG":
+                    bytecode.Add((byte)Op_code.NEG);
+                    break;
+                case "AND":
+                    bytecode.Add((byte)Op_code.AND);
+                    break;
+                case "OR":
+                    bytecode.Add((byte)Op_code.OR);
+                    break;
+                case "CMP_LE":
+                    bytecode.Add((byte)Op_code.CMP_LE);
+                    break;
+                case "CMP_LEQ":
+                    bytecode.Add((byte)Op_code.CMP_LEQ);
+                    break;
+                case "CMP_GE":
+                    bytecode.Add((byte)Op_code.CMP_GE);
+                    break;
+                case "CMP_GEQ":
+                    bytecode.Add((byte)Op_code.CMP_GEQ);
+                    break;
+                case "CMP_EQ":
+                    bytecode.Add((byte)Op_code.CMP_EQ);
+                    break;
+                case "CMP_NEQ":
+                    bytecode.Add((byte)Op_code.CMP_NEQ);
+                    break;
+            }
+        }
+
+        return bytecode.ToArray();
+    }
 }
