@@ -1,0 +1,27 @@
+let a: int = 0;
+let b: int = 1;
+
+let i: int = 0;
+while (a >= 0){
+    i = i + 1;
+
+    let c: int = a + b;
+
+    print("fib #");
+    print(i);
+    print(": ");
+    print(a);
+    print("\n");
+
+    let sleep: int = 0;
+    while (sleep < 50000){ sleep = sleep + 1; }
+
+    a = b;
+    b = c;
+}
+
+print("Reached #");
+print(i);
+print(" before overflow\n");
+
+return a;

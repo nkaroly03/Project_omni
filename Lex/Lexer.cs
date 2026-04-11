@@ -74,8 +74,8 @@ public static class Lexer{
 
         string file_lines = File.ReadAllText(path);
 
-        if (
-            !((Func<bool>)(
+        if (!(
+            (Func<bool>)(
                 () => {
                     bool quote_is_closed = true;
                     bool was_escaped = false;
@@ -91,8 +91,8 @@ public static class Lexer{
                     }
                     return quote_is_closed;
                 }
-            ))()
-        )
+            )
+        )())
             throw new Exception("Unclosed string literal".colour_str());
 
         int line_idx = 0;
@@ -148,20 +148,22 @@ public static class Lexer{
 
                     "return" => Token.Type.RETURN,
 
-                    _ => token_type = ((Func<Token.Type>)(
-                        () => {
-                            if (line.All((c) => char.IsDigit(c)))
-                                return Token.Type.INT_LIT;
-                            else if (line.Count((c) => c == '.') == 1 && line[0] != '.' && line.All((c) => char.IsDigit(c) || c == '.'))
-                                return Token.Type.FLOAT_LIT;
-                            else if (line[0] == '"')
-                                return Token.Type.STR_LIT;
-                            else if (!char.IsDigit(line[0]) && line.All((c) => char.IsAsciiLetter(c) || char.IsDigit(c) || c == '_'))
-                                return Token.Type.ID;
-                            else
-                                throw new Exception($"On line <{line_idx + 1}> found invalid token <{line}>".colour_str());
-                        }
-                    ))(),
+                    _ => (
+                        (Func<Token.Type>)(
+                            () => {
+                                if (line.All((c) => char.IsDigit(c)))
+                                    return Token.Type.INT_LIT;
+                                else if (line.Count((c) => c == '.') == 1 && line[0] != '.' && line.All((c) => char.IsDigit(c) || c == '.'))
+                                    return Token.Type.FLOAT_LIT;
+                                else if (line[0] == '"')
+                                    return Token.Type.STR_LIT;
+                                else if (!char.IsDigit(line[0]) && line.All((c) => char.IsAsciiLetter(c) || char.IsDigit(c) || c == '_'))
+                                    return Token.Type.ID;
+                                else
+                                    throw new Exception($"On line <{line_idx + 1}> found invalid token <{line}>".colour_str());
+                            }
+                        )
+                    )(),
                 };
                 if (tokens.Count > 0 && tokens.Last().type == Token.Type.STR_LIT && token_type == Token.Type.STR_LIT)
                     tokens[tokens.Count - 1] = tokens.Last() with{id = tokens.Last().id + line[1..(line.Length - 1)]};

@@ -6,7 +6,7 @@ using System.Text;
 
 static class Compiler_extensions{
     extension(StringBuilder self){
-        public void add_instruction(string str) => self.AppendLine(Compiler.M_INDENT + str);
+        public void add_instruction(string str) => self.AppendLine($"    {str}");
         public int count_instructions() => self.ToString().Split(Environment.NewLine).Length;
     }
     extension(string self){
@@ -57,8 +57,6 @@ public static class Compiler{
         CMP_EQ,
         CMP_NEQ,
     }
-
-    internal const string M_INDENT = "    ";
 
     static bool to_IR(Node current_AST_node, Node? next_AST_node, OrderedDictionary<string, int> stack_info, StringBuilder sb, ref int stack_size, ref int let_decl_counter){
         switch (current_AST_node.token.type){

@@ -1,6 +1,7 @@
 ﻿namespace Parse;
 
 using Lex;
+using System.Text;
 
 static class Parse_extensions{
     extension(Token.Type self){
@@ -42,20 +43,22 @@ public sealed class Node{
     public Token token;
     public List<Node> sub_nodes = new();
 
-    void tostring_helper_recurse(ref string s, int indent = 0){
-        s += (new string(' ', indent) + token.id + '\n');
+    void tostring_helper(StringBuilder sb, int indent = 0){
+        sb.Append(' ', indent);
+        sb.AppendLine(token.id);
 
         foreach (Node n in sub_nodes)
-            n.tostring_helper_recurse(ref s, indent + 4);
+            n.tostring_helper(sb, indent + 4);
     }
     string tostring_helper(){
-        string s = string.Empty;
+        StringBuilder sb = new();
 
-        tostring_helper_recurse(ref s);
+        tostring_helper(sb);
 
-        s += (new string('-', 20) + '\n');
+        sb.Append('-', 20);
+        sb.AppendLine();
 
-        return s;
+        return sb.ToString();
     }
 
     public override string ToString() => tostring_helper();
