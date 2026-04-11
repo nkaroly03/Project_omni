@@ -9,6 +9,9 @@ static class Compiler_extensions{
         public void add_instruction(string str) => self.AppendLine(Compiler.M_INDENT + str);
         public int count_instructions() => self.ToString().Split(Environment.NewLine).Length;
     }
+    extension(string self){
+        public string get_string_literal() => System.Text.RegularExpressions.Regex.Unescape(self[1..(self.Length - 1)]);
+    }
 }
 
 public static class Compiler{
@@ -291,10 +294,10 @@ public static class Compiler{
                     break;
                 case "PRINT":
                     if (rhs.Length > 0)
-                        instruction_byte_count += (sizeof(int) + Encoding.UTF8.GetBytes(rhs.Trim('"')).Length);
+                        instruction_byte_count += (sizeof(int) + Encoding.UTF8.GetBytes(rhs.get_string_literal()).Length);
                     break;
                 case "SCAN":
-                    instruction_byte_count += (sizeof(int) + Encoding.UTF8.GetBytes(rhs.Trim('"')).Length);
+                    instruction_byte_count += (sizeof(int) + Encoding.UTF8.GetBytes(rhs.get_string_literal()).Length);
                     break;
             }
         }
@@ -353,7 +356,7 @@ public static class Compiler{
                     break;
                 case "PRINT":
                     if (rhs.Length > 0){
-                        as_bytes = Encoding.UTF8.GetBytes(rhs.Trim('"'));
+                        as_bytes = Encoding.UTF8.GetBytes(rhs.get_string_literal());
                         bytecode.Add((byte)Op_code.PRINT_STR);
                         bytecode.AddRange(BitConverter.GetBytes(as_bytes.Length));
                         bytecode.AddRange(as_bytes);
@@ -362,7 +365,7 @@ public static class Compiler{
                         bytecode.Add((byte)Op_code.PRINT);
                     break;
                 case "SCAN":
-                    as_bytes = Encoding.UTF8.GetBytes(rhs.Trim('"'));
+                    as_bytes = Encoding.UTF8.GetBytes(rhs.get_string_literal());
                     bytecode.Add((byte)Op_code.SCAN);
                     bytecode.AddRange(BitConverter.GetBytes(as_bytes.Length));
                     bytecode.AddRange(as_bytes);

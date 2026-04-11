@@ -1,54 +1,55 @@
 let stop: bool = false;
 
 while (not stop){
-    let a: float = scan("a:");
-    let b: float = scan("b:");
+    let op: int = 0;
+    op = scan("Enter operation:\n\t[0] -> Add\n\t[1] -> Sub\n\t[2] -> Mul\n\t[3] -> Div\n\t[4] -> Mod\n\t[5] -> Quit\n\nOp: ");
+    while (op < 0 or op > 5){
+        print("Invalid operation\n");
+        op = scan("Enter operation:\n\t[0] -> Add\n\t[1] -> Sub\n\t[2] -> Mul\n\t[3] -> Div\n\t[4] -> Mod\n\t[5] -> Quit\n\nOp: ");
+    }
 
-    print("0 -> Add");
-    print("1 -> Sub");
-    print("2 -> Mul");
-    print("3 -> Div");
-    print("4 -> Mod");
-    print("5 -> Quit");
+    if (op != 5){
+        let a: float = scan("a: ");
+        let b: float = scan("b: ");
 
-    let op: int = scan("");
-
-    if (op >= 0 and op <= 5){
         if (op == 0){
-            print("Result:");
+            print("Result: ");
             print(a + b);
+            print("\n");
         }
         else if (op == 1){
-            print("Result:");
+            print("Result: ");
             print(a - b);
+            print("\n");
         }
         else if (op == 2){
-            print("Result:");
+            print("Result: ");
             print(a * b);
+            print("\n");
         }
         else if (op == 3){
             if (b != 0){
-                print("Result:");
+                print("Result: ");
                 print(a / b);
+                print("\n");
             }
             else{
-                print("Division by 0");
+                print("Division by 0\n");
             }
         }
         else if (op == 4){
             if (b != 0){
-                print("Result:");
+                print("Result: ");
                 print(a % b);
+                print("\n");
             }
             else{
-                print("Modulus by 0");
+                print("Modulus by 0\n");
             }
-        }
-        else if (op == 5){
-            stop = true;
         }
     }
     else{
-        print("Invalid op");
+        print("Stopping\n");
+        stop = true;
     }
 }

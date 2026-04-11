@@ -74,8 +74,26 @@ public static class Lexer{
 
         string file_lines = File.ReadAllText(path);
 
-        if (file_lines.Count((c) => c == '"') % 2 != 0)
-            throw new Exception("String literal was not closed".colour_str());
+        if (
+            !((Func<bool>)(
+                () => {
+                    bool quote_is_closed = true;
+                    bool was_escaped = false;
+                    foreach (char c in file_lines){
+                        if (!was_escaped){
+                            if (c == '\\')
+                                was_escaped = true;
+                            else if (c == '"')
+                                quote_is_closed = !quote_is_closed;
+                        }
+                        else
+                            was_escaped = false;
+                    }
+                    return quote_is_closed;
+                }
+            ))()
+        )
+            throw new Exception("Unclosed string literal".colour_str());
 
         int line_number = 0;
         foreach (string line in file_lines.Split('\n')){
@@ -185,7 +203,7 @@ public static class Lexer{
                         break;
                 }
 
-                tokens.Add(new(){type = token_type, id = (token_type != Token.Type.STR_LIT) ? s : s.Trim('"'), line_number = line_number + 1});
+                tokens.Add(new(){type = token_type, id = (token_type != Token.Type.STR_LIT) ? s : s[1..(s.Length - 1)], line_number = line_number + 1});
             }
             ++line_number;
         }

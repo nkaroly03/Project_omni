@@ -71,10 +71,10 @@ public static class Interpreter{
                     pc += sizeof(int);
                     string print_str = Encoding.UTF8.GetString(bytecode[pc..][..print_strlen]);
                     pc += print_strlen;
-                    Console.WriteLine(print_str);
+                    Console.Write(print_str);
                     break;
                 case Compiler.Op_code.PRINT:
-                    Console.WriteLine(stack.pop());
+                    Console.Write(stack.pop());
                     break;
 
                 case Compiler.Op_code.SCAN:
@@ -82,7 +82,7 @@ public static class Interpreter{
                     pc += sizeof(int);
                     string scan_str = Encoding.UTF8.GetString(bytecode[pc..][..scan_strlen]);
                     pc += scan_strlen;
-                    Console.WriteLine(scan_str);
+                    Console.Write(scan_str);
                     string line_read = Console.ReadLine()!;
                     try{ stack.Add(new(bool.Parse(line_read))); }
                     catch (FormatException){
