@@ -1,7 +1,6 @@
 namespace Interpret;
 
 using Compile;
-using System.Globalization;
 using System.Text;
 
 static class Interpreter_extensions{
@@ -89,7 +88,7 @@ public static class Interpreter{
                         try{ stack.Add(new(int.Parse(line_read))); }
                         catch (OverflowException){ stack.Add(new((line_read.Trim()[0] == '-') ? int.MinValue : int.MaxValue)); }
                         catch (FormatException){
-                            try{ stack.Add(new(float.Parse(line_read, CultureInfo.InvariantCulture))); }
+                            try{ stack.Add(new(float.Parse(line_read, System.Globalization.CultureInfo.InvariantCulture))); }
                             catch (OverflowException){ stack.Add(new((line_read.Trim()[0] == '-') ? float.MinValue : float.MaxValue)); }
                         }
                     }

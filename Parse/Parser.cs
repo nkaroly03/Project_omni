@@ -150,7 +150,7 @@ public static class Parser{
                 break;
 
             case Token.Type.SEMICOLON:
-                throw new Exception($"On line <{tok.line_number}> use of empty statement is a bug");
+                throw new Exception($"On line <{tok.line_number}> use of empty statement is a bug".colour_str());
 
             case Token.Type.LET_DECL:
                 tok = tokens.Peek();

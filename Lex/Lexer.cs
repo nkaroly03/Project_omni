@@ -96,54 +96,14 @@ public static class Lexer{
             throw new Exception("Unclosed string literal".colour_str());
 
         int line_number = 0;
-        foreach (string line in file_lines.Split('\n')){
-            List<string> line_splitted = System.Text.RegularExpressions.Regex.Split(
-                line,
-                @"([:;(){}<>!=+*/%-]|""(?:.*)""|\blet\b|\bbool\b|\bfalse\b|\btrue\b|\bint\b|\bfloat\b|\bprint\b|\bscan\b|\bif\b|\belse\b|\bwhile\b|\band\b|\bor\b|\bnot\b|\breturn\b)"
-            )
-            .Where((s) => !string.IsNullOrWhiteSpace(s)).ToList();
-
-            for (
-                int i = 0, j;
-                i >= 0 && (j = line_splitted.FindIndex(i, (s) => { string temp = s.Trim(); return temp == "!" || temp == "=" || temp == "<" || temp == ">"; })) >= 0;
-                i = j + 1
+        foreach (string line in file_lines.Split(Environment.NewLine)){
+            foreach (
+                string s in
+                System.Text.RegularExpressions.Regex.Split(
+                    line,
+                    @"([:;(){}+*/%-]|[<>!=]=?|""(?:.*)""|\blet\b|\bbool\b|\bfalse\b|\btrue\b|\bint\b|\bfloat\b|\bprint\b|\bscan\b|\bif\b|\belse\b|\bwhile\b|\band\b|\bor\b|\bnot\b|\breturn\b)"
+                ).Where((s) => !string.IsNullOrWhiteSpace(s)).ToArray().Select((s) => s.Trim()).ToArray()
             ){
-                if (j + 1 < line_splitted.Count){
-                    string temp = line_splitted[j] + line_splitted[j + 1];
-                    switch (line_splitted[j].Trim()){
-                        case "!":
-                            if (temp.Trim() != "!=")
-                                throw new Exception("<!> must be followed by <=>".colour_str());
-                            else{
-                                line_splitted[j] = temp;
-                                line_splitted.RemoveAt(j + 1);
-                            }
-                            break;
-                        case "=":
-                            if (temp.Trim() == "=="){
-                                line_splitted[j] = temp;
-                                line_splitted.RemoveAt(j + 1);
-                            }
-                            break;
-                        case "<":
-                            if (temp.Trim() == "<="){
-                                line_splitted[j] = temp;
-                                line_splitted.RemoveAt(j + 1);
-                            }
-                            break;
-                        case ">":
-                            if (temp.Trim() == ">="){
-                                line_splitted[j] = temp;
-                                line_splitted.RemoveAt(j + 1);
-                            }
-                            break;
-                    }
-                }
-            }
-
-            line_splitted = line_splitted.Select((s) => s.Trim()).ToList();
-
-            foreach (string s in line_splitted){
                 Token.Type token_type;
                 switch (s){
                     case "false":  token_type = Token.Type.FALSE;           break;
@@ -199,7 +159,7 @@ public static class Lexer{
                         else if (!char.IsDigit(s[0]) && s.All((c) => char.IsAsciiLetter(c) || char.IsDigit(c) || c == '_'))
                             token_type = Token.Type.ID;
                         else
-                            throw new Exception($"Found invalid token <{s}> on line <{line_number + 1}>".colour_str());
+                            throw new Exception($"On line <{line_number + 1}> found invalid token <{s}>".colour_str());
                         break;
                 }
 
