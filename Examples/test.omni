@@ -1,30 +1,54 @@
-let a: int = (-(10 + 2) * -4);
-let b: float = -3.14 + -a * (a + -a);
+let stop: bool = false;
 
-print("Hello");
-print(b + 3.25);
+while (not stop){
+    let a: float = scan("a:");
+    let b: float = scan("b:");
 
-let c44: int = scan("Input: ") + 1;
+    print("0 -> Add");
+    print("1 -> Sub");
+    print("2 -> Mul");
+    print("3 -> Div");
+    print("4 -> Mod");
+    print("5 -> Quit");
 
-if (c44 < 10){
-    let e: bool = not false;
-    print("else if");
-    print((c44 == 10) == (not (c44 != 10)));
-}
-else{
-    let e: float = 2.718;
-    print("c44 == 10");
-}
+    let op: int = scan("");
 
-while (c44 < 20){
-    if (c44 % 2 == 0){
-        print("Even");
-    }
-    else if (c44 % 2 == 1){
-        print("Odd");
+    if (op >= 0 and op <= 5){
+        if (op == 0){
+            print("Result:");
+            print(a + b);
+        }
+        else if (op == 1){
+            print("Result:");
+            print(a - b);
+        }
+        else if (op == 2){
+            print("Result:");
+            print(a * b);
+        }
+        else if (op == 3){
+            if (b != 0){
+                print("Result:");
+                print(a / b);
+            }
+            else{
+                print("Division by 0");
+            }
+        }
+        else if (op == 4){
+            if (b != 0){
+                print("Result:");
+                print(a % b);
+            }
+            else{
+                print("Modulus by 0");
+            }
+        }
+        else if (op == 5){
+            stop = true;
+        }
     }
     else{
-        print("unreachable");
+        print("Invalid op");
     }
-    c44 = c44 + 1;
 }

@@ -92,39 +92,17 @@ public static class Compiler{
                 to_IR(current_AST_node.sub_nodes[0], null, stack_info, sb, ref stack_size, ref let_decl_counter);
                 to_IR(current_AST_node.sub_nodes[1], null, stack_info, sb, ref stack_size, ref let_decl_counter);
                 switch (current_AST_node.token.type){
-                    case Token.Type.LESS_THAN:
-                        sb.add_instruction($"{stack_size - 1} ; CMP_LE");
-                        break;
-                    case Token.Type.LESS_THAN_EQ:
-                        sb.add_instruction($"{stack_size - 1} ; CMP_LEQ");
-                        break;
-                    case Token.Type.GREATER_THAN:
-                        sb.add_instruction($"{stack_size - 1} ; CMP_GE");
-                        break;
-                    case Token.Type.GREATER_THAN_EQ:
-                        sb.add_instruction($"{stack_size - 1} ; CMP_GEQ");
-                        break;
-                    case Token.Type.NOT_EQUALS:
-                        sb.add_instruction($"{stack_size - 1} ; CMP_NEQ");
-                        break;
-                    case Token.Type.EQUALS:
-                        sb.add_instruction($"{stack_size - 1} ; CMP_EQ");
-                        break;
-                    case Token.Type.ASTERISK:
-                        sb.add_instruction($"{stack_size - 1} ; MUL");
-                        break;
-                    case Token.Type.SLASH:
-                        sb.add_instruction($"{stack_size - 1} ; DIV");
-                        break;
-                    case Token.Type.PERCENT:
-                        sb.add_instruction($"{stack_size - 1} ; MOD");
-                        break;
-                    case Token.Type.AND:
-                        sb.add_instruction($"{stack_size - 1} ; AND");
-                        break;
-                    case Token.Type.OR:
-                        sb.add_instruction($"{stack_size - 1} ; OR");
-                        break;
+                    case Token.Type.LESS_THAN:       sb.add_instruction($"{stack_size - 1} ; CMP_LE");  break;
+                    case Token.Type.LESS_THAN_EQ:    sb.add_instruction($"{stack_size - 1} ; CMP_LEQ"); break;
+                    case Token.Type.GREATER_THAN:    sb.add_instruction($"{stack_size - 1} ; CMP_GE");  break;
+                    case Token.Type.GREATER_THAN_EQ: sb.add_instruction($"{stack_size - 1} ; CMP_GEQ"); break;
+                    case Token.Type.NOT_EQUALS:      sb.add_instruction($"{stack_size - 1} ; CMP_NEQ"); break;
+                    case Token.Type.EQUALS:          sb.add_instruction($"{stack_size - 1} ; CMP_EQ");  break;
+                    case Token.Type.ASTERISK:        sb.add_instruction($"{stack_size - 1} ; MUL");     break;
+                    case Token.Type.SLASH:           sb.add_instruction($"{stack_size - 1} ; DIV");     break;
+                    case Token.Type.PERCENT:         sb.add_instruction($"{stack_size - 1} ; MOD");     break;
+                    case Token.Type.AND:             sb.add_instruction($"{stack_size - 1} ; AND");     break;
+                    case Token.Type.OR:              sb.add_instruction($"{stack_size - 1} ; OR");      break;
                 }
                 --stack_size;
                 break;
@@ -167,15 +145,9 @@ public static class Compiler{
                 ++let_decl_counter;
                 break;
 
-            case Token.Type.BOOL:
-                sb.add_instruction($"{stack_size} ; TO_BOOL");
-                break;
-            case Token.Type.INT:
-                sb.add_instruction($"{stack_size} ; TO_INT");
-                break;
-            case Token.Type.FLOAT:
-                sb.add_instruction($"{stack_size} ; TO_FLOAT");
-                break;
+            case Token.Type.BOOL:  sb.add_instruction($"{stack_size} ; TO_BOOL");  break;
+            case Token.Type.INT:   sb.add_instruction($"{stack_size} ; TO_INT");   break;
+            case Token.Type.FLOAT: sb.add_instruction($"{stack_size} ; TO_FLOAT"); break;
 
             case Token.Type.PRINT:
                 Node print_sub_node = current_AST_node.sub_nodes[0];
@@ -305,11 +277,8 @@ public static class Compiler{
 
         foreach (string instruction in instructions){
             instruction_byte_count += sizeof(Op_code);
-            string[] split_instruction = [
-                instruction.Split(' ', StringSplitOptions.TrimEntries)[0],
-                (instruction.IndexOf(' ') >= 0) ? instruction[(instruction.IndexOf(' ') + 1)..].Trim() : ""
-            ];
-            (string lhs, string rhs) = (split_instruction[0], split_instruction[1]);
+            int space_idx = instruction.IndexOf(' ');
+            (string lhs, string rhs) = (space_idx >= 0) ? (instruction[..space_idx], instruction[(space_idx + 1)..]) : (instruction, "");
             switch (lhs){
                 case "PUSH":
                     if (rhs != "FALSE" && rhs != "TRUE")
@@ -321,10 +290,11 @@ public static class Compiler{
                     instruction_byte_count += sizeof(int);
                     break;
                 case "PRINT":
-                    instruction_byte_count += (Convert.ToInt32(rhs.Length > 0) * (sizeof(int) + Encoding.UTF8.GetBytes(rhs.Trim('"')).Length));
+                    if (rhs.Length > 0)
+                        instruction_byte_count += (sizeof(int) + Encoding.UTF8.GetBytes(rhs.Trim('"')).Length);
                     break;
                 case "SCAN":
-                    instruction_byte_count += (sizeof(int) + Encoding.UTF8.GetBytes(rhs).Length);
+                    instruction_byte_count += (sizeof(int) + Encoding.UTF8.GetBytes(rhs.Trim('"')).Length);
                     break;
             }
         }
@@ -334,15 +304,10 @@ public static class Compiler{
 
     public static byte[] to_bytecode(string IR){
         List<byte> bytecode = new();
-        string[] instructions = IR.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
-        for (int i = 0; i < instructions.Length; ++i)
-            instructions[i] = instructions[i].Split(';')[1].Trim();
+        string[] instructions = IR.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries).Select((s) => s[(s.IndexOf(';') + 2)..]).ToArray();
         foreach ((int i, string instruction) in instructions.Index()){
-            string[] split_instruction = [
-                instruction.Split(' ', StringSplitOptions.TrimEntries)[0],
-                (instruction.IndexOf(' ') >= 0) ? instruction[(instruction.IndexOf(' ') + 1)..].Trim() : ""
-            ];
-            (string lhs, string rhs) = (split_instruction[0], split_instruction[1]);
+            int space_idx = instruction.IndexOf(' ');
+            (string lhs, string rhs) = (space_idx >= 0) ? (instruction[..space_idx], instruction[(space_idx + 1)..]) : (instruction, "");
             byte[] as_bytes;
             switch (lhs){
                 case "PUSH":
@@ -366,12 +331,10 @@ public static class Compiler{
                         bytecode.AddRange(as_bytes);
                     }
                     break;
-                case "POP":
-                    bytecode.Add((byte)Op_code.POP);
-                    break;
-                case "RET":
-                    bytecode.Add((byte)Op_code.RET);
-                    break;
+
+                case "POP": bytecode.Add((byte)Op_code.POP); break;
+                case "RET": bytecode.Add((byte)Op_code.RET); break;
+
                 case "MOV":
                     as_bytes = BitConverter.GetBytes(int.Parse(rhs[3..(rhs.Length - 1)]));
                     bytecode.Add((byte)Op_code.MOV);
@@ -404,57 +367,24 @@ public static class Compiler{
                     bytecode.AddRange(BitConverter.GetBytes(as_bytes.Length));
                     bytecode.AddRange(as_bytes);
                     break;
-                case "TO_BOOL":
-                    bytecode.Add((byte)Op_code.TO_BOOL);
-                    break;
-                case "TO_INT":
-                    bytecode.Add((byte)Op_code.TO_INT);
-                    break;
-                case "TO_FLOAT":
-                    bytecode.Add((byte)Op_code.TO_FLOAT);
-                    break;
-                case "ADD":
-                    bytecode.Add((byte)Op_code.ADD);
-                    break;
-                case "SUB":
-                    bytecode.Add((byte)Op_code.SUB);
-                    break;
-                case "MUL":
-                    bytecode.Add((byte)Op_code.MUL);
-                    break;
-                case "DIV":
-                    bytecode.Add((byte)Op_code.DIV);
-                    break;
-                case "MOD":
-                    bytecode.Add((byte)Op_code.MOD);
-                    break;
-                case "NEG":
-                    bytecode.Add((byte)Op_code.NEG);
-                    break;
-                case "AND":
-                    bytecode.Add((byte)Op_code.AND);
-                    break;
-                case "OR":
-                    bytecode.Add((byte)Op_code.OR);
-                    break;
-                case "CMP_LE":
-                    bytecode.Add((byte)Op_code.CMP_LE);
-                    break;
-                case "CMP_LEQ":
-                    bytecode.Add((byte)Op_code.CMP_LEQ);
-                    break;
-                case "CMP_GE":
-                    bytecode.Add((byte)Op_code.CMP_GE);
-                    break;
-                case "CMP_GEQ":
-                    bytecode.Add((byte)Op_code.CMP_GEQ);
-                    break;
-                case "CMP_EQ":
-                    bytecode.Add((byte)Op_code.CMP_EQ);
-                    break;
-                case "CMP_NEQ":
-                    bytecode.Add((byte)Op_code.CMP_NEQ);
-                    break;
+
+                case "TO_BOOL":  bytecode.Add((byte)Op_code.TO_BOOL);  break;
+                case "TO_INT":   bytecode.Add((byte)Op_code.TO_INT);   break;
+                case "TO_FLOAT": bytecode.Add((byte)Op_code.TO_FLOAT); break;
+                case "ADD":      bytecode.Add((byte)Op_code.ADD);      break;
+                case "SUB":      bytecode.Add((byte)Op_code.SUB);      break;
+                case "MUL":      bytecode.Add((byte)Op_code.MUL);      break;
+                case "DIV":      bytecode.Add((byte)Op_code.DIV);      break;
+                case "MOD":      bytecode.Add((byte)Op_code.MOD);      break;
+                case "NEG":      bytecode.Add((byte)Op_code.NEG);      break;
+                case "AND":      bytecode.Add((byte)Op_code.AND);      break;
+                case "OR":       bytecode.Add((byte)Op_code.OR);       break;
+                case "CMP_LE":   bytecode.Add((byte)Op_code.CMP_LE);   break;
+                case "CMP_LEQ":  bytecode.Add((byte)Op_code.CMP_LEQ);  break;
+                case "CMP_GE":   bytecode.Add((byte)Op_code.CMP_GE);   break;
+                case "CMP_GEQ":  bytecode.Add((byte)Op_code.CMP_GEQ);  break;
+                case "CMP_EQ":   bytecode.Add((byte)Op_code.CMP_EQ);   break;
+                case "CMP_NEQ":  bytecode.Add((byte)Op_code.CMP_NEQ);  break;
             }
         }
 

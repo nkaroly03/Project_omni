@@ -95,31 +95,15 @@ public static class Interpreter{
                     }
                     break;
 
-                case Compiler.Op_code.TO_BOOL:
-                    stack[stack.Count - 1] = new(stack.Last().to_bool());
-                    break;
-                case Compiler.Op_code.TO_INT:
-                    stack[stack.Count - 1] = new(stack.Last().to_int());
-                    break;
-                case Compiler.Op_code.TO_FLOAT:
-                    stack[stack.Count - 1] = new(stack.Last().to_float());
-                    break;
+                case Compiler.Op_code.TO_BOOL:  stack[stack.Count - 1] = new(stack.Last().to_bool());  break;
+                case Compiler.Op_code.TO_INT:   stack[stack.Count - 1] = new(stack.Last().to_int());   break;
+                case Compiler.Op_code.TO_FLOAT: stack[stack.Count - 1] = new(stack.Last().to_float()); break;
 
-                case Compiler.Op_code.ADD:
-                    stack[stack.Count - 2] += stack.pop();
-                    break;
-                case Compiler.Op_code.SUB:
-                    stack[stack.Count - 2] -= stack.pop();
-                    break;
-                case Compiler.Op_code.MUL:
-                    stack[stack.Count - 2] *= stack.pop();
-                    break;
-                case Compiler.Op_code.DIV:
-                    stack[stack.Count - 2] /= stack.pop();
-                    break;
-                case Compiler.Op_code.MOD:
-                    stack[stack.Count - 2] %= stack.pop();
-                    break;
+                case Compiler.Op_code.ADD: stack[stack.Count - 2] += stack.pop(); break;
+                case Compiler.Op_code.SUB: stack[stack.Count - 2] -= stack.pop(); break;
+                case Compiler.Op_code.MUL: stack[stack.Count - 2] *= stack.pop(); break;
+                case Compiler.Op_code.DIV: stack[stack.Count - 2] /= stack.pop(); break;
+                case Compiler.Op_code.MOD: stack[stack.Count - 2] %= stack.pop(); break;
 
                 case Compiler.Op_code.NEG:
                     stack[stack.Count - 1] = -stack.Last();
@@ -133,24 +117,12 @@ public static class Interpreter{
                     stack.pop();
                     break;
 
-                case Compiler.Op_code.CMP_LE:
-                    stack[stack.Count - 2] = new(stack[stack.Count - 2] <  stack.pop());
-                    break;
-                case Compiler.Op_code.CMP_LEQ:
-                    stack[stack.Count - 2] = new(stack[stack.Count - 2] <= stack.pop());
-                    break;
-                case Compiler.Op_code.CMP_GE:
-                    stack[stack.Count - 2] = new(stack[stack.Count - 2] >  stack.pop());
-                    break;
-                case Compiler.Op_code.CMP_GEQ:
-                    stack[stack.Count - 2] = new(stack[stack.Count - 2] >= stack.pop());
-                    break;
-                case Compiler.Op_code.CMP_EQ:
-                    stack[stack.Count - 2] = new(stack[stack.Count - 2] == stack.pop());
-                    break;
-                case Compiler.Op_code.CMP_NEQ:
-                    stack[stack.Count - 2] = new(stack[stack.Count - 2] != stack.pop());
-                    break;
+                case Compiler.Op_code.CMP_LE:  stack[stack.Count - 2] = new(stack[stack.Count - 2] <  stack.pop()); break;
+                case Compiler.Op_code.CMP_LEQ: stack[stack.Count - 2] = new(stack[stack.Count - 2] <= stack.pop()); break;
+                case Compiler.Op_code.CMP_GE:  stack[stack.Count - 2] = new(stack[stack.Count - 2] >  stack.pop()); break;
+                case Compiler.Op_code.CMP_GEQ: stack[stack.Count - 2] = new(stack[stack.Count - 2] >= stack.pop()); break;
+                case Compiler.Op_code.CMP_EQ:  stack[stack.Count - 2] = new(stack[stack.Count - 2] == stack.pop()); break;
+                case Compiler.Op_code.CMP_NEQ: stack[stack.Count - 2] = new(stack[stack.Count - 2] != stack.pop()); break;
             }
         }
 
