@@ -95,20 +95,14 @@ public static class Parser{
             lhs = temp;
         }
         else if (tok.type == Token.Type.NOT || tok.type == Token.Type.PLUS || tok.type == Token.Type.MINUS){
-            switch (tokens.Peek().type){
-                case Token.Type.ID:
-                case Token.Type.FALSE:
-                case Token.Type.TRUE:
-                case Token.Type.INT_LIT:
-                case Token.Type.FLOAT_LIT:
-                    lhs = new(){token = tok, sub_nodes = [new(){token = tokens.Pop()}]};;
-                    break;
-                case Token.Type.LPAREN:
-                    lhs = new(){token = tok, sub_nodes = [parse_arithm_expr(tokens, Token.Type.NOT.binding_powers().Item2)]};
-                    break;
-                default:
-                    throw new Exception($"On line <{tok.line_number}> found invalid token <{tok.id}>".colour_str());
-            }
+            lhs = tokens.Peek().type switch{
+                Token.Type.ID or Token.Type.FALSE or Token.Type.TRUE or Token.Type.INT_LIT or Token.Type.FLOAT_LIT =>
+                    new(){token = tok, sub_nodes = [new(){token = tokens.Pop()}]},
+
+                Token.Type.LPAREN => new(){token = tok, sub_nodes = [parse_arithm_expr(tokens, Token.Type.NOT.binding_powers().Item2)]},
+
+                _ => throw new Exception($"On line <{tok.line_number}> found invalid token <{tok.id}>".colour_str()),
+            };
         }
         else
             throw new Exception($"On line <{tokens.Peek().line_number}> found invalid token <{tokens.Peek().id}>".colour_str());

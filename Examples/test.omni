@@ -1,11 +1,21 @@
 let stop: bool = false;
 
 while (not stop){
-    let op: int = 0;
-    op = scan("Enter operation:\n\t[0] -> Add\n\t[1] -> Sub\n\t[2] -> Mul\n\t[3] -> Div\n\t[4] -> Mod\n\t[5] -> Quit\n\nOp: ");
+    let op: int = -1;
     while (op < 0 or op > 5){
-        print("Invalid operation\n");
-        op = scan("Enter operation:\n\t[0] -> Add\n\t[1] -> Sub\n\t[2] -> Mul\n\t[3] -> Div\n\t[4] -> Mod\n\t[5] -> Quit\n\nOp: ");
+        op = scan(
+            "Enter operation:\n"
+            "\t[0] -> Add\n"
+            "\t[1] -> Sub\n"
+            "\t[2] -> Mul\n"
+            "\t[3] -> Div\n"
+            "\t[4] -> Mod\n"
+            "\t[5] -> Quit\n\n"
+            "Op: "
+        );
+        if (op < 0 or op > 5){
+            print("Invalid operation\n");
+        }
     }
 
     if (op != 5){

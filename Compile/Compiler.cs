@@ -94,19 +94,21 @@ public static class Compiler{
             case Token.Type.OR:
                 to_IR(current_AST_node.sub_nodes[0], null, stack_info, sb, ref stack_size, ref let_decl_counter);
                 to_IR(current_AST_node.sub_nodes[1], null, stack_info, sb, ref stack_size, ref let_decl_counter);
-                switch (current_AST_node.token.type){
-                    case Token.Type.LESS_THAN:       sb.add_instruction($"{stack_size - 1} ; CMP_LE");  break;
-                    case Token.Type.LESS_THAN_EQ:    sb.add_instruction($"{stack_size - 1} ; CMP_LEQ"); break;
-                    case Token.Type.GREATER_THAN:    sb.add_instruction($"{stack_size - 1} ; CMP_GE");  break;
-                    case Token.Type.GREATER_THAN_EQ: sb.add_instruction($"{stack_size - 1} ; CMP_GEQ"); break;
-                    case Token.Type.NOT_EQUALS:      sb.add_instruction($"{stack_size - 1} ; CMP_NEQ"); break;
-                    case Token.Type.EQUALS:          sb.add_instruction($"{stack_size - 1} ; CMP_EQ");  break;
-                    case Token.Type.ASTERISK:        sb.add_instruction($"{stack_size - 1} ; MUL");     break;
-                    case Token.Type.SLASH:           sb.add_instruction($"{stack_size - 1} ; DIV");     break;
-                    case Token.Type.PERCENT:         sb.add_instruction($"{stack_size - 1} ; MOD");     break;
-                    case Token.Type.AND:             sb.add_instruction($"{stack_size - 1} ; AND");     break;
-                    case Token.Type.OR:              sb.add_instruction($"{stack_size - 1} ; OR");      break;
-                }
+                sb.add_instruction($"{stack_size - 1} ; {current_AST_node.token.type switch{
+                    Token.Type.LESS_THAN       => "CMP_LE",
+                    Token.Type.LESS_THAN_EQ    => "CMP_LEQ",
+                    Token.Type.GREATER_THAN    => "CMP_GE",
+                    Token.Type.GREATER_THAN_EQ => "CMP_GEQ",
+                    Token.Type.NOT_EQUALS      => "CMP_NEQ",
+                    Token.Type.EQUALS          => "CMP_EQ",
+                    Token.Type.ASTERISK        => "MUL",
+                    Token.Type.SLASH           => "DIV",
+                    Token.Type.PERCENT         => "MOD",
+                    Token.Type.AND             => "AND",
+                    Token.Type.OR              => "OR",
+                    
+                    _ => throw new System.Diagnostics.UnreachableException(),
+                }}");
                 --stack_size;
                 break;
 

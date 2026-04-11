@@ -95,77 +95,81 @@ public static class Lexer{
         )
             throw new Exception("Unclosed string literal".colour_str());
 
-        int line_number = 0;
-        foreach (string line in file_lines.Split(Environment.NewLine)){
-            foreach (
-                string s in
-                System.Text.RegularExpressions.Regex.Split(
-                    line,
-                    @"([:;(){}+*/%-]|[<>!=]=?|""(?:.*)""|\blet\b|\bbool\b|\bfalse\b|\btrue\b|\bint\b|\bfloat\b|\bprint\b|\bscan\b|\bif\b|\belse\b|\bwhile\b|\band\b|\bor\b|\bnot\b|\breturn\b)"
-                ).Where((s) => !string.IsNullOrWhiteSpace(s)).ToArray().Select((s) => s.Trim()).ToArray()
-            ){
-                Token.Type token_type;
-                switch (s){
-                    case "false":  token_type = Token.Type.FALSE;           break;
-                    case "true":   token_type = Token.Type.TRUE;            break;
+        int line_idx = 0;
+        foreach (
+            string line in
+            System.Text.RegularExpressions.Regex.Split(
+                file_lines,
+                @"([:;(){}+*/%-]|[<>!=]=?|(?:\r\n|\r|\n)|""(?:.*)""|\blet\b|\bbool\b|\bfalse\b|\btrue\b|\bint\b|\bfloat\b|\bprint\b|\bscan\b|\bif\b|\belse\b|\bwhile\b|\band\b|\bor\b|\bnot\b|\breturn\b)"
+            ).Select((s) => s.Trim(' ')).Where((s) => s.Length > 0).ToArray()
+        ){
+            if (line != Environment.NewLine){
+                Token.Type token_type = line switch{
+                    "false"  => Token.Type.FALSE,
+                    "true"   => Token.Type.TRUE,
 
-                    case ":":      token_type = Token.Type.COLON;           break;
-                    case ";":      token_type = Token.Type.SEMICOLON;       break;
-                    case "(":      token_type = Token.Type.LPAREN;          break;
-                    case ")":      token_type = Token.Type.RPAREN;          break;
-                    case "{":      token_type = Token.Type.LBRACE;          break;
-                    case "}":      token_type = Token.Type.RBRACE;          break;
+                    ":"      => Token.Type.COLON,
+                    ";"      => Token.Type.SEMICOLON,
+                    "("      => Token.Type.LPAREN,
+                    ")"      => Token.Type.RPAREN,
+                    "{"      => Token.Type.LBRACE,
+                    "}"      => Token.Type.RBRACE,
 
-                    case "<":      token_type = Token.Type.LESS_THAN;       break;
-                    case "<=":     token_type = Token.Type.LESS_THAN_EQ;    break;
-                    case ">":      token_type = Token.Type.GREATER_THAN;    break;
-                    case ">=":     token_type = Token.Type.GREATER_THAN_EQ; break;
-                    case "!=":     token_type = Token.Type.NOT_EQUALS;      break;
-                    case "==":     token_type = Token.Type.EQUALS;          break;
-                    case "=":      token_type = Token.Type.EQ;              break;
-                    case "+":      token_type = Token.Type.PLUS;            break;
-                    case "*":      token_type = Token.Type.ASTERISK;        break;
-                    case "/":      token_type = Token.Type.SLASH;           break;
-                    case "%":      token_type = Token.Type.PERCENT;         break;
-                    case "-":      token_type = Token.Type.MINUS;           break;
+                    "<"      => Token.Type.LESS_THAN,
+                    "<="     => Token.Type.LESS_THAN_EQ,
+                    ">"      => Token.Type.GREATER_THAN,
+                    ">="     => Token.Type.GREATER_THAN_EQ,
+                    "!="     => Token.Type.NOT_EQUALS,
+                    "=="     => Token.Type.EQUALS,
+                    "="      => Token.Type.EQ,
+                    "+"      => Token.Type.PLUS,
+                    "*"      => Token.Type.ASTERISK,
+                    "/"      => Token.Type.SLASH,
+                    "%"      => Token.Type.PERCENT,
+                    "-"      => Token.Type.MINUS,
 
-                    case "let":    token_type = Token.Type.LET_DECL;        break;
+                    "let"    => Token.Type.LET_DECL,
 
-                    case "bool":   token_type = Token.Type.BOOL;            break;
-                    case "int":    token_type = Token.Type.INT;             break;
-                    case "float":  token_type = Token.Type.FLOAT;           break;
+                    "bool"   => Token.Type.BOOL,
+                    "int"    => Token.Type.INT,
+                    "float"  => Token.Type.FLOAT,
 
-                    case "print":  token_type = Token.Type.PRINT;           break;
-                    case "scan":   token_type = Token.Type.SCAN;            break;
+                    "print"  => Token.Type.PRINT,
+                    "scan"   => Token.Type.SCAN,
 
-                    case "if":     token_type = Token.Type.IF;              break;
-                    case "else":   token_type = Token.Type.ELSE;            break;
+                    "if"     => Token.Type.IF,
+                    "else"   => Token.Type.ELSE,
 
-                    case "while":  token_type = Token.Type.WHILE;           break;
+                    "while"  => Token.Type.WHILE,
 
-                    case "and":    token_type = Token.Type.AND;             break;
-                    case "or":     token_type = Token.Type.OR;              break;
-                    case "not":    token_type = Token.Type.NOT;             break;
+                    "and"    => Token.Type.AND,
+                    "or"     => Token.Type.OR,
+                    "not"    => Token.Type.NOT,
 
-                    case "return": token_type = Token.Type.RETURN;          break;
+                    "return" => Token.Type.RETURN,
 
-                    default:
-                        if (s.All((c) => char.IsDigit(c)))
-                            token_type = Token.Type.INT_LIT;
-                        else if (s.Count((c) => c == '.') == 1 && s[0] != '.' && s.All((c) => char.IsDigit(c) || c == '.'))
-                            token_type = Token.Type.FLOAT_LIT;
-                        else if (s[0] == '"')
-                            token_type = Token.Type.STR_LIT;
-                        else if (!char.IsDigit(s[0]) && s.All((c) => char.IsAsciiLetter(c) || char.IsDigit(c) || c == '_'))
-                            token_type = Token.Type.ID;
-                        else
-                            throw new Exception($"On line <{line_number + 1}> found invalid token <{s}>".colour_str());
-                        break;
-                }
-
-                tokens.Add(new(){type = token_type, id = (token_type != Token.Type.STR_LIT) ? s : s[1..(s.Length - 1)], line_number = line_number + 1});
+                    _ => token_type = ((Func<Token.Type>)(
+                        () => {
+                            if (line.All((c) => char.IsDigit(c)))
+                                return Token.Type.INT_LIT;
+                            else if (line.Count((c) => c == '.') == 1 && line[0] != '.' && line.All((c) => char.IsDigit(c) || c == '.'))
+                                return Token.Type.FLOAT_LIT;
+                            else if (line[0] == '"')
+                                return Token.Type.STR_LIT;
+                            else if (!char.IsDigit(line[0]) && line.All((c) => char.IsAsciiLetter(c) || char.IsDigit(c) || c == '_'))
+                                return Token.Type.ID;
+                            else
+                                throw new Exception($"On line <{line_idx + 1}> found invalid token <{line}>".colour_str());
+                        }
+                    ))(),
+                };
+                if (tokens.Count > 0 && tokens.Last().type == Token.Type.STR_LIT && token_type == Token.Type.STR_LIT)
+                    tokens[tokens.Count - 1] = tokens.Last() with{id = tokens.Last().id + line[1..(line.Length - 1)]};
+                else
+                    tokens.Add(new(){type = token_type, id = (token_type != Token.Type.STR_LIT) ? line : line[1..(line.Length - 1)], line_number = line_idx + 1});
             }
-            ++line_number;
+            else
+                ++line_idx;
         }
 
         return tokens;
