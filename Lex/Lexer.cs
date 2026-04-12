@@ -1,5 +1,7 @@
 ﻿namespace Lex;
 
+using System.Text.RegularExpressions;
+
 public static class Lex_extensions{
     extension(string self){
         public string colour_str(byte r, byte g, byte b) => $"\x1b[38;2;{r};{g};{b}m{self}\x1b[0m";
@@ -66,8 +68,8 @@ public readonly struct Token{
 }
 
 public class Syntax_error_exception : Exception{
-    public Syntax_error_exception(string msg) : base(msg){}
-    public Syntax_error_exception(string msg, Exception inner_exception) : base(msg, inner_exception){}
+    public Syntax_error_exception(string msg) : base(msg.colour_str()){}
+    public Syntax_error_exception(string msg, Exception inner_exception) : base(msg.colour_str(), inner_exception){}
 
     public Syntax_error_exception(){}
 }
@@ -77,37 +79,36 @@ public static class Lexer{
         List<Token> tokens = new();
 
         if (!path.EndsWith(".omni"))
-            throw new ArgumentOutOfRangeException("Bad file extension".colour_str());
+            throw new ArgumentOutOfRangeException("Bad file extension");
 
         string file_lines = File.ReadAllText(path);
 
-        if (!(
-            (Func<bool>)(
-                () => {
-                    bool quote_is_closed = true;
-                    bool was_escaped = false;
-                    foreach (char c in file_lines){
-                        if (!was_escaped){
-                            if (c == '\\')
-                                was_escaped = true;
-                            else if (c == '"')
-                                quote_is_closed = !quote_is_closed;
-                        }
-                        else
-                            was_escaped = false;
+        int quote_idx = 0;
+        if (!((Func<bool>)(() => {
+            bool quote_is_closed = true;
+            bool was_escaped = false;
+            foreach ((int i, char c) in file_lines.Index()){
+                if (!was_escaped){
+                    if (c == '\\')
+                        was_escaped = true;
+                    else if (c == '"'){
+                        quote_is_closed = !quote_is_closed;
+                        quote_idx = i;
                     }
-                    return quote_is_closed;
                 }
-            )
-        )())
-            throw new Syntax_error_exception("Unclosed string literal".colour_str());
+                else
+                    was_escaped = false;
+            }
+            return quote_is_closed;
+        }))())
+            throw new Syntax_error_exception($"On line <{Regex.Matches(file_lines[..(quote_idx + 1)], Environment.NewLine).Count + 1}> found starting <\"> of unclosed string literal");
 
         int line_idx = 0;
         foreach (
             string line in
-            System.Text.RegularExpressions.Regex.Split(
+            Regex.Split(
                 file_lines,
-                @"([:;(){}+*/%-]|[<>!=]=?|(?:\r\n|\r|\n)|""(?:.*)""|\blet\b|\bbool\b|\bfalse\b|\btrue\b|\bint\b|\bfloat\b|\bprint\b|\bscan\b|\bif\b|\belse\b|\bwhile\b|\band\b|\bor\b|\bnot\b|\breturn\b)"
+                @"([:;(){}+*/%-]|[<>!=]=?|\r\n|\r|\n|"".*""|\blet\b|\bbool\b|\bfalse\b|\btrue\b|\bint\b|\bfloat\b|\bprint\b|\bscan\b|\bif\b|\belse\b|\bwhile\b|\band\b|\bor\b|\bnot\b|\breturn\b)"
             ).Select((s) => s.Trim(' ')).Where((s) => s.Length > 0).ToArray()
         ){
             if (line != Environment.NewLine){
@@ -155,22 +156,18 @@ public static class Lexer{
 
                     "return" => Token.Type.RETURN,
 
-                    _ => (
-                        (Func<Token.Type>)(
-                            () => {
-                                if (line.All((c) => char.IsDigit(c)))
-                                    return Token.Type.INT_LIT;
-                                else if (line.Count((c) => c == '.') == 1 && line[0] != '.' && line.All((c) => char.IsDigit(c) || c == '.'))
-                                    return Token.Type.FLOAT_LIT;
-                                else if (line[0] == '"')
-                                    return Token.Type.STR_LIT;
-                                else if (!char.IsDigit(line[0]) && line.All((c) => char.IsAsciiLetter(c) || char.IsDigit(c) || c == '_'))
-                                    return Token.Type.ID;
-                                else
-                                    throw new Syntax_error_exception($"On line <{line_idx + 1}> found invalid token <{line}>".colour_str());
-                            }
-                        )
-                    )(),
+                    _ => ((Func<Token.Type>)(() => {
+                        if (line.All((c) => char.IsDigit(c)))
+                            return Token.Type.INT_LIT;
+                        else if (line.Count((c) => c == '.') == 1 && line[0] != '.' && line.All((c) => char.IsDigit(c) || c == '.'))
+                            return Token.Type.FLOAT_LIT;
+                        else if (line[0] == '"')
+                            return Token.Type.STR_LIT;
+                        else if (!char.IsDigit(line[0]) && line.All((c) => char.IsAsciiLetter(c) || char.IsDigit(c) || c == '_'))
+                            return Token.Type.ID;
+                        else
+                            throw new Syntax_error_exception($"On line <{line_idx + 1}> found invalid token <{line}>");
+                    }))(),
                 };
                 if (tokens.Count > 0 && tokens.Last().type == Token.Type.STR_LIT && token_type == Token.Type.STR_LIT)
                     tokens[tokens.Count - 1] = tokens.Last() with{id = tokens.Last().id + line[1..(line.Length - 1)]};
