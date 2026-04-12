@@ -5,7 +5,7 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Examples\test.omni
 
     2 ; PUSH SP[-1]
     2 ; NEG
-    1 ; JMPZ 108
+    1 ; JMPZ 106
     2 ; PUSH 1
     2 ; NEG
     2 ; TO_INT
@@ -105,14 +105,12 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Examples\test.omni
     4 ; PRINT "Modulus by 0\n"
     3 ; POP
     2 ; POP
-    2 ; JMP 2
+    2 ; JMP 4
     2 ; PRINT "Stopping\n"
-    3 ; PUSH SP[-1]
-    4 ; PUSH 5
-    3 ; CMP_EQ
+    3 ; PUSH TRUE
     2 ; MOV SP[-3]
     1 ; POP
-    1 ; JMP -109
+    1 ; JMP -107
 
     2 ; PUSH 0
     1 ; RET

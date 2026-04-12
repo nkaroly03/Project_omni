@@ -1,7 +1,5 @@
 ﻿namespace Lex;
 
-using System.Text.RegularExpressions;
-
 public static class Lex_extensions{
     extension(string self){
         public string colour_str(byte r, byte g, byte b) => $"\x1b[38;2;{r};{g};{b}m{self}\x1b[0m";
@@ -83,7 +81,6 @@ public static class Lexer{
 
         string file_lines = File.ReadAllText(path);
 
-        int quote_idx = 0;
         if (!((Func<bool>)(() => {
             bool quote_is_closed = true;
             bool was_escaped = false;
@@ -91,24 +88,23 @@ public static class Lexer{
                 if (!was_escaped){
                     if (c == '\\')
                         was_escaped = true;
-                    else if (c == '"'){
+                    else if (c == '"')
                         quote_is_closed = !quote_is_closed;
-                        quote_idx = i;
-                    }
                 }
                 else
                     was_escaped = false;
             }
             return quote_is_closed;
         }))())
-            throw new Syntax_error_exception($"On line <{Regex.Matches(file_lines[..(quote_idx + 1)], Environment.NewLine).Count + 1}> found starting <\"> of unclosed string literal");
+            throw new Syntax_error_exception($"Unclosed string literal");
 
         int line_idx = 0;
         foreach (
             string line in
-            Regex.Split(
+            System.Text.RegularExpressions.Regex.Split(
                 file_lines,
-                @"([:;(){}+*/%-]|[<>!=]=?|\r\n|\r|\n|"".*""|\blet\b|\bbool\b|\bfalse\b|\btrue\b|\bint\b|\bfloat\b|\bprint\b|\bscan\b|\bif\b|\belse\b|\bwhile\b|\band\b|\bor\b|\bnot\b|\breturn\b)"
+                @"([:;(){}+*/%-]|[<>!=]=?|\r\n|\r|\n|"".*""|" +
+                @"\blet\b|\bbool\b|\bfalse\b|\btrue\b|\bint\b|\bfloat\b|\bprint\b|\bscan\b|\bif\b|\belse\b|\bwhile\b|\band\b|\bor\b|\bnot\b|\breturn\b)"
             ).Select((s) => s.Trim(' ')).Where((s) => s.Length > 0).ToArray()
         ){
             if (line != Environment.NewLine){
