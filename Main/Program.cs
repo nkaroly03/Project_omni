@@ -30,6 +30,3 @@ File.WriteAllLines($"{out_dir_name}/{file_name}.ir", [$"src: {Path.GetFullPath(a
 File.WriteAllBytes($"{out_dir_name}/{file_name}.bc", bytecode);
 
 Console.WriteLine($"return value: {Interpreter.run(bytecode)}");
-
-List<int> l = [0,1,2,3];
-ReadOnlySpan<int> s = System.Runtime.InteropServices.CollectionsMarshal.AsSpan(l);
