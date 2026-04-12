@@ -65,12 +65,19 @@ public readonly struct Token{
     public override string ToString() => $"{{.line_number = {line_number}, .type = {type}, .id = {id}}}";
 }
 
+public class Syntax_error_exception : Exception{
+    public Syntax_error_exception(string msg) : base(msg){}
+    public Syntax_error_exception(string msg, Exception inner_exception) : base(msg, inner_exception){}
+
+    public Syntax_error_exception(){}
+}
+
 public static class Lexer{
     public static List<Token> tokenize(string path){
         List<Token> tokens = new();
 
         if (!path.EndsWith(".omni"))
-            throw new Exception("Bad file extension".colour_str());
+            throw new ArgumentOutOfRangeException("Bad file extension".colour_str());
 
         string file_lines = File.ReadAllText(path);
 
@@ -93,7 +100,7 @@ public static class Lexer{
                 }
             )
         )())
-            throw new Exception("Unclosed string literal".colour_str());
+            throw new Syntax_error_exception("Unclosed string literal".colour_str());
 
         int line_idx = 0;
         foreach (
@@ -160,7 +167,7 @@ public static class Lexer{
                                 else if (!char.IsDigit(line[0]) && line.All((c) => char.IsAsciiLetter(c) || char.IsDigit(c) || c == '_'))
                                     return Token.Type.ID;
                                 else
-                                    throw new Exception($"On line <{line_idx + 1}> found invalid token <{line}>".colour_str());
+                                    throw new Syntax_error_exception($"On line <{line_idx + 1}> found invalid token <{line}>".colour_str());
                             }
                         )
                     )(),
