@@ -1,11 +1,11 @@
-namespace Interpret;
+namespace AST_Interpret;
 
 using Lex;
 using Parse;
 using System.Diagnostics;
 using System.Globalization;
 
-public sealed class AST_Interpreter{
+public sealed class Interpreter{
     Dictionary<string, Value> m_ids;
     Dictionary<string, int> m_id_counts;
     List<Node> m_AST;
@@ -71,7 +71,7 @@ public sealed class AST_Interpreter{
             case Token.Type.PLUS:
             case Token.Type.MINUS:
                 v1 = calculate_expr(node.sub_nodes[0]);
-                if (node.sub_nodes.Count > 1){
+                if (node.sub_nodes.Length > 1){
                     v2 = calculate_expr(node.sub_nodes[1]);
                     return (node.token.type == Token.Type.PLUS) ? new(v1 + v2) : new(v1 - v2);
                 }
@@ -99,7 +99,7 @@ public sealed class AST_Interpreter{
         }
     }
 
-    Value run(List<Node> nodes, ref Value? result){
+    Value run(ReadOnlySpan<Node> nodes, ref Value? result){
         bool if_statement_ran = false;
         foreach (Node node in nodes){
             if (result is not null)
@@ -169,14 +169,14 @@ public sealed class AST_Interpreter{
         return result!;
     }
 
-    public AST_Interpreter(List<Node> AST) => (m_ids, m_id_counts, m_AST) = (new(), new(), AST);
-    public AST_Interpreter(List<Token> tokens) : this(Parser.build_AST(tokens)){}
-    public AST_Interpreter(string path) : this(Lexer.tokenize(path)){}
+    public Interpreter(List<Node> AST) => (m_ids, m_id_counts, m_AST) = (new(), new(), AST);
+    public Interpreter(List<Token> tokens) : this(Parser.build_AST(tokens)){}
+    public Interpreter(string path) : this(Lexer.tokenize(path)){}
 
     public Value run(){
         Value? temp = null;
 
-        temp = run(m_AST, ref temp);
+        temp = run(System.Runtime.InteropServices.CollectionsMarshal.AsSpan(m_AST), ref temp);
 
         m_ids = new();
         m_id_counts = new();

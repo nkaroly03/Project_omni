@@ -8,8 +8,7 @@
     ".NETCoreApp,Version=v10.0": {
       "Interpret/1.0.0": {
         "dependencies": {
-          "Compile": "1.0.0",
-          "Parse": "1.0.0"
+          "Compile": "1.0.0"
         },
         "runtime": {
           "Interpret.dll": {}

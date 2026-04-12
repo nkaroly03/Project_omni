@@ -1,7 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\Parse\Parse.csproj" />
     <ProjectReference Include="..\Compile\Compile.csproj" />
   </ItemGroup>
 

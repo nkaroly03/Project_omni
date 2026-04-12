@@ -60,8 +60,7 @@
   },
   "projectFileDependencyGroups": {
     "net10.0": [
-      "Compile >= 1.0.0",
-      "Parse >= 1.0.0"
+      "Compile >= 1.0.0"
     ]
   },
   "packageFolders": {
@@ -93,9 +92,6 @@
           "projectReferences": {
             "C:\\Users\\giganibba840\\Desktop\\C#\\Project_omni\\Compile\\Compile.csproj": {
               "projectPath": "C:\\Users\\giganibba840\\Desktop\\C#\\Project_omni\\Compile\\Compile.csproj"
-            },
-            "C:\\Users\\giganibba840\\Desktop\\C#\\Project_omni\\Parse\\Parse.csproj": {
-              "projectPath": "C:\\Users\\giganibba840\\Desktop\\C#\\Project_omni\\Parse\\Parse.csproj"
             }
           }
         }

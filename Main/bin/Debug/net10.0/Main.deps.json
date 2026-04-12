@@ -8,6 +8,7 @@
     ".NETCoreApp,Version=v10.0": {
       "Main/1.0.0": {
         "dependencies": {
+          "AST_Interpret": "1.0.0",
           "Compile": "1.0.0",
           "Interpret": "1.0.0",
           "Lex": "1.0.0",
@@ -15,6 +16,18 @@
         },
         "runtime": {
           "Main.dll": {}
+        }
+      },
+      "AST_Interpret/1.0.0": {
+        "dependencies": {
+          "Lex": "1.0.0",
+          "Parse": "1.0.0"
+        },
+        "runtime": {
+          "AST_Interpret.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
         }
       },
       "Compile/1.0.0": {
@@ -31,8 +44,7 @@
       },
       "Interpret/1.0.0": {
         "dependencies": {
-          "Compile": "1.0.0",
-          "Parse": "1.0.0"
+          "Compile": "1.0.0"
         },
         "runtime": {
           "Interpret.dll": {
@@ -64,6 +76,11 @@
   },
   "libraries": {
     "Main/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "AST_Interpret/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

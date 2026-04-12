@@ -12,6 +12,9 @@ static class Compiler_extensions{
     extension(string self){
         public string get_string_literal() => System.Text.RegularExpressions.Regex.Unescape(self[1..(self.Length - 1)]);
     }
+    extension(ReadOnlySpan<Node> self){
+        public Node Last() => self[self.Length - 1];
+    }
 }
 
 public static class Compiler{
@@ -123,7 +126,7 @@ public static class Compiler{
 
             case Token.Type.PLUS:
                 to_IR(current_AST_node.sub_nodes[0], null, stack_info, sb, ref stack_size, ref let_decl_counter);
-                if (current_AST_node.sub_nodes.Count > 1){
+                if (current_AST_node.sub_nodes.Length > 1){
                     to_IR(current_AST_node.sub_nodes[1], null, stack_info, sb, ref stack_size, ref let_decl_counter);
                     sb.add_instruction($"{stack_size - 1} ; ADD");
                     --stack_size;
@@ -131,7 +134,7 @@ public static class Compiler{
                 break;
             case Token.Type.MINUS:
                 to_IR(current_AST_node.sub_nodes[0], null, stack_info, sb, ref stack_size, ref let_decl_counter);
-                if (current_AST_node.sub_nodes.Count > 1){
+                if (current_AST_node.sub_nodes.Length > 1){
                     to_IR(current_AST_node.sub_nodes[1], null, stack_info, sb, ref stack_size, ref let_decl_counter);
                     sb.add_instruction($"{stack_size - 1} ; SUB");
                     --stack_size;
@@ -175,11 +178,11 @@ public static class Compiler{
                 --stack_size;
 
                 int if_let_decl_counter = 0;
-                List<Node> if_sub_nodes = current_AST_node.sub_nodes[1..];
-                if (if_sub_nodes.Count > 0){
+                ReadOnlySpan<Node> if_sub_nodes = current_AST_node.sub_nodes[1..];
+                if (if_sub_nodes.Length > 0){
                     bool was_if = false;
-                    foreach ((Node if_sub_node_current, Node if_sub_node_next) in if_sub_nodes[..(if_sub_nodes.Count - 1)].Zip(if_sub_nodes[1..]))
-                        was_if = (!was_if) ? to_IR(if_sub_node_current, if_sub_node_next, stack_info, if_else_sb, ref stack_size, ref if_let_decl_counter) : false;
+                    for (int i = 0; i < if_sub_nodes.Length - 1; ++i)
+                        was_if = (!was_if) ? to_IR(if_sub_nodes[i], if_sub_nodes[i + 1], stack_info, if_else_sb, ref stack_size, ref if_let_decl_counter) : false;
                     if (!was_if)
                         to_IR(if_sub_nodes.Last(), null, stack_info, if_else_sb, ref stack_size, ref if_let_decl_counter);
                 }
@@ -195,11 +198,11 @@ public static class Compiler{
 
                     if_else_sb.Clear();
 
-                    List<Node> else_sub_nodes = next_AST_node!.sub_nodes;
-                    if (else_sub_nodes.Count > 0){
+                    ReadOnlySpan<Node> else_sub_nodes = next_AST_node!.sub_nodes;
+                    if (else_sub_nodes.Length > 0){
                         bool was_if = false;
-                        foreach ((Node else_sub_node_current, Node else_sub_node_next) in else_sub_nodes[..(else_sub_nodes.Count - 1)].Zip(else_sub_nodes[1..]))
-                            was_if = (!was_if) ? to_IR(else_sub_node_current, else_sub_node_next, stack_info, if_else_sb, ref stack_size, ref else_let_decl_counter) : false;
+                        for (int i = 0; i < else_sub_nodes.Length - 1; ++i)
+                            was_if = (!was_if) ? to_IR(else_sub_nodes[i], else_sub_nodes[i + 1], stack_info, if_else_sb, ref stack_size, ref else_let_decl_counter) : false;
                         if (!was_if)
                             to_IR(else_sub_nodes.Last(), null, stack_info, if_else_sb, ref stack_size, ref else_let_decl_counter);
                     }
@@ -218,12 +221,12 @@ public static class Compiler{
                 
                 StringBuilder while_sb = new();
 
-                List<Node> while_sub_nodes = current_AST_node.sub_nodes[1..];
-                if (while_sub_nodes.Count > 0){
+                ReadOnlySpan<Node> while_sub_nodes = current_AST_node.sub_nodes[1..];
+                if (while_sub_nodes.Length > 0){
                     int while_let_decl_counter = 0;
 
-                    foreach ((Node while_sub_node_current, Node while_sub_node_next) in while_sub_nodes[..(while_sub_nodes.Count - 1)].Zip(while_sub_nodes[1..]))
-                        to_IR(while_sub_node_current, while_sub_node_next, stack_info, while_sb, ref stack_size, ref while_let_decl_counter);
+                    for (int i = 0; i < while_sub_nodes.Length - 1; ++i)
+                        to_IR(while_sub_nodes[i], while_sub_nodes[i + 1], stack_info, while_sb, ref stack_size, ref while_let_decl_counter);
                     to_IR(while_sub_nodes.Last(), null, stack_info, while_sb, ref stack_size, ref while_let_decl_counter);
 
                     while (while_let_decl_counter-- > 0){

@@ -2,6 +2,20 @@
   "version": 3,
   "targets": {
     "net10.0": {
+      "AST_Interpret/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v10.0",
+        "dependencies": {
+          "Lex": "1.0.0",
+          "Parse": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/AST_Interpret.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/AST_Interpret.dll": {}
+        }
+      },
       "Compile/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v10.0",
@@ -20,8 +34,7 @@
         "type": "project",
         "framework": ".NETCoreApp,Version=v10.0",
         "dependencies": {
-          "Compile": "1.0.0",
-          "Parse": "1.0.0"
+          "Compile": "1.0.0"
         },
         "compile": {
           "bin/placeholder/Interpret.dll": {}
@@ -56,6 +69,11 @@
     }
   },
   "libraries": {
+    "AST_Interpret/1.0.0": {
+      "type": "project",
+      "path": "../AST_Interpret/AST_Interpret.csproj",
+      "msbuildProject": "../AST_Interpret/AST_Interpret.csproj"
+    },
     "Compile/1.0.0": {
       "type": "project",
       "path": "../Compile/Compile.csproj",
@@ -79,6 +97,7 @@
   },
   "projectFileDependencyGroups": {
     "net10.0": [
+      "AST_Interpret >= 1.0.0",
       "Compile >= 1.0.0",
       "Interpret >= 1.0.0",
       "Lex >= 1.0.0",
@@ -112,6 +131,9 @@
         "net10.0": {
           "targetAlias": "net10.0",
           "projectReferences": {
+            "C:\\Users\\giganibba840\\Desktop\\C#\\Project_omni\\AST_Interpret\\AST_Interpret.csproj": {
+              "projectPath": "C:\\Users\\giganibba840\\Desktop\\C#\\Project_omni\\AST_Interpret\\AST_Interpret.csproj"
+            },
             "C:\\Users\\giganibba840\\Desktop\\C#\\Project_omni\\Compile\\Compile.csproj": {
               "projectPath": "C:\\Users\\giganibba840\\Desktop\\C#\\Project_omni\\Compile\\Compile.csproj"
             },

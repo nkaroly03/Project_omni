@@ -7,9 +7,10 @@ string[] argv = Environment.GetCommandLineArgs();
 
 List<Token> tokens = Lexer.tokenize(argv[1]);
 List<Node> AST = Parser.build_AST(tokens);
-// foreach (Node node in AST)
-    // Console.WriteLine(node);
-// Console.WriteLine(new string('-', 40));
+// foreach (Node node in AST){
+    // Console.Write(node);
+    // Console.WriteLine(new string('-', 40));
+// }
 
 string IR = Compiler.to_IR(AST);
 // Console.WriteLine(IR);
@@ -29,3 +30,6 @@ File.WriteAllLines($"{out_dir_name}/{file_name}.ir", [$"src: {Path.GetFullPath(a
 File.WriteAllBytes($"{out_dir_name}/{file_name}.bc", bytecode);
 
 Console.WriteLine($"return value: {Interpreter.run(bytecode)}");
+
+List<int> l = [0,1,2,3];
+ReadOnlySpan<int> s = System.Runtime.InteropServices.CollectionsMarshal.AsSpan(l);
