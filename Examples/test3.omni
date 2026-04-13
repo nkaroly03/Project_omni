@@ -1,6 +1,8 @@
-let i: int = 8;
-while (i >= 0){
-    i = i - 1;
-    print((137 >> i) & 1);
-}
+let i: int = 1;
+let int_cast: int = 0;
+
+print("i << (int_cast = 3.14): ");
+print(i << (int_cast = 3.14));
 print("\n");
+
+int_cast = 3.14;

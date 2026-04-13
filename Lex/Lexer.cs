@@ -133,7 +133,6 @@ public static class Lexer{
                     "<="     => Token.Type.LESS_THAN_EQ,
                     ">"      => Token.Type.GREATER_THAN,
                     ">="     => Token.Type.GREATER_THAN_EQ,
-                    "="      => Token.Type.EQ,
                     "+"      => Token.Type.PLUS,
                     "-"      => Token.Type.MINUS,
                     "*"      => Token.Type.ASTERISK,
@@ -150,6 +149,8 @@ public static class Lexer{
                     "and"    => Token.Type.AND,
                     "or"     => Token.Type.OR,
                     "not"    => Token.Type.NOT,
+
+                    "="      => Token.Type.EQ,
 
                     "let"    => Token.Type.LET_DECL,
 

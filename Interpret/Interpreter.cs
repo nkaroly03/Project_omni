@@ -49,7 +49,14 @@ public static class Interpreter{
                     break;
 
                 case Compiler.Op_code.MOV:
-                    stack[stack.Count + BitConverter.ToInt32(bytecode[pc..][..sizeof(int)])] = stack.Last();
+                    int value_idx = stack.Count + BitConverter.ToInt32(bytecode[pc..][..sizeof(int)]);
+                    stack[value_idx] = stack[value_idx].data switch{
+                        bool  => new(stack.Last().to_bool()),
+                        int   => new(stack.Last().to_int()),
+                        float => new(stack.Last().to_float()),
+
+                        _ => throw new System.Diagnostics.UnreachableException(),
+                    };
                     pc += sizeof(int);
                     stack.pop();
                     break;
