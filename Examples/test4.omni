@@ -1,0 +1,10 @@
+let i: int = 0;
+
+if (true){
+    if (false){
+        print("ifif\n");
+    }
+    else{
+        print("ifelse\n");
+    }
+}

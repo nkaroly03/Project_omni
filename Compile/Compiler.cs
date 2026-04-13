@@ -65,7 +65,7 @@ public static class Compiler{
         NEG,
     }
 
-    static bool to_IR(Node current_AST_node, Node? next_AST_node, OrderedDictionary<string, int> stack_info, StringBuilder sb, ref int stack_size, ref int let_decl_counter){
+    static void to_IR(Node current_AST_node, Node? next_AST_node, OrderedDictionary<string, int> stack_info, StringBuilder sb, ref int stack_size, ref int let_decl_counter){
         switch (current_AST_node.token.type){
             case Token.Type.ID:
                 ++stack_size;
@@ -197,11 +197,10 @@ public static class Compiler{
                 int if_let_decl_counter = 0;
                 ReadOnlySpan<Node> if_sub_nodes = current_AST_node.sub_nodes[1..];
                 if (if_sub_nodes.Length > 0){
-                    bool was_if = false;
                     for (int i = 0; i < if_sub_nodes.Length - 1; ++i)
-                        was_if = (!was_if) ? to_IR(if_sub_nodes[i], if_sub_nodes[i + 1], stack_info, if_else_sb, ref stack_size, ref if_let_decl_counter) : false;
-                    if (!was_if)
-                        to_IR(if_sub_nodes[^1], null, stack_info, if_else_sb, ref stack_size, ref if_let_decl_counter);
+                        if (if_sub_nodes[i].token.type != Token.Type.ELSE)
+                            to_IR(if_sub_nodes[i], if_sub_nodes[i + 1], stack_info, if_else_sb, ref stack_size, ref if_let_decl_counter);
+                    to_IR(if_sub_nodes[^1], null, stack_info, if_else_sb, ref stack_size, ref if_let_decl_counter);
                 }
                 while (if_let_decl_counter-- > 0){
                     if_else_sb.add_instruction($"{--stack_size} ; POP");
@@ -217,11 +216,10 @@ public static class Compiler{
 
                     ReadOnlySpan<Node> else_sub_nodes = next_AST_node!.sub_nodes;
                     if (else_sub_nodes.Length > 0){
-                        bool was_if = false;
                         for (int i = 0; i < else_sub_nodes.Length - 1; ++i)
-                            was_if = (!was_if) ? to_IR(else_sub_nodes[i], else_sub_nodes[i + 1], stack_info, if_else_sb, ref stack_size, ref else_let_decl_counter) : false;
-                        if (!was_if)
-                            to_IR(else_sub_nodes[^1], null, stack_info, if_else_sb, ref stack_size, ref else_let_decl_counter);
+                            if (else_sub_nodes[i].token.type != Token.Type.ELSE)
+                                to_IR(else_sub_nodes[i], else_sub_nodes[i + 1], stack_info, if_else_sb, ref stack_size, ref else_let_decl_counter);
+                        to_IR(else_sub_nodes[^1], null, stack_info, if_else_sb, ref stack_size, ref else_let_decl_counter);
                     }
                     while (else_let_decl_counter-- > 0){
                         if_else_sb.add_instruction($"{--stack_size} ; POP");
@@ -230,7 +228,7 @@ public static class Compiler{
                     sb.add_instruction($"{stack_size} ; JMP {if_else_sb.count_instructions()}");
                     sb.Append(if_else_sb);
                 }
-                return true;
+                break;
             case Token.Type.WHILE:
                 StringBuilder while_condition_sb = new();
                 to_IR(current_AST_node.sub_nodes[0], null, stack_info, while_condition_sb, ref stack_size, ref let_decl_counter);
@@ -264,8 +262,6 @@ public static class Compiler{
                 --stack_size;
                 break;
         }
-
-        return false;
     }
 
     public static string to_IR(ReadOnlySpan<Node> AST){
@@ -276,14 +272,11 @@ public static class Compiler{
         int stack_size = 0;
         int let_decl_counter = 0;
 
-        bool was_if = false;
         for (int i = 0; i < AST.Length - 1; ++i){
-            if (!was_if){
-                was_if = to_IR(AST[i], AST[i + 1], stack_info, sb, ref stack_size, ref let_decl_counter);
+            if (AST[i].token.type != Token.Type.ELSE){
+                to_IR(AST[i], AST[i + 1], stack_info, sb, ref stack_size, ref let_decl_counter);
                 sb.AppendLine();
             }
-            else
-                was_if = false;
         }
         to_IR(AST[^1], null, stack_info, sb, ref stack_size, ref let_decl_counter);
 

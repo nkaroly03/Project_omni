@@ -205,9 +205,13 @@ public static class Parser{
                 if (tok.type != Token.Type.RPAREN)
                     throw new Syntax_error_exception($"On line <{tok.line_number}> <print> must be closed by <)>");
 
-                tok = tokens.Pop();
-                if (tok.type != Token.Type.SEMICOLON)
-                    throw new Syntax_error_exception($"On line <{tok.line_number}> <print> statement must be close by <;>");
+                if (tokens.Count > 0){
+                    tok = tokens.Pop();
+                    if (tok.type != Token.Type.SEMICOLON)
+                        throw new Syntax_error_exception($"On line <{tok.line_number}> <print> statement must be close by <;>");
+                }
+                else
+                    throw new Syntax_error_exception($"On line <{tok.line_number}> found missing <;>");
 
                 break;
             case Token.Type.SCAN:

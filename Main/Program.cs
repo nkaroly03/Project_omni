@@ -13,7 +13,7 @@ foreach (Node node in AST){
 }
 
 string IR = Compiler.to_IR(AST);
-// Console.WriteLine(IR);
+Console.WriteLine(IR);
 ReadOnlySpan<byte> bytecode = Compiler.to_bytecode(IR);
 
 // for (int i = 0; i < bytecode.Length; ++i){
