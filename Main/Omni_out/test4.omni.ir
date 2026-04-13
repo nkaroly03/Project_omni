@@ -3,14 +3,6 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Examples\test4.omni
     1 ; PUSH 0
     1 ; TO_INT
 
-    2 ; PUSH TRUE
-    1 ; JMPZ 6
-    2 ; PUSH FALSE
-    1 ; JMPZ 3
-    1 ; PRINT "ifif\n"
-    1 ; JMP 2
-    1 ; PRINT "elseelse\n"
-
     2 ; PUSH 0
     1 ; RET
     0 ; POP

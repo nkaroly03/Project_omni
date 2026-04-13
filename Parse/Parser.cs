@@ -103,8 +103,8 @@ public static class Parser{
         }
         else if (tok.type == Token.Type.PLUS || tok.type == Token.Type.MINUS || tok.type == Token.Type.BITWISE_NEG || tok.type == Token.Type.NOT){
             lhs = tokens.Peek().type switch{
-                Token.Type.ID or Token.Type.FALSE or Token.Type.TRUE or Token.Type.INT_LIT or Token.Type.FLOAT_LIT =>
-                    new(){token = tok, m_sub_nodes = [new(){token = tokens.Pop()}]},
+                Token.Type.ID or Token.Type.FALSE or Token.Type.TRUE or Token.Type.INT_LIT or Token.Type.FLOAT_LIT
+                    => new(){token = tok, m_sub_nodes = [new(){token = tokens.Pop()}]},
 
                 Token.Type.LPAREN => new(){token = tok, m_sub_nodes = [parse_arithm_expr(tokens, Token.Type.NOT.binding_powers().Item2)]},
 

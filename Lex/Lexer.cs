@@ -1,5 +1,7 @@
 ﻿namespace Lex;
 
+using System.Globalization;
+
 public static class Lex_extensions{
     extension(string self){
         public string colour_str(byte r, byte g, byte b) => $"\x1b[38;2;{r};{g};{b}m{self}\x1b[0m";
@@ -70,7 +72,7 @@ public readonly struct Token{
     public required readonly Type type{ get; init; }
     public required readonly string id{ get; init; }
 
-    public override string ToString() => $"{{.line_number = {line_number}, .type = {type}, .id = {id}}}";
+    public override string ToString() => $"{{.{nameof(line_number)} = {line_number}, .{nameof(type)} = {type}, .{nameof(id)} = {id}}}";
 }
 
 public class Syntax_error_exception : Exception{
@@ -116,6 +118,8 @@ public static class Lexer{
             ).Select((s) => s.Trim(' ')).Where((s) => s.Length > 0).ToArray()
         ){
             if (line != Environment.NewLine){
+                string token_id = line;
+
                 Token.Type token_type = line switch{
                     "false"  => Token.Type.FALSE,
                     "true"   => Token.Type.TRUE,
@@ -171,10 +175,20 @@ public static class Lexer{
                     _ => ((Func<Token.Type>)(() => {
                         if (line.All((c) => char.IsDigit(c)))
                             return Token.Type.INT_LIT;
+                        else if ((line.StartsWith("0x") || line.StartsWith("0X")) && line[2..].All((c) => char.IsAsciiHexDigit(c))){
+                            token_id = int.Parse(line[2..], NumberStyles.AllowHexSpecifier).ToString();
+                            return Token.Type.INT_LIT;
+                        }
+                        else if ((line.StartsWith("0b") || line.StartsWith("0B")) && line[2..].All((c) => c == '0' || c == '1')){
+                            token_id = int.Parse(line[2..], NumberStyles.AllowBinarySpecifier).ToString();
+                            return Token.Type.INT_LIT;
+                        }
                         else if (line.Count((c) => c == '.') == 1 && line[0] != '.' && line.All((c) => char.IsDigit(c) || c == '.'))
                             return Token.Type.FLOAT_LIT;
-                        else if (line[0] == '"')
+                        else if (line[0] == '"'){
+                            token_id = line[1..(line.Length - 1)];
                             return Token.Type.STR_LIT;
+                        }
                         else if (!char.IsDigit(line[0]) && line.All((c) => char.IsAsciiLetter(c) || char.IsDigit(c) || c == '_'))
                             return Token.Type.ID;
                         else
@@ -184,7 +198,7 @@ public static class Lexer{
                 if (tokens.Count > 0 && tokens.Last().type == Token.Type.STR_LIT && token_type == Token.Type.STR_LIT)
                     tokens[tokens.Count - 1] = tokens.Last() with{id = tokens.Last().id + line[1..(line.Length - 1)]};
                 else
-                    tokens.Add(new(){type = token_type, id = (token_type != Token.Type.STR_LIT) ? line : line[1..(line.Length - 1)], line_number = line_idx + 1});
+                    tokens.Add(new(){type = token_type, id = token_id, line_number = line_idx + 1});
             }
             else
                 ++line_idx;
