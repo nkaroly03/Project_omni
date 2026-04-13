@@ -43,6 +43,14 @@ public sealed class Value{
 
         return temp;
     }
+    static Value bitwise_arithm_op(Value v1, Value v2, Action<Value, Value> op){
+        if (v1.data is not int || v2.data is not int)
+            throw new InvalidOperationException("Trying to use bitwise operations on non integer types");
+
+        op(v1, v2);
+
+        return v1;
+    }
 
     static bool cmp_op(Value v1, Value v2, Func<int, int, bool> int_cmp, Func<float, float, bool> float_cmp){
         switch (v1.data){
@@ -85,6 +93,17 @@ public sealed class Value{
     public static Value operator*(Value v1, Value v2) => arithm_op(new(v1), new(v2), (_v1, _v2) => _v1 *= _v2);
     public static Value operator/(Value v1, Value v2) => arithm_op(new(v1), new(v2), (_v1, _v2) => _v1 /= _v2);
     public static Value operator%(Value v1, Value v2) => arithm_op(new(v1), new(v2), (_v1, _v2) => _v1 %= _v2);
+
+    public static Value operator<<(Value v1, Value v2) => bitwise_arithm_op(new(v1), new(v2), (_v1, _v2) => _v1 <<= _v2);
+    public static Value operator>>(Value v1, Value v2) => bitwise_arithm_op(new(v1), new(v2), (_v1, _v2) => _v1 >>= _v2);
+    public static Value operator& (Value v1, Value v2) => bitwise_arithm_op(new(v1), new(v2), (_v1, _v2) => _v1  &= _v2);
+    public static Value operator| (Value v1, Value v2) => bitwise_arithm_op(new(v1), new(v2), (_v1, _v2) => _v1  |= _v2);
+    public static Value operator^ (Value v1, Value v2) => bitwise_arithm_op(new(v1), new(v2), (_v1, _v2) => _v1  ^= _v2);
+    public static Value operator~ (Value v) => v.data switch{
+        int => new(~v.to_int()),
+
+        _ => throw new InvalidOperationException("Trying to use bitwise operations on non integer types"),
+    };
 
     public static bool operator< (Value v1, Value v2) => cmp_op(v1, v2, (i1, i2) => (i1 <  i2), (f1, f2) => (f1 <  f2));
     public static bool operator<=(Value v1, Value v2) => cmp_op(v1, v2, (i1, i2) => (i1 <= i2), (f1, f2) => (f1 <= f2));
@@ -164,4 +183,35 @@ public sealed class Value{
 
         _ => throw new UnreachableException()
     };
+
+    public void operator<<=(Value v){
+        if (data is not int || v.data is not int)
+            throw new InvalidOperationException("Trying to use bitwise operations on non integer types");
+
+        data = to_int() << v.to_int();
+    }
+    public void operator>>=(Value v){
+        if (data is not int || v.data is not int)
+            throw new InvalidOperationException("Trying to use bitwise operations on non integer types");
+
+        data = to_int() >> v.to_int();
+    }
+    public void operator&=(Value v){
+        if (data is not int || v.data is not int)
+            throw new InvalidOperationException("Trying to use bitwise operations on non integer types");
+
+        data = to_int() & v.to_int();
+    }
+    public void operator|=(Value v){
+        if (data is not int || v.data is not int)
+            throw new InvalidOperationException("Trying to use bitwise operations on non integer types");
+
+        data = to_int() | v.to_int();
+    }
+    public void operator^=(Value v){
+        if (data is not int || v.data is not int)
+            throw new InvalidOperationException("Trying to use bitwise operations on non integer types");
+
+        data = to_int() ^ v.to_int();
+    }
 }

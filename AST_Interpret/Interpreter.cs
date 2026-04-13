@@ -169,8 +169,8 @@ public sealed class Interpreter{
         return result!;
     }
 
-    public Interpreter(List<Node> AST) => (m_ids, m_id_counts, m_AST) = (new(), new(), AST);
-    public Interpreter(List<Token> tokens) : this(Parser.build_AST(tokens)){}
+    public Interpreter(ReadOnlySpan<Node> AST) => (m_ids, m_id_counts, m_AST) = (new(), new(), AST.ToArray().ToList());
+    public Interpreter(ReadOnlySpan<Token> tokens) : this(Parser.build_AST(tokens)){}
     public Interpreter(string path) : this(Lexer.tokenize(path)){}
 
     public Value run(){

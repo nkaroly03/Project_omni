@@ -24,18 +24,30 @@ public readonly struct Token{
         LBRACE,
         RBRACE,
 
+        EQUALS,
+        NOT_EQUALS,
         LESS_THAN,
         LESS_THAN_EQ,
         GREATER_THAN,
         GREATER_THAN_EQ,
-        NOT_EQUALS,
-        EQUALS,
-        EQ,
         PLUS,
         MINUS,
         ASTERISK,
         SLASH,
         PERCENT,
+
+        SHIFT_LEFT,
+        SHIFT_RIGHT,
+        BITWISE_AND,
+        BITWISE_OR,
+        XOR,
+        BITWISE_NEG,
+
+        AND,
+        OR,
+        NOT,
+
+        EQ,
         
         LET_DECL,
 
@@ -50,10 +62,6 @@ public readonly struct Token{
         ELSE,
 
         WHILE,
-
-        AND,
-        OR,
-        NOT,
 
         RETURN
     }
@@ -73,7 +81,7 @@ public class Syntax_error_exception : Exception{
 }
 
 public static class Lexer{
-    public static List<Token> tokenize(string path){
+    public static ReadOnlySpan<Token> tokenize(string path){
         List<Token> tokens = new();
 
         if (!path.EndsWith(".omni"))
@@ -103,7 +111,7 @@ public static class Lexer{
             string line in
             System.Text.RegularExpressions.Regex.Split(
                 file_lines,
-                @"([:;(){}+*/%-]|[<>!=]=?|\r\n|\r|\n|"".*""|" +
+                @"([:;(){}+*/%&|^~-]|<<|>>|!=|[<>=]=?|\r\n|\r|\n|"".*""|" +
                 @"\blet\b|\bbool\b|\bfalse\b|\btrue\b|\bint\b|\bfloat\b|\bprint\b|\bscan\b|\bif\b|\belse\b|\bwhile\b|\band\b|\bor\b|\bnot\b|\breturn\b)"
             ).Select((s) => s.Trim(' ')).Where((s) => s.Length > 0).ToArray()
         ){
@@ -119,18 +127,29 @@ public static class Lexer{
                     "{"      => Token.Type.LBRACE,
                     "}"      => Token.Type.RBRACE,
 
+                    "=="     => Token.Type.EQUALS,
+                    "!="     => Token.Type.NOT_EQUALS,
                     "<"      => Token.Type.LESS_THAN,
                     "<="     => Token.Type.LESS_THAN_EQ,
                     ">"      => Token.Type.GREATER_THAN,
                     ">="     => Token.Type.GREATER_THAN_EQ,
-                    "!="     => Token.Type.NOT_EQUALS,
-                    "=="     => Token.Type.EQUALS,
                     "="      => Token.Type.EQ,
                     "+"      => Token.Type.PLUS,
+                    "-"      => Token.Type.MINUS,
                     "*"      => Token.Type.ASTERISK,
                     "/"      => Token.Type.SLASH,
                     "%"      => Token.Type.PERCENT,
-                    "-"      => Token.Type.MINUS,
+
+                    "<<"     => Token.Type.SHIFT_LEFT,
+                    ">>"     => Token.Type.SHIFT_RIGHT,
+                    "&"      => Token.Type.BITWISE_AND,
+                    "|"      => Token.Type.BITWISE_OR,
+                    "^"      => Token.Type.XOR,
+                    "~"      => Token.Type.BITWISE_NEG,
+
+                    "and"    => Token.Type.AND,
+                    "or"     => Token.Type.OR,
+                    "not"    => Token.Type.NOT,
 
                     "let"    => Token.Type.LET_DECL,
 
@@ -145,10 +164,6 @@ public static class Lexer{
                     "else"   => Token.Type.ELSE,
 
                     "while"  => Token.Type.WHILE,
-
-                    "and"    => Token.Type.AND,
-                    "or"     => Token.Type.OR,
-                    "not"    => Token.Type.NOT,
 
                     "return" => Token.Type.RETURN,
 
@@ -174,6 +189,6 @@ public static class Lexer{
                 ++line_idx;
         }
 
-        return tokens;
+        return System.Runtime.InteropServices.CollectionsMarshal.AsSpan(tokens);
     }
 }

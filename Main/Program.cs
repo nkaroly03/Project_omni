@@ -5,8 +5,8 @@ using Parse;
 
 string[] argv = Environment.GetCommandLineArgs();
 
-List<Token> tokens = Lexer.tokenize(argv[1]);
-List<Node> AST = Parser.build_AST(tokens);
+ReadOnlySpan<Token> tokens = Lexer.tokenize(argv[1]);
+ReadOnlySpan<Node> AST = Parser.build_AST(tokens);
 // foreach (Node node in AST){
     // Console.Write(node);
     // Console.WriteLine(new string('-', 40));
@@ -14,10 +14,10 @@ List<Node> AST = Parser.build_AST(tokens);
 
 string IR = Compiler.to_IR(AST);
 // Console.WriteLine(IR);
-byte[] bytecode = Compiler.to_bytecode(IR);
+ReadOnlySpan<byte> bytecode = Compiler.to_bytecode(IR);
 
-// foreach ((int i, byte instruction) in bytecode.Index()){
-    // Console.Write($"{instruction.ToString().PadLeft(3)}, ");
+// for (int i = 0; i < bytecode.Length; ++i){
+    // Console.Write($"{bytecode[i].ToString().PadLeft(3)}, ");
     // if ((i + 1) % 10 == 0)
         // Console.WriteLine();
 // }

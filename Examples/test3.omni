@@ -1,0 +1,6 @@
+let i: int = 8;
+while (i >= 0){
+    i = i - 1;
+    print((137 >> i) & 1);
+}
+print("\n");

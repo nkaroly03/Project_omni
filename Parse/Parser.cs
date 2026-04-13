@@ -6,25 +6,35 @@ using System.Text;
 static class Parse_extensions{
     extension(Token.Type self){
         public bool is_atom() => (int)self >= (int)Token.Type.ID && (int)self <= (int)Token.Type.STR_LIT;
-        public bool is_operation() => (int)self >= (int)Token.Type.LESS_THAN && (int)self <= (int)Token.Type.RETURN;
+        public bool is_operation() => (int)self >= (int)Token.Type.EQUALS && (int)self <= (int)Token.Type.EQ;
 
         public Tuple<float, float> binding_powers(){
             switch (self){
                 case Token.Type.NOT:
-                    return new(7.1f, 7.0f);
+                case Token.Type.BITWISE_NEG:
+                    return new(11.1f, 11.0f);
                 case Token.Type.ASTERISK:
                 case Token.Type.SLASH:
                 case Token.Type.PERCENT:
-                    return new(6.1f, 6.0f);
+                    return new(10.1f, 10.0f);
                 case Token.Type.PLUS:
                 case Token.Type.MINUS:
-                    return new(5.0f, 5.1f);
+                    return new(9.0f, 9.1f);
+                case Token.Type.SHIFT_LEFT:
+                case Token.Type.SHIFT_RIGHT:
+                    return new(8.0f, 8.1f);
+                case Token.Type.EQUALS:
+                case Token.Type.NOT_EQUALS:
                 case Token.Type.LESS_THAN:
                 case Token.Type.LESS_THAN_EQ:
                 case Token.Type.GREATER_THAN:
                 case Token.Type.GREATER_THAN_EQ:
-                case Token.Type.EQUALS:
-                case Token.Type.NOT_EQUALS:
+                    return new(7.0f, 7.1f);
+                case Token.Type.BITWISE_AND:
+                    return new(6.0f, 6.1f);
+                case Token.Type.XOR:
+                    return new(5.0f, 5.1f);
+                case Token.Type.BITWISE_OR:
                     return new(4.0f, 4.1f);
                 case Token.Type.AND:
                     return new(3.0f, 3.1f);
@@ -91,7 +101,7 @@ public static class Parser{
 
             lhs = temp;
         }
-        else if (tok.type == Token.Type.NOT || tok.type == Token.Type.PLUS || tok.type == Token.Type.MINUS){
+        else if (tok.type == Token.Type.PLUS || tok.type == Token.Type.MINUS || tok.type == Token.Type.BITWISE_NEG || tok.type == Token.Type.NOT){
             lhs = tokens.Peek().type switch{
                 Token.Type.ID or Token.Type.FALSE or Token.Type.TRUE or Token.Type.INT_LIT or Token.Type.FLOAT_LIT =>
                     new(){token = tok, m_sub_nodes = [new(){token = tokens.Pop()}]},
@@ -258,16 +268,17 @@ public static class Parser{
         return node;
     }
 
-    public static List<Node> build_AST(List<Token> tokens){
-        tokens.Reverse();
+    public static ReadOnlySpan<Node> build_AST(ReadOnlySpan<Token> tokens){
+        List<Token> token_list = tokens.ToArray().ToList();
+        token_list.Reverse();
 
         List<Node> nodes = new(); 
 
-        Stack<Token> token_stack = new(tokens);
+        Stack<Token> token_stack = new(token_list);
 
-        if (tokens.Count((t) => t.type == Token.Type.LPAREN) != tokens.Count((t) => t.type == Token.Type.RPAREN))
+        if (token_list.Count((t) => t.type == Token.Type.LPAREN) != token_list.Count((t) => t.type == Token.Type.RPAREN))
             throw new Syntax_error_exception("The number of opening and closing parenthesis' must match");
-        if (tokens.Count((t) => t.type == Token.Type.LBRACE) != tokens.Count((t) => t.type == Token.Type.RBRACE))
+        if (token_list.Count((t) => t.type == Token.Type.LBRACE) != token_list.Count((t) => t.type == Token.Type.RBRACE))
             throw new Syntax_error_exception("The number of opening and closing braces must match");
 
         while (token_stack.Count > 0)
@@ -275,7 +286,7 @@ public static class Parser{
         if (nodes.Last().token.type != Token.Type.RETURN)
             nodes.Add(new(){token = new(){type = Token.Type.RETURN, id = "return"}, m_sub_nodes = [new(){token = new(){type = Token.Type.INT_LIT, id = "0"}}]});
 
-        return nodes;
+        return System.Runtime.InteropServices.CollectionsMarshal.AsSpan(nodes);
     }
 
     /*
