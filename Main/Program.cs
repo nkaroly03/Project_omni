@@ -7,13 +7,13 @@ string[] argv = Environment.GetCommandLineArgs();
 
 ReadOnlySpan<Token> tokens = Lexer.tokenize(argv[1]);
 ReadOnlySpan<Node> AST = Parser.build_AST(tokens);
-// foreach (Node node in AST){
-    // Console.Write(node);
-    // Console.WriteLine(new string('-', 40));
-// }
+foreach (Node node in AST){
+    Console.Write(node);
+    Console.WriteLine(new string('-', 40));
+}
 
 string IR = Compiler.to_IR(AST);
-// Console.WriteLine(IR);
+Console.WriteLine(IR);
 ReadOnlySpan<byte> bytecode = Compiler.to_bytecode(IR);
 
 // for (int i = 0; i < bytecode.Length; ++i){

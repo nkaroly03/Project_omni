@@ -1,51 +1,31 @@
 ﻿namespace Parse;
 
 using Lex;
-using System.Text;
 
 static class Parse_extensions{
     extension(Token.Type self){
         public bool is_atom() => (int)self >= (int)Token.Type.ID && (int)self <= (int)Token.Type.STR_LIT;
         public bool is_operation() => (int)self >= (int)Token.Type.EQUALS && (int)self <= (int)Token.Type.EQ;
 
-        public Tuple<float, float> binding_powers(){
-            switch (self){
-                case Token.Type.NOT:
-                case Token.Type.BITWISE_NEG:
-                    return new(11.1f, 11.0f);
-                case Token.Type.ASTERISK:
-                case Token.Type.SLASH:
-                case Token.Type.PERCENT:
-                    return new(10.1f, 10.0f);
-                case Token.Type.PLUS:
-                case Token.Type.MINUS:
-                    return new(9.0f, 9.1f);
-                case Token.Type.SHIFT_LEFT:
-                case Token.Type.SHIFT_RIGHT:
-                    return new(8.0f, 8.1f);
-                case Token.Type.EQUALS:
-                case Token.Type.NOT_EQUALS:
-                case Token.Type.LESS_THAN:
-                case Token.Type.LESS_THAN_EQ:
-                case Token.Type.GREATER_THAN:
-                case Token.Type.GREATER_THAN_EQ:
-                    return new(7.0f, 7.1f);
-                case Token.Type.BITWISE_AND:
-                    return new(6.0f, 6.1f);
-                case Token.Type.XOR:
-                    return new(5.0f, 5.1f);
-                case Token.Type.BITWISE_OR:
-                    return new(4.0f, 4.1f);
-                case Token.Type.AND:
-                    return new(3.0f, 3.1f);
-                case Token.Type.OR:
-                    return new(2.0f, 2.1f);
-                case Token.Type.EQ:
-                    return new(1.1f, 1.0f);
-                default:
-                    throw new ArgumentOutOfRangeException($"<{self}> of type <Token.Type> does not have an associated binding power");
-            }
-        }
+        public Tuple<float, float> binding_powers() => self switch{
+            Token.Type.NOT or Token.Type.BITWISE_NEG                      => new(11.1f, 11.0f),
+            Token.Type.ASTERISK or Token.Type.SLASH or Token.Type.PERCENT => new(10.1f, 10.0f),
+            Token.Type.PLUS or Token.Type.MINUS                           => new( 9.0f,  9.1f),
+            Token.Type.SHIFT_LEFT or Token.Type.SHIFT_RIGHT               => new( 8.0f,  8.1f),
+
+            Token.Type.EQUALS       or Token.Type.NOT_EQUALS      or
+            Token.Type.LESS_THAN    or Token.Type.LESS_THAN_EQ    or
+            Token.Type.GREATER_THAN or Token.Type.GREATER_THAN_EQ         => new(7.0f, 7.1f),
+
+            Token.Type.BITWISE_AND                                        => new(6.0f, 6.1f),
+            Token.Type.XOR                                                => new(5.0f, 5.1f),
+            Token.Type.BITWISE_OR                                         => new(4.0f, 4.1f),
+            Token.Type.AND                                                => new(3.0f, 3.1f),
+            Token.Type.OR                                                 => new(2.0f, 2.1f),
+            Token.Type.EQ                                                 => new(1.1f, 1.0f),
+
+            _ => throw new ArgumentOutOfRangeException($"<{self}> of type <Token.Type> does not have an associated binding power"),
+        };
     }
 }
 
@@ -55,7 +35,7 @@ public sealed class Node{
     public Token token{ get; internal set; }
     public ReadOnlySpan<Node> sub_nodes => System.Runtime.InteropServices.CollectionsMarshal.AsSpan(m_sub_nodes);
 
-    string tostring_helper(StringBuilder sb, int indent = 0){
+    string tostring_helper(System.Text.StringBuilder sb, int indent = 0){
         sb.Append(' ', indent);
         sb.AppendLine(token.id);
 
@@ -69,7 +49,7 @@ public sealed class Node{
 }
 
 public static class Parser{
-    static Node parse_arithm_expr(Stack<Token> tokens, float min_rhs_binding_power){
+    static Node parse_arithm_expr(Stack<Token> tokens, float prev_rhs_binding_power){
         Node lhs = new();
 
         Token tok = tokens.Pop();
@@ -123,7 +103,7 @@ public static class Parser{
                 throw new Syntax_error_exception($"On line <{op.line_number}> found invalid token <{op.id}>");
 
             (float l_bp, float r_bp) = op.type.binding_powers();
-            if (l_bp < min_rhs_binding_power)
+            if (l_bp < prev_rhs_binding_power)
                 break;
             tokens.Pop();
 

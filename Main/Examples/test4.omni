@@ -1,0 +1,7 @@
+let i: int = 0;
+let j: int = -1;
+
+print((i = 10));
+print("\n");
+
+return (i = -1);

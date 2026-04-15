@@ -65,7 +65,15 @@ public static class Compiler{
         NEG,
     }
 
-    static void to_IR(Node current_AST_node, Node? next_AST_node, OrderedDictionary<string, int> stack_info, StringBuilder sb, ref int stack_size, ref int let_decl_counter){
+    static void to_IR(
+        Node current_AST_node,
+		Node? next_AST_node,
+		OrderedDictionary<string, int> stack_info,
+		StringBuilder sb,
+		ref int stack_size,
+		ref int let_decl_counter,
+        bool push_back_after_assignment
+    ){
         switch (current_AST_node.token.type){
             case Token.Type.ID:
                 ++stack_size;
@@ -102,8 +110,8 @@ public static class Compiler{
             case Token.Type.XOR:
             case Token.Type.AND:
             case Token.Type.OR:
-                to_IR(current_AST_node.sub_nodes[0], null, stack_info, sb, ref stack_size, ref let_decl_counter);
-                to_IR(current_AST_node.sub_nodes[1], null, stack_info, sb, ref stack_size, ref let_decl_counter);
+                to_IR(current_AST_node.sub_nodes[0], null, stack_info, sb, ref stack_size, ref let_decl_counter, true);
+                to_IR(current_AST_node.sub_nodes[1], null, stack_info, sb, ref stack_size, ref let_decl_counter, true);
                 sb.add_instruction($"{stack_size - 1} ; {current_AST_node.token.type switch{
                     Token.Type.EQUALS          => "CMP_EQ",
                     Token.Type.NOT_EQUALS      => "CMP_NEQ",
@@ -128,26 +136,27 @@ public static class Compiler{
                 break;
 
             case Token.Type.BITWISE_NEG:
-                to_IR(current_AST_node.sub_nodes[0], null, stack_info, sb, ref stack_size, ref let_decl_counter);
+                to_IR(current_AST_node.sub_nodes[0], null, stack_info, sb, ref stack_size, ref let_decl_counter, true);
                 sb.add_instruction($"{stack_size} ; BNEG");
                 break;
             case Token.Type.NOT:
-                to_IR(current_AST_node.sub_nodes[0], null, stack_info, sb, ref stack_size, ref let_decl_counter);
+                to_IR(current_AST_node.sub_nodes[0], null, stack_info, sb, ref stack_size, ref let_decl_counter, true);
+                sb.add_instruction($"{stack_size} ; TO_BOOL");
                 sb.add_instruction($"{stack_size} ; NEG");
                 break;
 
             case Token.Type.PLUS:
-                to_IR(current_AST_node.sub_nodes[0], null, stack_info, sb, ref stack_size, ref let_decl_counter);
+                to_IR(current_AST_node.sub_nodes[0], null, stack_info, sb, ref stack_size, ref let_decl_counter, true);
                 if (current_AST_node.sub_nodes.Length > 1){
-                    to_IR(current_AST_node.sub_nodes[1], null, stack_info, sb, ref stack_size, ref let_decl_counter);
+                    to_IR(current_AST_node.sub_nodes[1], null, stack_info, sb, ref stack_size, ref let_decl_counter, true);
                     sb.add_instruction($"{stack_size - 1} ; ADD");
                     --stack_size;
                 }
                 break;
             case Token.Type.MINUS:
-                to_IR(current_AST_node.sub_nodes[0], null, stack_info, sb, ref stack_size, ref let_decl_counter);
+                to_IR(current_AST_node.sub_nodes[0], null, stack_info, sb, ref stack_size, ref let_decl_counter, true);
                 if (current_AST_node.sub_nodes.Length > 1){
-                    to_IR(current_AST_node.sub_nodes[1], null, stack_info, sb, ref stack_size, ref let_decl_counter);
+                    to_IR(current_AST_node.sub_nodes[1], null, stack_info, sb, ref stack_size, ref let_decl_counter, true);
                     sb.add_instruction($"{stack_size - 1} ; SUB");
                     --stack_size;
                 }
@@ -156,14 +165,18 @@ public static class Compiler{
                 break;
 
             case Token.Type.EQ:
-                to_IR(current_AST_node.sub_nodes[1], null, stack_info, sb, ref stack_size, ref let_decl_counter);
+                to_IR(current_AST_node.sub_nodes[1], null, stack_info, sb, ref stack_size, ref let_decl_counter, true);
                 sb.add_instruction($"{stack_size - 1} ; MOV SP[-{stack_size - stack_info[current_AST_node.sub_nodes[0].token.id]}]");
                 --stack_size;
+                if (push_back_after_assignment){
+                    sb.add_instruction($"{stack_size + 1} ; PUSH SP[-{stack_size - stack_info[current_AST_node.sub_nodes[0].token.id]}]");
+                    ++stack_size;
+                }
                 break;
 
             case Token.Type.LET_DECL:
-                to_IR(current_AST_node.sub_nodes[1].sub_nodes[0], null, stack_info, sb, ref stack_size, ref let_decl_counter);
-                to_IR(current_AST_node.sub_nodes[1], null, stack_info, sb, ref stack_size, ref let_decl_counter);
+                to_IR(current_AST_node.sub_nodes[1].sub_nodes[0], null, stack_info, sb, ref stack_size, ref let_decl_counter, true);
+                to_IR(current_AST_node.sub_nodes[1], null, stack_info, sb, ref stack_size, ref let_decl_counter, true);
                 stack_info.Add(current_AST_node.sub_nodes[0].token.id, stack_info.Count);
                 ++let_decl_counter;
                 break;
@@ -177,7 +190,7 @@ public static class Compiler{
                 if (print_sub_node.token.type == Token.Type.STR_LIT)
                     sb.add_instruction($"{stack_size} ; PRINT \"{print_sub_node.token.id}\"");
                 else{
-                    to_IR(print_sub_node, null, stack_info, sb, ref stack_size, ref let_decl_counter);
+                    to_IR(print_sub_node, null, stack_info, sb, ref stack_size, ref let_decl_counter, true);
                     sb.add_instruction($"{stack_size - 1} ; PRINT");
                     --stack_size;
                 }
@@ -191,7 +204,7 @@ public static class Compiler{
                 StringBuilder if_else_sb = new();
                 bool has_else_after = (next_AST_node is not null && next_AST_node.token.type == Token.Type.ELSE);
 
-                to_IR(current_AST_node.sub_nodes[0], null, stack_info, sb, ref stack_size, ref let_decl_counter);
+                to_IR(current_AST_node.sub_nodes[0], null, stack_info, sb, ref stack_size, ref let_decl_counter, true);
                 --stack_size;
 
                 int if_let_decl_counter = 0;
@@ -199,8 +212,8 @@ public static class Compiler{
                 if (if_sub_nodes.Length > 0){
                     for (int i = 0; i < if_sub_nodes.Length - 1; ++i)
                         if (if_sub_nodes[i].token.type != Token.Type.ELSE)
-                            to_IR(if_sub_nodes[i], if_sub_nodes[i + 1], stack_info, if_else_sb, ref stack_size, ref if_let_decl_counter);
-                    to_IR(if_sub_nodes[^1], null, stack_info, if_else_sb, ref stack_size, ref if_let_decl_counter);
+                            to_IR(if_sub_nodes[i], if_sub_nodes[i + 1], stack_info, if_else_sb, ref stack_size, ref if_let_decl_counter, false);
+                    to_IR(if_sub_nodes[^1], null, stack_info, if_else_sb, ref stack_size, ref if_let_decl_counter, false);
                 }
                 while (if_let_decl_counter-- > 0){
                     if_else_sb.add_instruction($"{--stack_size} ; POP");
@@ -218,8 +231,8 @@ public static class Compiler{
                     if (else_sub_nodes.Length > 0){
                         for (int i = 0; i < else_sub_nodes.Length - 1; ++i)
                             if (else_sub_nodes[i].token.type != Token.Type.ELSE)
-                                to_IR(else_sub_nodes[i], else_sub_nodes[i + 1], stack_info, if_else_sb, ref stack_size, ref else_let_decl_counter);
-                        to_IR(else_sub_nodes[^1], null, stack_info, if_else_sb, ref stack_size, ref else_let_decl_counter);
+                                to_IR(else_sub_nodes[i], else_sub_nodes[i + 1], stack_info, if_else_sb, ref stack_size, ref else_let_decl_counter, false);
+                        to_IR(else_sub_nodes[^1], null, stack_info, if_else_sb, ref stack_size, ref else_let_decl_counter, false);
                     }
                     while (else_let_decl_counter-- > 0){
                         if_else_sb.add_instruction($"{--stack_size} ; POP");
@@ -231,7 +244,7 @@ public static class Compiler{
                 break;
             case Token.Type.WHILE:
                 StringBuilder while_condition_sb = new();
-                to_IR(current_AST_node.sub_nodes[0], null, stack_info, while_condition_sb, ref stack_size, ref let_decl_counter);
+                to_IR(current_AST_node.sub_nodes[0], null, stack_info, while_condition_sb, ref stack_size, ref let_decl_counter, true);
                 --stack_size;
                 
                 StringBuilder while_sb = new();
@@ -241,8 +254,8 @@ public static class Compiler{
                     int while_let_decl_counter = 0;
 
                     for (int i = 0; i < while_sub_nodes.Length - 1; ++i)
-                        to_IR(while_sub_nodes[i], while_sub_nodes[i + 1], stack_info, while_sb, ref stack_size, ref while_let_decl_counter);
-                    to_IR(while_sub_nodes[^1], null, stack_info, while_sb, ref stack_size, ref while_let_decl_counter);
+                        to_IR(while_sub_nodes[i], while_sub_nodes[i + 1], stack_info, while_sb, ref stack_size, ref while_let_decl_counter, false);
+                    to_IR(while_sub_nodes[^1], null, stack_info, while_sb, ref stack_size, ref while_let_decl_counter, false);
 
                     while (while_let_decl_counter-- > 0){
                         while_sb.add_instruction($"{--stack_size} ; POP");
@@ -257,7 +270,7 @@ public static class Compiler{
                 break;
 
             case Token.Type.RETURN:
-                to_IR(current_AST_node.sub_nodes[0], null, stack_info, sb, ref stack_size, ref let_decl_counter);
+                to_IR(current_AST_node.sub_nodes[0], null, stack_info, sb, ref stack_size, ref let_decl_counter, true);
                 sb.add_instruction($"{stack_size - 1} ; RET");
                 --stack_size;
                 break;
@@ -274,11 +287,11 @@ public static class Compiler{
 
         for (int i = 0; i < AST.Length - 1; ++i){
             if (AST[i].token.type != Token.Type.ELSE){
-                to_IR(AST[i], AST[i + 1], stack_info, sb, ref stack_size, ref let_decl_counter);
+                to_IR(AST[i], AST[i + 1], stack_info, sb, ref stack_size, ref let_decl_counter, false);
                 sb.AppendLine();
             }
         }
-        to_IR(AST[^1], null, stack_info, sb, ref stack_size, ref let_decl_counter);
+        to_IR(AST[^1], null, stack_info, sb, ref stack_size, ref let_decl_counter, false);
 
         while (stack_size > 0)
             sb.add_instruction($"{--stack_size} ; POP");
