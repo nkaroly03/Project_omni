@@ -44,9 +44,6 @@ public sealed class Value{
         return temp;
     }
     static Value bitwise_arithm_op(Value v1, Value v2, Action<Value, Value> op){
-        if (v1.data is not int || v2.data is not int)
-            throw new InvalidOperationException("Trying to use bitwise operations on non integer types");
-
         op(v1, v2);
 
         return v1;

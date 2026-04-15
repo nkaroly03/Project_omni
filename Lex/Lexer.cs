@@ -198,7 +198,7 @@ public static class Lexer{
                     }))(),
                 };
                 if (tokens.Count > 0 && tokens[^1].type == Token.Type.STR_LIT && token_type == Token.Type.STR_LIT)
-                    tokens[tokens.Count - 1] = tokens[^1] with{id = tokens[^1].id + line[1..(line.Length - 1)]};
+                    tokens[^1] = tokens[^1] with{id = tokens[^1].id + line[1..(line.Length - 1)]};
                 else
                     tokens.Add(new(){type = token_type, id = token_id, line_number = line_idx + 1});
             }

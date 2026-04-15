@@ -1,6 +1,12 @@
-let i: int = 0;
+let i: int = 3;
 
-if (false);
-else if (false);
+if (i < 3 or (i = 10) == 10){
+    print("if\n");
+}
+else{
+    print("else\n");
+}
 
-return i;
+print("i: ");
+print(i);
+print("\n");

@@ -110,8 +110,6 @@ public static class Compiler{
             case Token.Type.BITWISE_AND:
             case Token.Type.BITWISE_OR:
             case Token.Type.XOR:
-            case Token.Type.AND:
-            case Token.Type.OR:
                 to_IR(current_AST_node.sub_nodes[0], null, stack_info, sb, ref stack_size, ref let_decl_counter, true);
                 to_IR(current_AST_node.sub_nodes[1], null, stack_info, sb, ref stack_size, ref let_decl_counter, true);
                 sb.add_instruction($"{stack_size - 1} ; {current_AST_node.token.type switch{
@@ -130,8 +128,6 @@ public static class Compiler{
                     Token.Type.BITWISE_AND     => "BAND",
                     Token.Type.BITWISE_OR      => "BOR",
                     Token.Type.XOR             => "XOR",
-                    Token.Type.AND             => "AND",
-                    Token.Type.OR              => "OR",
                     
                     _ => throw new System.Diagnostics.UnreachableException(),
                 }}");
@@ -141,6 +137,27 @@ public static class Compiler{
             case Token.Type.BITWISE_NEG:
                 to_IR(current_AST_node.sub_nodes[0], null, stack_info, sb, ref stack_size, ref let_decl_counter, true);
                 sb.add_instruction($"{stack_size} ; BNEG");
+                break;
+
+            case Token.Type.AND:
+            case Token.Type.OR:
+                to_IR(current_AST_node.sub_nodes[0], null, stack_info, sb, ref stack_size, ref let_decl_counter, true);
+                sb.add_instruction($"{stack_size} ; TO_BOOL");
+                if (current_AST_node.token.type == Token.Type.AND){
+                    sb.add_instruction($"{stack_size} ; NEG");
+                    sb.add_instruction($"{stack_size - 1} ; JMPZ 3");
+                    sb.add_instruction($"{stack_size} ; PUSH FALSE");
+                }
+                else{
+                    sb.add_instruction($"{stack_size - 1} ; JMPZ 3");
+                    sb.add_instruction($"{stack_size} ; PUSH TRUE");
+                }
+                StringBuilder and_or_sb = new();
+                --stack_size;
+                to_IR(current_AST_node.sub_nodes[1], null, stack_info, and_or_sb, ref stack_size, ref let_decl_counter, true);
+                sb.add_instruction($"{stack_size} ; JMP {and_or_sb.count_instructions()}");
+                sb.Append(and_or_sb);
+                sb.add_instruction($"{stack_size} ; TO_BOOL");
                 break;
             case Token.Type.NOT:
                 to_IR(current_AST_node.sub_nodes[0], null, stack_info, sb, ref stack_size, ref let_decl_counter, true);

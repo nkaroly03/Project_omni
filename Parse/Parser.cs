@@ -87,7 +87,7 @@ public static class Parser{
                 Token.Type.ID or Token.Type.FALSE or Token.Type.TRUE or Token.Type.INT_LIT or Token.Type.FLOAT_LIT
                     => new(){token = tok, m_sub_nodes = [new(){token = tokens.Pop()}]},
 
-                Token.Type.LPAREN => new(){token = tok, m_sub_nodes = [parse_arithm_expr(tokens, Token.Type.NOT.binding_powers().Item2)]},
+                Token.Type.LPAREN => new(){token = tok, m_sub_nodes = [parse_arithm_expr(tokens, 0.0f)]},
 
                 _ => throw new Syntax_error_exception($"On line <{tok.line_number}> found invalid token <{tok.id}>"),
             };
@@ -227,7 +227,7 @@ public static class Parser{
                 else
                     tokens.Pop();
 
-                if (tokens.Peek().type == Token.Type.ELSE){
+                if (tokens.Count > 0 && tokens.Peek().type == Token.Type.ELSE){
                     tok = tokens.Pop();
                     if (tok_original.type == Token.Type.WHILE)
                         throw new Syntax_error_exception($"On line <{tok.line_number}> while statement is followed by else statement");
