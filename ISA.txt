@@ -20,23 +20,24 @@ Instructions:
     TO_INT:       converts SP[-1] to int
     TO_FLOAT:     converts SP[-1] to float
 
-    ADD:          calculates SP[-2]  +=  SP[-1],           then pops the stack
-    SUB:          calculates SP[-2]  -=  SP[-1],           then pops the stack
-    MUL:          calculates SP[-2]  *=  SP[-1],           then pops the stack
-    DIV:          calculates SP[-2]  /=  SP[-1],           then pops the stack
-    MOD:          calculates SP[-2]  %=  SP[-1],           then pops the stack
-    SHL:          calculates SP[-2] <<=  SP[-1],           then pops the stack
-    SHR:          calculates SP[-2] >>=  SP[-1],           then pops the stack
-    BAND:         calculates SP[-2]  &=  SP[-1],           then pops the stack
-    BOR:          calculates SP[-2]  |=  SP[-1],           then pops the stack
-    XOR:          calculates SP[-2]  ^=  SP[-1],           then pops the stack
+    ADD:          calculates SP[-2]  +=  SP[-1],                    then pops the stack
+    SUB:          calculates SP[-2]  -=  SP[-1],                    then pops the stack
+    MUL:          calculates SP[-2]  *=  SP[-1],                    then pops the stack
+    DIV:          calculates SP[-2]  /=  SP[-1],                    then pops the stack
+    MOD:          calculates SP[-2]  %=  SP[-1],                    then pops the stack
+    POW:          calculates SP[-2]   =  MathF.Pow(SP[-2], SP[-1]), then pops the stack
+    SHL:          calculates SP[-2] <<=  SP[-1],                    then pops the stack
+    SHR:          calculates SP[-2] >>=  SP[-1],                    then pops the stack
+    BAND:         calculates SP[-2]  &=  SP[-1],                    then pops the stack
+    BOR:          calculates SP[-2]  |=  SP[-1],                    then pops the stack
+    XOR:          calculates SP[-2]  ^=  SP[-1],                    then pops the stack
     BNEG:         calculates SP[-1]   = ~SP[-1]
-    AND:          calculates SP[-2]   =  SP[-2] && SP[-1], then pops the stack
-    OR:           calculates SP[-2]   =  SP[-2] || SP[-1], then pops the stack
+    AND:          calculates SP[-2]   =  SP[-2] && SP[-1],          then pops the stack
+    OR:           calculates SP[-2]   =  SP[-2] || SP[-1],          then pops the stack
     NEG:          calculates SP[-1]   = -SP[-1]
-    CMP_EQ:       calculates SP[-2]   =  SP[-2] == SP[-1], then pops the stack
-    CMP_NEQ:      calculates SP[-2]   =  SP[-2] != SP[-1], then pops the stack
-    CMP_LE:       calculates SP[-2]   =  SP[-2] <  SP[-1], then pops the stack
-    CMP_LEQ:      calculates SP[-2]   =  SP[-2] <= SP[-1], then pops the stack
-    CMP_GE:       calculates SP[-2]   =  SP[-2] >  SP[-1], then pops the stack
-    CMP_GEQ:      calculates SP[-2]   =  SP[-2] >= SP[-1], then pops the stack
+    CMP_EQ:       calculates SP[-2]   =  SP[-2] == SP[-1],          then pops the stack
+    CMP_NEQ:      calculates SP[-2]   =  SP[-2] != SP[-1],          then pops the stack
+    CMP_LE:       calculates SP[-2]   =  SP[-2] <  SP[-1],          then pops the stack
+    CMP_LEQ:      calculates SP[-2]   =  SP[-2] <= SP[-1],          then pops the stack
+    CMP_GE:       calculates SP[-2]   =  SP[-2] >  SP[-1],          then pops the stack
+    CMP_GEQ:      calculates SP[-2]   =  SP[-2] >= SP[-1],          then pops the stack

@@ -37,6 +37,7 @@ public readonly struct Token{
         ASTERISK,
         SLASH,
         PERCENT,
+        EXP,
 
         SHIFT_LEFT,
         SHIFT_RIGHT,
@@ -113,7 +114,7 @@ public static class Lexer{
             string line in
             System.Text.RegularExpressions.Regex.Split(
                 file_lines,
-                @"([:;(){}+*/%&|^~-]|<<|>>|!=|[<>=]=?|\r\n|\r|\n|"".*""|" +
+                @"(\*\*|[:;(){}+*/%&|^~-]|<<|>>|!=|[<>=]=?|\r\n|\r|\n|"".*""|" +
                 @"\blet\b|\bbool\b|\bfalse\b|\btrue\b|\bint\b|\bfloat\b|\bprint\b|\bscan\b|\bif\b|\belse\b|\bwhile\b|\band\b|\bor\b|\bnot\b|\breturn\b)"
             ).Select((s) => s.Trim(' ')).Where((s) => s.Length > 0).ToArray()
         ){
@@ -142,6 +143,7 @@ public static class Lexer{
                     "*"      => Token.Type.ASTERISK,
                     "/"      => Token.Type.SLASH,
                     "%"      => Token.Type.PERCENT,
+                    "**"     => Token.Type.EXP,
 
                     "<<"     => Token.Type.SHIFT_LEFT,
                     ">>"     => Token.Type.SHIFT_RIGHT,
@@ -195,8 +197,8 @@ public static class Lexer{
                             throw new Syntax_error_exception($"On line <{line_idx + 1}> found invalid token <{line}>");
                     }))(),
                 };
-                if (tokens.Count > 0 && tokens.Last().type == Token.Type.STR_LIT && token_type == Token.Type.STR_LIT)
-                    tokens[tokens.Count - 1] = tokens.Last() with{id = tokens.Last().id + line[1..(line.Length - 1)]};
+                if (tokens.Count > 0 && tokens[^1].type == Token.Type.STR_LIT && token_type == Token.Type.STR_LIT)
+                    tokens[tokens.Count - 1] = tokens[^1] with{id = tokens[^1].id + line[1..(line.Length - 1)]};
                 else
                     tokens.Add(new(){type = token_type, id = token_id, line_number = line_idx + 1});
             }

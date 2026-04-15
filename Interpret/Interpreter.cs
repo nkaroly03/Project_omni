@@ -1,12 +1,13 @@
 namespace Interpret;
 
 using Compile;
+using System.Diagnostics;
 using System.Text;
 
 static class Interpreter_extensions{
     extension(List<Value> self){
         public Value pop(){
-            Value temp = self.Last();
+            Value temp = self[^1];
 
             self.RemoveAt(self.Count - 1);
 
@@ -51,11 +52,11 @@ public static class Interpreter{
                 case Compiler.Op_code.MOV:
                     int value_idx = stack.Count + BitConverter.ToInt32(bytecode[pc..][..sizeof(int)]);
                     stack[value_idx] = stack[value_idx].data switch{
-                        bool  => new(stack.Last().to_bool()),
-                        int   => new(stack.Last().to_int()),
-                        float => new(stack.Last().to_float()),
+                        bool  => new(stack[^1].to_bool()),
+                        int   => new(stack[^1].to_int()),
+                        float => new(stack[^1].to_float()),
 
-                        _ => throw new System.Diagnostics.UnreachableException(),
+                        _ => throw new UnreachableException(),
                     };
                     pc += sizeof(int);
                     stack.pop();
@@ -101,46 +102,57 @@ public static class Interpreter{
                     }
                     break;
 
-                case Compiler.Op_code.TO_BOOL:  stack[stack.Count - 1] = new(stack.Last().to_bool());  break;
-                case Compiler.Op_code.TO_INT:   stack[stack.Count - 1] = new(stack.Last().to_int());   break;
-                case Compiler.Op_code.TO_FLOAT: stack[stack.Count - 1] = new(stack.Last().to_float()); break;
+                case Compiler.Op_code.TO_BOOL:  stack[^1] = new(stack[^1].to_bool());  break;
+                case Compiler.Op_code.TO_INT:   stack[^1] = new(stack[^1].to_int());   break;
+                case Compiler.Op_code.TO_FLOAT: stack[^1] = new(stack[^1].to_float()); break;
 
-                case Compiler.Op_code.CMP_EQ:  stack[stack.Count - 2] = new(stack[stack.Count - 2] == stack.pop()); break;
-                case Compiler.Op_code.CMP_NEQ: stack[stack.Count - 2] = new(stack[stack.Count - 2] != stack.pop()); break;
-                case Compiler.Op_code.CMP_LE:  stack[stack.Count - 2] = new(stack[stack.Count - 2] <  stack.pop()); break;
-                case Compiler.Op_code.CMP_LEQ: stack[stack.Count - 2] = new(stack[stack.Count - 2] <= stack.pop()); break;
-                case Compiler.Op_code.CMP_GE:  stack[stack.Count - 2] = new(stack[stack.Count - 2] >  stack.pop()); break;
-                case Compiler.Op_code.CMP_GEQ: stack[stack.Count - 2] = new(stack[stack.Count - 2] >= stack.pop()); break;
+                case Compiler.Op_code.CMP_EQ:  stack[^2] = new(stack[^2] == stack.pop()); break;
+                case Compiler.Op_code.CMP_NEQ: stack[^2] = new(stack[^2] != stack.pop()); break;
+                case Compiler.Op_code.CMP_LE:  stack[^2] = new(stack[^2] <  stack.pop()); break;
+                case Compiler.Op_code.CMP_LEQ: stack[^2] = new(stack[^2] <= stack.pop()); break;
+                case Compiler.Op_code.CMP_GE:  stack[^2] = new(stack[^2] >  stack.pop()); break;
+                case Compiler.Op_code.CMP_GEQ: stack[^2] = new(stack[^2] >= stack.pop()); break;
 
-                case Compiler.Op_code.ADD:  stack[stack.Count - 2]  += stack.pop(); break;
-                case Compiler.Op_code.SUB:  stack[stack.Count - 2]  -= stack.pop(); break;
-                case Compiler.Op_code.MUL:  stack[stack.Count - 2]  *= stack.pop(); break;
-                case Compiler.Op_code.DIV:  stack[stack.Count - 2]  /= stack.pop(); break;
-                case Compiler.Op_code.MOD:  stack[stack.Count - 2]  %= stack.pop(); break;
-                case Compiler.Op_code.SHL:  stack[stack.Count - 2] <<= stack.pop(); break;
-                case Compiler.Op_code.SHR:  stack[stack.Count - 2] >>= stack.pop(); break;
-                case Compiler.Op_code.BAND: stack[stack.Count - 2]  &= stack.pop(); break;
-                case Compiler.Op_code.BOR:  stack[stack.Count - 2]  |= stack.pop(); break;
-                case Compiler.Op_code.XOR:  stack[stack.Count - 2]  ^= stack.pop(); break;
+                case Compiler.Op_code.ADD:  stack[^2]  += stack.pop(); break;
+                case Compiler.Op_code.SUB:  stack[^2]  -= stack.pop(); break;
+                case Compiler.Op_code.MUL:  stack[^2]  *= stack.pop(); break;
+                case Compiler.Op_code.DIV:  stack[^2]  /= stack.pop(); break;
+                case Compiler.Op_code.MOD:  stack[^2]  %= stack.pop(); break;
+                case Compiler.Op_code.SHL:  stack[^2] <<= stack.pop(); break;
+                case Compiler.Op_code.SHR:  stack[^2] >>= stack.pop(); break;
+                case Compiler.Op_code.BAND: stack[^2]  &= stack.pop(); break;
+                case Compiler.Op_code.BOR:  stack[^2]  |= stack.pop(); break;
+                case Compiler.Op_code.XOR:  stack[^2]  ^= stack.pop(); break;
+                                            
+                case Compiler.Op_code.POW:
+                    stack[^2] = stack[^2].data switch{
+                        bool  => new(Convert.ToBoolean(MathF.Pow(stack[^2].to_float(), stack[^1].to_float()))),
+                        int   => new((int)MathF.Pow(stack[^2].to_float(), stack[^1].to_float())),
+                        float => new(MathF.Pow(stack[^2].to_float(), stack[^1].to_float())),
+
+                        _ => throw new UnreachableException(),
+                    };
+                    stack.pop();
+                    break;
 
                 case Compiler.Op_code.BNEG:
-                    stack[stack.Count - 1] = ~stack.Last();
+                    stack[^1] = ~stack[^1];
                     break;
 
                 case Compiler.Op_code.AND:
-                    stack[stack.Count - 2] = new(stack[stack.Count - 2].to_bool() && stack.Last().to_bool());
+                    stack[^2] = new(stack[^2].to_bool() && stack[^1].to_bool());
                     stack.pop();
                     break;
                 case Compiler.Op_code.OR:
-                    stack[stack.Count - 2] = new(stack[stack.Count - 2].to_bool() || stack.Last().to_bool());
+                    stack[^2] = new(stack[^2].to_bool() || stack[^1].to_bool());
                     stack.pop();
                     break;
                 case Compiler.Op_code.NEG:
-                    stack[stack.Count - 1] = -stack.Last();
+                    stack[^1] = -stack[^1];
                     break;
             }
         }
 
-        return stack.Last();
+        return stack[^1];
     }
 }

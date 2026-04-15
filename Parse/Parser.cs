@@ -8,6 +8,7 @@ static class Parse_extensions{
         public bool is_operation() => (int)self >= (int)Token.Type.EQUALS && (int)self <= (int)Token.Type.EQ;
 
         public Tuple<float, float> binding_powers() => self switch{
+            Token.Type.EXP                                                => new(12.1f, 12.0f),
             Token.Type.NOT or Token.Type.BITWISE_NEG                      => new(11.1f, 11.0f),
             Token.Type.ASTERISK or Token.Type.SLASH or Token.Type.PERCENT => new(10.1f, 10.0f),
             Token.Type.PLUS or Token.Type.MINUS                           => new( 9.0f,  9.1f),
@@ -113,16 +114,17 @@ public static class Parser{
 
         return lhs;
     }
-    static Node parse_expr(Stack<Token> tokens){
-        Node node = new();
+    static Tuple<Node, Node?> parse_expr(Stack<Token> tokens){
+        Node node1 = new();
+        Node? node2 = null;
 
-        Token tok = tokens.Pop();
-        node.token = tok;
-        switch (tok.type){
+        Token tok_original = tokens.Pop(), tok = tok_original;
+        node1.token = tok;
+        switch (tok_original.type){
             case Token.Type.ID:
                 tokens.Push(tok);
 
-                node = parse_arithm_expr(tokens, 0.0f);
+                node1 = parse_arithm_expr(tokens, 0.0f);
 
                 tok = tokens.Pop();
                 if (tok.type != Token.Type.SEMICOLON)
@@ -131,14 +133,15 @@ public static class Parser{
                 break;
 
             case Token.Type.SEMICOLON:
-                throw new Syntax_error_exception($"On line <{tok.line_number}> use of empty statement is a bug");
+                (node1, node2) = parse_expr(tokens);
+                break;
 
             case Token.Type.LET_DECL:
                 tok = tokens.Peek();
                 if (tok.type != Token.Type.ID)
                     throw new Syntax_error_exception($"On line <{tok.line_number}> <let> must be followed by an identifier");
 
-                node.m_sub_nodes.Add(new(){token = tokens.Pop()});
+                node1.m_sub_nodes.Add(new(){token = tokens.Pop()});
 
                 tok = tokens.Peek();
                 if (tok.type != Token.Type.COLON)
@@ -150,21 +153,18 @@ public static class Parser{
                 if (tok.type != Token.Type.BOOL && tok.type != Token.Type.INT && tok.type != Token.Type.FLOAT)
                     throw new Syntax_error_exception($"On line <{tok.line_number}> <:> must be followed by a valid type");
 
-                node.m_sub_nodes.Add(new(){token = tokens.Pop()});
+                node1.m_sub_nodes.Add(new(){token = tokens.Pop()});
 
                 tok = tokens.Peek();
                 if (tok.type != Token.Type.EQ)
                     throw new Syntax_error_exception($"On line <{tok.line_number}> type must be followed by <=>");
-                tok = tokens.Peek();
+                tokens.Pop();
 
-                if (tok.type == Token.Type.SCAN)
-                    node.m_sub_nodes[1].m_sub_nodes.Add(parse_expr(tokens));
-                else{
-                    tokens.Pop();
-                    node.m_sub_nodes[1].m_sub_nodes.Add(parse_arithm_expr(tokens, 0.0f));
-                }
+                node1.m_sub_nodes[1].m_sub_nodes.Add(parse_arithm_expr(tokens, 0.0f));
                 
                 tok = tokens.Pop();
+                if (tok.type != Token.Type.SEMICOLON)
+                    throw new Syntax_error_exception(($"On line <{tok.line_number}> let declaration must be closed by <;>"));
 
                 break;
 
@@ -175,11 +175,11 @@ public static class Parser{
 
                 tok = tokens.Peek();
                 if (tok.type == Token.Type.STR_LIT){
-                    node.m_sub_nodes.Add(new(){token = tok});
+                    node1.m_sub_nodes.Add(new(){token = tok});
                     tokens.Pop();
                 }
                 else
-                    node.m_sub_nodes.Add(parse_arithm_expr(tokens, 0.0f));
+                    node1.m_sub_nodes.Add(parse_arithm_expr(tokens, 0.0f));
 
                 tok = tokens.Pop();
                 if (tok.type != Token.Type.RPAREN)
@@ -199,45 +199,66 @@ public static class Parser{
 
             case Token.Type.IF:
             case Token.Type.WHILE:
-                node.m_sub_nodes.Add(parse_arithm_expr(tokens, 0.0f));
-
                 tok = tokens.Pop();
-                if (tok.type != Token.Type.LBRACE)
-                    throw new Syntax_error_exception($"On line <{tok.line_number}> <{tok.id}> statement body must be put inside <{{>");
-
-                while (tokens.Peek().type != Token.Type.RBRACE)
-                    node.m_sub_nodes.Add(parse_expr(tokens));
-
+                if (tok.type != Token.Type.LPAREN)
+                    throw new Syntax_error_exception($"On line <{tok.line_number}> statement must start with <(>");
+                node1.m_sub_nodes.Add(parse_arithm_expr(tokens, 0.0f));
                 tok = tokens.Pop();
-                if (tok.type != Token.Type.RBRACE)
-                    throw new Syntax_error_exception($"On line <{tok.line_number}> <{tok.id}> statement body must closed by <}}>");
+                if (tok.type != Token.Type.RPAREN)
+                    throw new Syntax_error_exception($"On line <{tok.line_number}> statement must end with <)>");
 
-                break;
-            case Token.Type.ELSE:
                 tok = tokens.Peek();
-
                 if (tok.type == Token.Type.LBRACE){
                     tokens.Pop();
-
-                    while (tokens.Peek().type != Token.Type.RBRACE)
-                        node.m_sub_nodes.Add(parse_expr(tokens));
-
-                    tok = tokens.Pop();
-                    if (tok.type != Token.Type.RBRACE)
-                        throw new Syntax_error_exception($"On line <{tok.line_number}> <else> statement body must closed by <}}>");
+                    while (tokens.Peek().type != Token.Type.RBRACE){
+                        (Node n1, Node? n2) = parse_expr(tokens);
+                        node1.m_sub_nodes.Add(n1);
+                        if (n2 is not null)
+                            node1.m_sub_nodes.Add(n2);
+                    }
+                    tokens.Pop();
                 }
-                else if (tok.type == Token.Type.IF){
-                    node.m_sub_nodes.Add(parse_expr(tokens));
-                    if (tokens.Count > 0 && tokens.Peek().type == Token.Type.ELSE)
-                        node.m_sub_nodes.Add(parse_expr(tokens));
+                else if (tok.type != Token.Type.SEMICOLON){
+                    (Node n1, Node? n2) = parse_expr(tokens);
+                    node1.m_sub_nodes.Add(n1);
+                    if (n2 is not null)
+                        node1.m_sub_nodes.Add(n2);
                 }
                 else
-                    throw new Syntax_error_exception($"On line <{tok.line_number}> <else> statement must be preceded by <if>");
+                    tokens.Pop();
+
+                if (tokens.Peek().type == Token.Type.ELSE){
+                    tok = tokens.Pop();
+                    if (tok_original.type == Token.Type.WHILE)
+                        throw new Syntax_error_exception($"On line <{tok.line_number}> while statement is followed by else statement");
+
+                    node2 = new(){token = tok};
+
+                    tok = tokens.Peek();
+                    if (tok.type == Token.Type.LBRACE){
+                        tokens.Pop();
+                        while (tokens.Peek().type != Token.Type.RBRACE){
+                            (Node n1, Node? n2) = parse_expr(tokens);
+                            node2.m_sub_nodes.Add(n1);
+                            if (n2 is not null)
+                                node2.m_sub_nodes.Add(n2);
+                        }
+                        tokens.Pop();
+                    }
+                    else if (tok.type != Token.Type.SEMICOLON){
+                        (Node n1, Node? n2) = parse_expr(tokens);
+                        node2.m_sub_nodes.Add(n1);
+                        if (n2 is not null)
+                            node2.m_sub_nodes.Add(n2);
+                    }
+                    else
+                        tokens.Pop();
+                }
 
                 break;
 
             case Token.Type.RETURN:
-                node.m_sub_nodes.Add(parse_arithm_expr(tokens, 0.0f));
+                node1.m_sub_nodes.Add(parse_arithm_expr(tokens, 0.0f));
 
                 tok = tokens.Pop();
                 if (tok.type != Token.Type.SEMICOLON)
@@ -249,7 +270,7 @@ public static class Parser{
                 throw new Syntax_error_exception($"On line <{tok.line_number}> found invalid token <{tok.id}>");
         }
 
-        return node;
+        return new (node1, node2);
     }
 
     public static ReadOnlySpan<Node> build_AST(ReadOnlySpan<Token> tokens){
@@ -265,9 +286,14 @@ public static class Parser{
         if (token_list.Count((t) => t.type == Token.Type.LBRACE) != token_list.Count((t) => t.type == Token.Type.RBRACE))
             throw new Syntax_error_exception("The number of opening and closing braces must match");
 
-        while (token_stack.Count > 0)
-            nodes.Add(parse_expr(token_stack));
-        if (nodes.Last().token.type != Token.Type.RETURN)
+        while (token_stack.Count > 0){
+            (Node n1, Node? n2) = parse_expr(token_stack);
+            nodes.Add(n1);
+            if (n2 is not null)
+                nodes.Add(n2);
+        }
+
+        if (nodes[^1].token.type != Token.Type.RETURN)
             nodes.Add(new(){token = new(){type = Token.Type.RETURN, id = "return"}, m_sub_nodes = [new(){token = new(){type = Token.Type.INT_LIT, id = "0"}}]});
 
         return System.Runtime.InteropServices.CollectionsMarshal.AsSpan(nodes);

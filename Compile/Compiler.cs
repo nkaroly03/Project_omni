@@ -52,6 +52,7 @@ public static class Compiler{
         MUL,
         DIV,
         MOD,
+        POW,
 
         SHL,
         SHR,
@@ -103,6 +104,7 @@ public static class Compiler{
             case Token.Type.ASTERISK:
             case Token.Type.SLASH:
             case Token.Type.PERCENT:
+            case Token.Type.EXP:
             case Token.Type.SHIFT_LEFT:
             case Token.Type.SHIFT_RIGHT:
             case Token.Type.BITWISE_AND:
@@ -122,6 +124,7 @@ public static class Compiler{
                     Token.Type.ASTERISK        => "MUL",
                     Token.Type.SLASH           => "DIV",
                     Token.Type.PERCENT         => "MOD",
+                    Token.Type.EXP             => "POW",
                     Token.Type.SHIFT_LEFT      => "SHL",
                     Token.Type.SHIFT_RIGHT     => "SHR",
                     Token.Type.BITWISE_AND     => "BAND",
@@ -411,6 +414,7 @@ public static class Compiler{
                 case "MUL":      bytecode.Add((byte)Op_code.MUL);      break;
                 case "DIV":      bytecode.Add((byte)Op_code.DIV);      break;
                 case "MOD":      bytecode.Add((byte)Op_code.MOD);      break;
+                case "POW":      bytecode.Add((byte)Op_code.POW);      break;
                 case "SHL":      bytecode.Add((byte)Op_code.SHL);      break;
                 case "SHR":      bytecode.Add((byte)Op_code.SHR);      break;
                 case "BAND":     bytecode.Add((byte)Op_code.BAND);     break;
