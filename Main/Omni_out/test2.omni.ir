@@ -1,4 +1,4 @@
-src: C:\Users\giganibba840\Desktop\C#\Project_omni\Examples\test2.omni
+src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\test2.omni
 
     1 ; PUSH 0
     1 ; TO_INT
@@ -12,7 +12,7 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Examples\test2.omni
     4 ; PUSH SP[-3]
     5 ; PUSH 0
     4 ; CMP_GEQ
-    3 ; JMPZ 34
+    3 ; JMPZ 36
     4 ; PUSH SP[-1]
     5 ; PUSH 1
     4 ; ADD
@@ -31,21 +31,23 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Examples\test2.omni
     5 ; PUSH 0
     5 ; TO_INT
     6 ; PUSH SP[-1]
-    7 ; PUSH 50000
-    6 ; CMP_LE
-    5 ; JMPZ 6
-    6 ; PUSH SP[-1]
     7 ; PUSH 1
     6 ; ADD
     5 ; MOV SP[-2]
-    5 ; JMP -8
+    6 ; PUSH SP[-1]
+    7 ; PUSH 1
+    6 ; SUB
+    7 ; PUSH 50000
+    6 ; CMP_LE
+    5 ; JMPZ 2
+    5 ; JMP -10
     6 ; PUSH SP[-4]
     5 ; MOV SP[-6]
     6 ; PUSH SP[-2]
     5 ; MOV SP[-5]
     4 ; POP
     3 ; POP
-    3 ; JMP -36
+    3 ; JMP -38
 
     3 ; PRINT "Reached #"
 

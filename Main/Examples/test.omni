@@ -1,22 +1,18 @@
-let stop: bool = false;
+let result: float = 0;
 
-while (not stop){
-    let op: int = -1;
-    while (op < 0 or op > 5){
-        op = scan(
-            "Enter operation:\n"
-            "\t[0] -> Add\n"
-            "\t[1] -> Sub\n"
-            "\t[2] -> Mul\n"
-            "\t[3] -> Div\n"
-            "\t[4] -> Mod\n"
-            "\t[5] -> Quit\n\n"
-            "Op: "
-        );
-        if (op < 0 or op > 5){
-            print("Invalid operation\n");
-        }
-    }
+while (true){
+    let op: int = 0;
+    while ((op = scan(
+        "Enter operation:\n"
+        "\t[0] -> Add\n"
+        "\t[1] -> Sub\n"
+        "\t[2] -> Mul\n"
+        "\t[3] -> Div\n"
+        "\t[4] -> Mod\n"
+        "\t[5] -> Quit\n\n"
+        "Op: "
+    )) < 0 or op > 5)
+        print("Invalid operation\n");
 
     if (op != 5){
         let a: float = scan("a: ");
@@ -24,42 +20,40 @@ while (not stop){
 
         if (op == 0){
             print("Result: ");
-            print(a + b);
+            print((result = a + b));
             print("\n");
         }
         else if (op == 1){
             print("Result: ");
-            print(a - b);
+            print((result = a - b));
             print("\n");
         }
         else if (op == 2){
             print("Result: ");
-            print(a * b);
+            print((result = a * b));
             print("\n");
         }
         else if (op == 3){
             if (b != 0){
                 print("Result: ");
-                print(a / b);
+                print((result = a / b));
                 print("\n");
             }
-            else{
+            else
                 print("Division by 0\n");
-            }
         }
         else if (op == 4){
             if (b != 0){
                 print("Result: ");
-                print(a % b);
+                print((result = a % b));
                 print("\n");
             }
-            else{
+            else
                 print("Modulus by 0\n");
-            }
         }
     }
     else{
         print("Stopping\n");
-        stop = true;
+        return result;
     }
 }

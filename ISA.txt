@@ -32,8 +32,8 @@ Instructions:
     BOR:          calculates SP[-2]  |=  SP[-1],                    then pops the stack
     XOR:          calculates SP[-2]  ^=  SP[-1],                    then pops the stack
     BNEG:         calculates SP[-1]   = ~SP[-1]
-    AND:          calculates SP[-2]   =  SP[-2] && SP[-1],          then pops the stack
-    OR:           calculates SP[-2]   =  SP[-2] || SP[-1],          then pops the stack
+    AND:          calculates SP[-2]   =  SP[-2] && SP[-1],          then pops the stack (not used anymore due to short-circuiting)
+    OR:           calculates SP[-2]   =  SP[-2] || SP[-1],          then pops the stack (not used anymore due to short-circuiting)
     NEG:          calculates SP[-1]   = -SP[-1]
     CMP_EQ:       calculates SP[-2]   =  SP[-2] == SP[-1],          then pops the stack
     CMP_NEQ:      calculates SP[-2]   =  SP[-2] != SP[-1],          then pops the stack

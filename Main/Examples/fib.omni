@@ -1,9 +1,10 @@
 let a: int = 0;
 let b: int = 1;
 
-while (a < 255){
+while (a < (1 << 8) - 1){
     let c: int = a + b;
     print(a);
+    print("\n");
     a = b;
     b = c;
 }

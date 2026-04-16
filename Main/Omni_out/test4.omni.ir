@@ -1,18 +1,20 @@
 src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\test4.omni
 
-    0 ; PRINT "10000000 and: "
+    0 ; PRINT "1000000 and 2000000 and 0: "
 
-    1 ; PUSH 10000000
+    1 ; PUSH 1000000
     1 ; TO_BOOL
     1 ; NEG
     0 ; JMPZ 3
     1 ; PUSH FALSE
-    1 ; JMP 7
-    1 ; PUSH 10
-    2 ; PUSH 2
-    3 ; PUSH 8
-    2 ; MUL
-    1 ; ADD
+    1 ; JMP 3
+    1 ; PUSH 2000000
+    1 ; TO_BOOL
+    1 ; NEG
+    0 ; JMPZ 3
+    1 ; PUSH FALSE
+    1 ; JMP 3
+    1 ; PUSH 0
     1 ; TO_BOOL
     0 ; PRINT
 

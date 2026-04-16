@@ -135,7 +135,6 @@ public static class Parser{
 
                 if (tokens.Count == 0 || (tok = tokens.Pop()).type != Token.Type.SEMICOLON)
                     throw new Syntax_error_exception($"On line <{tok.line_number}> <id> expression must be closed by <;>");
-
                 break;
 
             case Token.Type.LET_DECL:
@@ -162,7 +161,6 @@ public static class Parser{
                 
                 if (tokens.Count == 0 || (tok = tokens.Pop()).type != Token.Type.SEMICOLON)
                     throw new Syntax_error_exception(($"On line <{tok.line_number}> let declaration must be closed by <;>"));
-
                 break;
 
             case Token.Type.PRINT:
@@ -179,10 +177,8 @@ public static class Parser{
                 if (tokens.Count == 0 || (tok = tokens.Pop()).type != Token.Type.RPAREN)
                     throw new Syntax_error_exception($"On line <{tok.line_number}> <print> must be closed by <)>");
 
-
                 if (tokens.Count == 0 || (tok = tokens.Pop()).type != Token.Type.SEMICOLON)
                     throw new Syntax_error_exception($"On line <{tok.line_number}> <print> statement must be close by <;>");
-
                 break;
             case Token.Type.SCAN:
                 throw new Syntax_error_exception($"On line <{tok.line_number}> discarding the result of <scan> statement is a bug");
@@ -250,16 +246,12 @@ public static class Parser{
                     else
                         tokens.Pop();
                 }
-
                 break;
 
             case Token.Type.RETURN:
                 node1.m_sub_nodes.Add(parse_arithm_expr(tokens, 0.0f));
-
-                tok = tokens.Pop();
-                if (tok.type != Token.Type.SEMICOLON)
+                if (tokens.Count == 0 || (tok = tokens.Pop()).type != Token.Type.SEMICOLON)
                     throw new Syntax_error_exception($"On line <{tok.line_number}> <return> statement body must closed by <;>");
-
                 break;
 
             default:

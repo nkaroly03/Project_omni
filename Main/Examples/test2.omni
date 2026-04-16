@@ -14,7 +14,7 @@ while (a >= 0){
     print("\n");
 
     let sleep: int = 0;
-    while (sleep < 50000){ sleep = sleep + 1; }
+    while ((sleep = sleep + 1) <= 50000);
 
     a = b;
     b = c;

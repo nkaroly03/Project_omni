@@ -139,14 +139,14 @@ public static class Interpreter{
                     stack[^1] = ~stack[^1];
                     break;
 
-                case Compiler.Op_code.AND:
-                    stack[^2] = new(stack[^2].to_bool() && stack[^1].to_bool());
-                    stack.pop();
-                    break;
-                case Compiler.Op_code.OR:
-                    stack[^2] = new(stack[^2].to_bool() || stack[^1].to_bool());
-                    stack.pop();
-                    break;
+                // case Compiler.Op_code.AND:
+                    // stack[^2] = new(stack[^2].to_bool() && stack[^1].to_bool());
+                    // stack.pop();
+                    // break;
+                // case Compiler.Op_code.OR:
+                    // stack[^2] = new(stack[^2].to_bool() || stack[^1].to_bool());
+                    // stack.pop();
+                    // break;
                 case Compiler.Op_code.NEG:
                     stack[^1] = -stack[^1];
                     break;

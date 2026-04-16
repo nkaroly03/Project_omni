@@ -1,3 +1,18 @@
-print("10000000 and: ");
-print(10000000 and 10 + 2 * 8);
+print("1000000 and 2000000 and 0: ");
+print(1000000 and 2000000 and 0);
 print("\n");
+
+// print("1000000 and 2000000 and 0 (if form): ");
+// if (1000000){
+    // if (2000000){
+        // if (0)
+            // print(true);
+        // else
+            // print(false);
+    // }
+    // else
+        // print(false);
+// }
+// else
+    // print(false);
+// print("\n");

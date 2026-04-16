@@ -1,22 +1,12 @@
-src: C:\Users\giganibba840\Desktop\C#\Project_omni\Examples\test.omni
+src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\test.omni
 
-    1 ; PUSH FALSE
-    1 ; TO_BOOL
+    1 ; PUSH 0
+    1 ; TO_FLOAT
 
-    2 ; PUSH SP[-1]
-    2 ; NEG
-    1 ; JMPZ 106
-    2 ; PUSH 1
-    2 ; NEG
+    2 ; PUSH TRUE
+    1 ; JMPZ 123
+    2 ; PUSH 0
     2 ; TO_INT
-    3 ; PUSH SP[-1]
-    4 ; PUSH 0
-    3 ; CMP_LE
-    4 ; PUSH SP[-2]
-    5 ; PUSH 5
-    4 ; CMP_GE
-    3 ; OR
-    2 ; JMPZ 13
     3 ; SCAN "Enter operation:\n\t[0] -> Add\n\t[1] -> Sub\n\t[2] -> Mul\n\t[3] -> Div\n\t[4] -> Mod\n\t[5] -> Quit\n\nOp: "
     2 ; MOV SP[-2]
     3 ; PUSH SP[-1]
@@ -25,14 +15,30 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Examples\test.omni
     4 ; PUSH SP[-2]
     5 ; PUSH 5
     4 ; CMP_GE
-    3 ; OR
-    2 ; JMPZ 2
+    3 ; TO_BOOL
+    2 ; JMPZ 3
+    3 ; PUSH TRUE
+    3 ; JMP 13
+    3 ; SCAN "Enter operation:\n\t[0] -> Add\n\t[1] -> Sub\n\t[2] -> Mul\n\t[3] -> Div\n\t[4] -> Mod\n\t[5] -> Quit\n\nOp: "
+    2 ; MOV SP[-2]
+    3 ; PUSH SP[-1]
+    4 ; PUSH 0
+    3 ; CMP_LE
+    4 ; PUSH SP[-2]
+    5 ; PUSH 5
+    4 ; CMP_GE
+    3 ; TO_BOOL
+    2 ; JMPZ 3
+    3 ; PUSH TRUE
+    3 ; JMP 13
+    3 ; TO_BOOL
+    2 ; JMPZ 3
     2 ; PRINT "Invalid operation\n"
-    2 ; JMP -19
+    2 ; JMP -27
     3 ; PUSH SP[-1]
     4 ; PUSH 5
     3 ; CMP_NEQ
-    2 ; JMPZ 74
+    2 ; JMPZ 84
     3 ; SCAN "a: "
     3 ; TO_FLOAT
     4 ; SCAN "b: "
@@ -40,65 +46,75 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Examples\test.omni
     5 ; PUSH SP[-3]
     6 ; PUSH 0
     5 ; CMP_EQ
-    4 ; JMPZ 8
+    4 ; JMPZ 10
     4 ; PRINT "Result: "
     5 ; PUSH SP[-2]
     6 ; PUSH SP[-2]
     5 ; ADD
+    4 ; MOV SP[-5]
+    5 ; PUSH SP[-4]
     4 ; PRINT
     4 ; PRINT "\n"
-    4 ; JMP 56
+    4 ; JMP 64
     5 ; PUSH SP[-3]
     6 ; PUSH 1
     5 ; CMP_EQ
-    4 ; JMPZ 8
+    4 ; JMPZ 10
     4 ; PRINT "Result: "
     5 ; PUSH SP[-2]
     6 ; PUSH SP[-2]
     5 ; SUB
+    4 ; MOV SP[-5]
+    5 ; PUSH SP[-4]
     4 ; PRINT
     4 ; PRINT "\n"
-    4 ; JMP 45
+    4 ; JMP 51
     5 ; PUSH SP[-3]
     6 ; PUSH 2
     5 ; CMP_EQ
-    4 ; JMPZ 8
+    4 ; JMPZ 10
     4 ; PRINT "Result: "
     5 ; PUSH SP[-2]
     6 ; PUSH SP[-2]
     5 ; MUL
+    4 ; MOV SP[-5]
+    5 ; PUSH SP[-4]
     4 ; PRINT
     4 ; PRINT "\n"
-    4 ; JMP 34
+    4 ; JMP 38
     5 ; PUSH SP[-3]
     6 ; PUSH 3
     5 ; CMP_EQ
-    4 ; JMPZ 14
+    4 ; JMPZ 16
     5 ; PUSH SP[-1]
     6 ; PUSH 0
     5 ; CMP_NEQ
-    4 ; JMPZ 8
+    4 ; JMPZ 10
     4 ; PRINT "Result: "
     5 ; PUSH SP[-2]
     6 ; PUSH SP[-2]
     5 ; DIV
+    4 ; MOV SP[-5]
+    5 ; PUSH SP[-4]
     4 ; PRINT
     4 ; PRINT "\n"
     4 ; JMP 2
     4 ; PRINT "Division by 0\n"
-    4 ; JMP 17
+    4 ; JMP 19
     5 ; PUSH SP[-3]
     6 ; PUSH 4
     5 ; CMP_EQ
-    4 ; JMPZ 13
+    4 ; JMPZ 15
     5 ; PUSH SP[-1]
     6 ; PUSH 0
     5 ; CMP_NEQ
-    4 ; JMPZ 8
+    4 ; JMPZ 10
     4 ; PRINT "Result: "
     5 ; PUSH SP[-2]
     6 ; PUSH SP[-2]
     5 ; MOD
+    4 ; MOV SP[-5]
+    5 ; PUSH SP[-4]
     4 ; PRINT
     4 ; PRINT "\n"
     4 ; JMP 2
@@ -107,10 +123,10 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Examples\test.omni
     2 ; POP
     2 ; JMP 4
     2 ; PRINT "Stopping\n"
-    3 ; PUSH TRUE
-    2 ; MOV SP[-3]
+    3 ; PUSH SP[-2]
+    2 ; RET
     1 ; POP
-    1 ; JMP -107
+    1 ; JMP -123
 
     2 ; PUSH 0
     1 ; RET
