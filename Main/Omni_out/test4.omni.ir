@@ -1,34 +1,23 @@
 src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\test4.omni
 
-    1 ; PUSH 3
-    1 ; TO_INT
+    0 ; PRINT "10000000 and: "
 
-    2 ; PUSH SP[-1]
-    3 ; PUSH 3
-    2 ; CMP_LE
-    2 ; TO_BOOL
-    1 ; JMPZ 3
-    2 ; PUSH TRUE
-    2 ; JMP 6
-    2 ; PUSH 10
-    1 ; MOV SP[-2]
-    2 ; PUSH SP[-1]
-    3 ; PUSH 10
-    2 ; CMP_EQ
-    2 ; TO_BOOL
-    1 ; JMPZ 3
-    1 ; PRINT "if\n"
-    1 ; JMP 2
-    1 ; PRINT "else\n"
+    1 ; PUSH 10000000
+    1 ; TO_BOOL
+    1 ; NEG
+    0 ; JMPZ 3
+    1 ; PUSH FALSE
+    1 ; JMP 7
+    1 ; PUSH 10
+    2 ; PUSH 2
+    3 ; PUSH 8
+    2 ; MUL
+    1 ; ADD
+    1 ; TO_BOOL
+    0 ; PRINT
 
-    1 ; PRINT "i: "
+    0 ; PRINT "\n"
 
-    2 ; PUSH SP[-1]
-    1 ; PRINT
-
-    1 ; PRINT "\n"
-
-    2 ; PUSH 0
-    1 ; RET
-    0 ; POP
+    1 ; PUSH 0
+    0 ; RET
 

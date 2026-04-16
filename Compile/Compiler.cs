@@ -141,8 +141,12 @@ public static class Compiler{
 
             case Token.Type.AND:
             case Token.Type.OR:
+                StringBuilder and_or_sb = new();
                 to_IR(current_AST_node.sub_nodes[0], null, stack_info, sb, ref stack_size, ref let_decl_counter, true);
-                sb.add_instruction($"{stack_size} ; TO_BOOL");
+                --stack_size;
+                to_IR(current_AST_node.sub_nodes[1], null, stack_info, and_or_sb, ref stack_size, ref let_decl_counter, true);
+                if (sb.ToString()[(sb.ToString().LastIndexOf(';') + 1)..].Trim() != "TO_BOOL")
+                    sb.add_instruction($"{stack_size} ; TO_BOOL");
                 if (current_AST_node.token.type == Token.Type.AND){
                     sb.add_instruction($"{stack_size} ; NEG");
                     sb.add_instruction($"{stack_size - 1} ; JMPZ 3");
@@ -152,12 +156,10 @@ public static class Compiler{
                     sb.add_instruction($"{stack_size - 1} ; JMPZ 3");
                     sb.add_instruction($"{stack_size} ; PUSH TRUE");
                 }
-                StringBuilder and_or_sb = new();
-                --stack_size;
-                to_IR(current_AST_node.sub_nodes[1], null, stack_info, and_or_sb, ref stack_size, ref let_decl_counter, true);
-                sb.add_instruction($"{stack_size} ; JMP {and_or_sb.count_instructions()}");
+                sb.add_instruction($"{stack_size} ; JMP {and_or_sb.count_instructions() + 1}");
                 sb.Append(and_or_sb);
-                sb.add_instruction($"{stack_size} ; TO_BOOL");
+                if (sb.ToString()[(sb.ToString().LastIndexOf(';') + 1)..].Trim() != "TO_BOOL")
+                    sb.add_instruction($"{stack_size} ; TO_BOOL");
                 break;
             case Token.Type.NOT:
                 to_IR(current_AST_node.sub_nodes[0], null, stack_info, sb, ref stack_size, ref let_decl_counter, true);

@@ -1,12 +1,3 @@
-let i: int = 3;
-
-if (i < 3 or (i = 10) == 10){
-    print("if\n");
-}
-else{
-    print("else\n");
-}
-
-print("i: ");
-print(i);
+print("10000000 and: ");
+print(10000000 and 10 + 2 * 8);
 print("\n");
