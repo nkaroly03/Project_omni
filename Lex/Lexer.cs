@@ -1,6 +1,7 @@
 ﻿namespace Lex;
 
 using System.Globalization;
+using System.Text.RegularExpressions;
 
 public static class Lex_extensions{
     extension(string self){
@@ -112,17 +113,17 @@ public static class Lexer{
         int line_idx = 0;
         foreach (
             string line in
-            System.Text.RegularExpressions.Regex.Split(
+            Regex.Split(
                 file_lines,
                 "(" +
-                    @"(?://.*)?(?:\r\n|\r|\n)|"".*""|" +
+                    @"/\*/[^/]*/\*/|(?://.*)?(?:\r\n|\r|\n)|"".*""|" +
                     @"\*\*|[:;(){}+*/%&|^~-]|<<|>>|!=|[<>=]=?|" +
                     @"\blet\b|\bbool\b|\bfalse\b|\btrue\b|\bint\b|\bfloat\b|\bprint\b|\bscan\b|\bif\b|\belse\b|\bwhile\b|\band\b|\bor\b|\bnot\b|\breturn\b" +
                 ")"
             ).Select((s) => s.Trim(' ')).Where((s) => s.Length > 0).ToArray()
         ){
             // Console.WriteLine($"tok: {System.Text.RegularExpressions.Regex.Escape(line)} | tok.Length: {line.Length}");
-            if (line != Environment.NewLine && !line.StartsWith("//")){
+            if (line != Environment.NewLine && !line.StartsWith("//") && !line.StartsWith("/*/")){
                 string token_id = line;
 
                 Token.Type token_type = line switch{
@@ -207,7 +208,7 @@ public static class Lexer{
                     tokens.Add(new(){type = token_type, id = token_id, line_number = line_idx + 1});
             }
             else
-                ++line_idx;
+                line_idx += Regex.Count(line, @"\r\n|\r|\n");
         }
 
         return System.Runtime.InteropServices.CollectionsMarshal.AsSpan(tokens);

@@ -20,6 +20,8 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\test4.omni
 
     0 ; PRINT "\n"
 
+    0 ; PRINT "\n"
+
     1 ; PUSH 0
     0 ; RET
 
