@@ -90,9 +90,10 @@ public static class Parser{
                 throw new Syntax_error_exception($"On line {tok.line_number} no tokens are available");
 
             lhs = tokens.Peek().type switch{
-                Token.Type.ID   or Token.Type.FALSE or Token.Type.TRUE        or Token.Type.INT_LIT or Token.Type.FLOAT_LIT or
-                Token.Type.PLUS or Token.Type.MINUS or Token.Type.BITWISE_NEG or Token.Type.NOT
-                    => new(){token = tok, m_sub_nodes = [parse_arithm_expr(tokens, tok.type.binding_powers().Item2)]},
+                Token.Type.ID      or Token.Type.FALSE       or Token.Type.TRUE or
+                Token.Type.INT_LIT or Token.Type.FLOAT_LIT   or Token.Type.PLUS or
+                Token.Type.MINUS   or Token.Type.BITWISE_NEG or Token.Type.NOT =>
+                    new(){token = tok, m_sub_nodes = [parse_arithm_expr(tokens, Token.Type.NOT.binding_powers().Item2)]},
 
                 Token.Type.LPAREN => new(){token = tok, m_sub_nodes = [parse_arithm_expr(tokens, 0.0f)]},
 

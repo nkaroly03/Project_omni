@@ -1,11 +1,5 @@
-let i: float = 3.14;
-
 print("val: ");
-print(i = 3 ** 2);
-print("\n");
-
-print("i: ");
-print(i);
+print(-1 * 2);
 print("\n");
 
 // single line comment
