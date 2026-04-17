@@ -1,27 +1,21 @@
 src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\test4.omni
 
-    0 ; PRINT "1000000 and 2000000 and 0: "
-
-    1 ; PUSH 1000000
-    1 ; TO_BOOL
-    1 ; NEG
-    0 ; JMPZ 3
-    1 ; PUSH FALSE
-    1 ; JMP 3
-    1 ; PUSH 2000000
-    1 ; TO_BOOL
-    1 ; NEG
-    0 ; JMPZ 3
-    1 ; PUSH FALSE
-    1 ; JMP 3
-    1 ; PUSH 0
-    1 ; TO_BOOL
-    0 ; PRINT
-
-    0 ; PRINT "\n"
-
-    0 ; PRINT "\n"
-
-    1 ; PUSH 0
-    0 ; RET
+    1 ; PUSH 3.14
+    1 ; TO_FLOAT
+    1 ; PRINT "val: "
+    2 ; PUSH 3
+    3 ; PUSH 2
+    2 ; POW
+    1 ; MOV SP[-2]
+    2 ; PUSH SP[-1]
+    1 ; PRINT
+    1 ; PRINT "\n"
+    1 ; PRINT "i: "
+    2 ; PUSH SP[-1]
+    1 ; PRINT
+    1 ; PRINT "\n"
+    1 ; PRINT "\n"
+    2 ; PUSH 0
+    1 ; RET
+    0 ; POP
 

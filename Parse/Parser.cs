@@ -50,7 +50,7 @@ public sealed class Node{
 }
 
 public static class Parser{
-    static Node parse_arithm_expr(Stack<Token> tokens, float prev_rhs_binding_power){
+    static Node parse_arithm_expr(Stack<Token> tokens, float prev_rbp){
         Node lhs = new();
 
         if (tokens.Count == 0)
@@ -88,9 +88,11 @@ public static class Parser{
         else if (tok.type == Token.Type.PLUS || tok.type == Token.Type.MINUS || tok.type == Token.Type.BITWISE_NEG || tok.type == Token.Type.NOT){
             if (tokens.Count == 0)
                 throw new Syntax_error_exception($"On line {tok.line_number} no tokens are available");
+
             lhs = tokens.Peek().type switch{
-                Token.Type.ID or Token.Type.FALSE or Token.Type.TRUE or Token.Type.INT_LIT or Token.Type.FLOAT_LIT
-                    => new(){token = tok, m_sub_nodes = [new(){token = tokens.Pop()}]},
+                Token.Type.ID   or Token.Type.FALSE or Token.Type.TRUE        or Token.Type.INT_LIT or Token.Type.FLOAT_LIT or
+                Token.Type.PLUS or Token.Type.MINUS or Token.Type.BITWISE_NEG or Token.Type.NOT
+                    => new(){token = tok, m_sub_nodes = [parse_arithm_expr(tokens, tok.type.binding_powers().Item2)]},
 
                 Token.Type.LPAREN => new(){token = tok, m_sub_nodes = [parse_arithm_expr(tokens, 0.0f)]},
 
@@ -111,7 +113,7 @@ public static class Parser{
                 throw new Syntax_error_exception($"On line <{op.line_number}> found invalid token <{op.id}>");
 
             (float l_bp, float r_bp) = op.type.binding_powers();
-            if (l_bp < prev_rhs_binding_power)
+            if (l_bp < prev_rbp)
                 break;
             tokens.Pop();
 

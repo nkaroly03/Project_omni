@@ -323,7 +323,7 @@ public static class Compiler{
         for (int i = 0; i < AST.Length - 1; ++i){
             if (AST[i].token.type != Token.Type.ELSE){
                 to_IR(AST[i], AST[i + 1], stack_info, sb, ref stack_size, ref let_decl_counter, false);
-                sb.AppendLine();
+                // sb.AppendLine();
             }
         }
         to_IR(AST[^1], null, stack_info, sb, ref stack_size, ref let_decl_counter, false);

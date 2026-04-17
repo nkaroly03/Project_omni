@@ -17,40 +17,31 @@ while (true){
     if (op != 5){
         let a: float = scan("a: ");
         let b: float = scan("b: ");
+        
+        let arithm_error: bool = false;
 
-        if (op == 0){
-            print("Result: ");
-            print((result = a + b));
-            print("\n");
-        }
-        else if (op == 1){
-            print("Result: ");
-            print((result = a - b));
-            print("\n");
-        }
-        else if (op == 2){
-            print("Result: ");
-            print((result = a * b));
-            print("\n");
-        }
-        else if (op == 3){
-            if (b != 0){
-                print("Result: ");
-                print((result = a / b));
-                print("\n");
-            }
+        if (op == 0)
+            result = a + b;
+        else if (op == 1)
+            result = a - b;
+        else if (op == 2)
+            result = a * b;
+        else if (b != 0){
+            if (op == 3)
+                result = a / b;
             else
-                print("Division by 0\n");
+                result = a % b;
         }
-        else if (op == 4){
-            if (b != 0){
-                print("Result: ");
-                print((result = a % b));
-                print("\n");
-            }
-            else
-                print("Modulus by 0\n");
+        else
+            arithm_error = true;
+
+        if (not arithm_error){
+            print("result: ");
+            print(result);
+            print("\n");
         }
+        else
+            print("Arithmetic error\n");
     }
     else{
         print("Stopping\n");

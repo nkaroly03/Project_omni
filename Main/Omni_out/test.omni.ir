@@ -2,9 +2,8 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\test.omni
 
     1 ; PUSH 0
     1 ; TO_FLOAT
-
     2 ; PUSH TRUE
-    1 ; JMPZ 123
+    1 ; JMPZ 95
     2 ; PUSH 0
     2 ; TO_INT
     3 ; SCAN "Enter operation:\n\t[0] -> Add\n\t[1] -> Sub\n\t[2] -> Mul\n\t[3] -> Div\n\t[4] -> Mod\n\t[5] -> Quit\n\nOp: "
@@ -12,113 +11,85 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\test.omni
     3 ; PUSH SP[-1]
     4 ; PUSH 0
     3 ; CMP_LE
-    4 ; PUSH SP[-2]
-    5 ; PUSH 5
-    4 ; CMP_GE
     3 ; TO_BOOL
     2 ; JMPZ 3
     3 ; PUSH TRUE
-    3 ; JMP 13
-    3 ; SCAN "Enter operation:\n\t[0] -> Add\n\t[1] -> Sub\n\t[2] -> Mul\n\t[3] -> Div\n\t[4] -> Mod\n\t[5] -> Quit\n\nOp: "
-    2 ; MOV SP[-2]
+    3 ; JMP 5
     3 ; PUSH SP[-1]
-    4 ; PUSH 0
-    3 ; CMP_LE
-    4 ; PUSH SP[-2]
-    5 ; PUSH 5
-    4 ; CMP_GE
-    3 ; TO_BOOL
-    2 ; JMPZ 3
-    3 ; PUSH TRUE
-    3 ; JMP 13
+    4 ; PUSH 5
+    3 ; CMP_GE
     3 ; TO_BOOL
     2 ; JMPZ 3
     2 ; PRINT "Invalid operation\n"
-    2 ; JMP -27
+    2 ; JMP -15
     3 ; PUSH SP[-1]
     4 ; PUSH 5
     3 ; CMP_NEQ
-    2 ; JMPZ 84
+    2 ; JMPZ 68
     3 ; SCAN "a: "
     3 ; TO_FLOAT
     4 ; SCAN "b: "
     4 ; TO_FLOAT
-    5 ; PUSH SP[-3]
-    6 ; PUSH 0
-    5 ; CMP_EQ
-    4 ; JMPZ 10
-    4 ; PRINT "Result: "
-    5 ; PUSH SP[-2]
+    5 ; PUSH FALSE
+    5 ; TO_BOOL
+    6 ; PUSH SP[-4]
+    7 ; PUSH 0
+    6 ; CMP_EQ
+    5 ; JMPZ 6
+    6 ; PUSH SP[-3]
+    7 ; PUSH SP[-3]
+    6 ; ADD
+    5 ; MOV SP[-6]
+    5 ; JMP 39
+    6 ; PUSH SP[-4]
+    7 ; PUSH 1
+    6 ; CMP_EQ
+    5 ; JMPZ 6
+    6 ; PUSH SP[-3]
+    7 ; PUSH SP[-3]
+    6 ; SUB
+    5 ; MOV SP[-6]
+    5 ; JMP 30
+    6 ; PUSH SP[-4]
+    7 ; PUSH 2
+    6 ; CMP_EQ
+    5 ; JMPZ 6
+    6 ; PUSH SP[-3]
+    7 ; PUSH SP[-3]
+    6 ; MUL
+    5 ; MOV SP[-6]
+    5 ; JMP 21
     6 ; PUSH SP[-2]
-    5 ; ADD
-    4 ; MOV SP[-5]
-    5 ; PUSH SP[-4]
-    4 ; PRINT
-    4 ; PRINT "\n"
-    4 ; JMP 64
-    5 ; PUSH SP[-3]
-    6 ; PUSH 1
-    5 ; CMP_EQ
-    4 ; JMPZ 10
-    4 ; PRINT "Result: "
-    5 ; PUSH SP[-2]
-    6 ; PUSH SP[-2]
-    5 ; SUB
-    4 ; MOV SP[-5]
-    5 ; PUSH SP[-4]
-    4 ; PRINT
-    4 ; PRINT "\n"
-    4 ; JMP 51
-    5 ; PUSH SP[-3]
-    6 ; PUSH 2
-    5 ; CMP_EQ
-    4 ; JMPZ 10
-    4 ; PRINT "Result: "
-    5 ; PUSH SP[-2]
-    6 ; PUSH SP[-2]
-    5 ; MUL
-    4 ; MOV SP[-5]
-    5 ; PUSH SP[-4]
-    4 ; PRINT
-    4 ; PRINT "\n"
-    4 ; JMP 38
-    5 ; PUSH SP[-3]
-    6 ; PUSH 3
-    5 ; CMP_EQ
-    4 ; JMPZ 16
-    5 ; PUSH SP[-1]
-    6 ; PUSH 0
-    5 ; CMP_NEQ
-    4 ; JMPZ 10
-    4 ; PRINT "Result: "
-    5 ; PUSH SP[-2]
-    6 ; PUSH SP[-2]
-    5 ; DIV
-    4 ; MOV SP[-5]
-    5 ; PUSH SP[-4]
-    4 ; PRINT
-    4 ; PRINT "\n"
-    4 ; JMP 2
-    4 ; PRINT "Division by 0\n"
-    4 ; JMP 19
-    5 ; PUSH SP[-3]
-    6 ; PUSH 4
-    5 ; CMP_EQ
-    4 ; JMPZ 15
-    5 ; PUSH SP[-1]
-    6 ; PUSH 0
-    5 ; CMP_NEQ
-    4 ; JMPZ 10
-    4 ; PRINT "Result: "
-    5 ; PUSH SP[-2]
-    6 ; PUSH SP[-2]
-    5 ; MOD
-    4 ; MOV SP[-5]
-    5 ; PUSH SP[-4]
-    4 ; PRINT
-    4 ; PRINT "\n"
-    4 ; JMP 2
-    4 ; PRINT "Modulus by 0\n"
+    7 ; PUSH 0
+    6 ; CMP_NEQ
+    5 ; JMPZ 15
+    6 ; PUSH SP[-4]
+    7 ; PUSH 3
+    6 ; CMP_EQ
+    5 ; JMPZ 6
+    6 ; PUSH SP[-3]
+    7 ; PUSH SP[-3]
+    6 ; DIV
+    5 ; MOV SP[-6]
+    5 ; JMP 5
+    6 ; PUSH SP[-3]
+    7 ; PUSH SP[-3]
+    6 ; MOD
+    5 ; MOV SP[-6]
+    5 ; JMP 3
+    6 ; PUSH TRUE
+    5 ; MOV SP[-2]
+    6 ; PUSH SP[-1]
+    6 ; TO_BOOL
+    6 ; NEG
+    5 ; JMPZ 6
+    5 ; PRINT "result: "
+    6 ; PUSH SP[-5]
+    5 ; PRINT
+    5 ; PRINT "\n"
+    5 ; JMP 2
+    5 ; PRINT "Arithmetic error\n"
+    4 ; POP
     3 ; POP
     2 ; POP
     2 ; JMP 4
@@ -126,8 +97,7 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\test.omni
     3 ; PUSH SP[-2]
     2 ; RET
     1 ; POP
-    1 ; JMP -123
-
+    1 ; JMP -95
     2 ; PUSH 0
     1 ; RET
     0 ; POP

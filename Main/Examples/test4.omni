@@ -1,5 +1,11 @@
-print("1000000 and 2000000 and 0: ");
-print(1000000 and 2000000 and 0);
+let i: float = 3.14;
+
+print("val: ");
+print(i = 3 ** 2);
+print("\n");
+
+print("i: ");
+print(i);
 print("\n");
 
 // single line comment
