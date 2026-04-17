@@ -1,5 +1,5 @@
 print("val: ");
-print(-1 * 2);
+print(2 ** -2 * 3);
 print("\n");
 
 // single line comment

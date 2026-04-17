@@ -1,9 +1,11 @@
 src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\test4.omni
 
     0 ; PRINT "val: "
-    1 ; PUSH 1
-    1 ; NEG
+    1 ; PUSH 2
     2 ; PUSH 2
+    2 ; NEG
+    1 ; POW
+    2 ; PUSH 3
     1 ; MUL
     0 ; PRINT
     0 ; PRINT "\n"

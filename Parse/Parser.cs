@@ -7,9 +7,10 @@ static class Parse_extensions{
         public bool is_atom() => (int)self >= (int)Token.Type.ID && (int)self <= (int)Token.Type.STR_LIT;
         public bool is_operation() => (int)self >= (int)Token.Type.EQUALS && (int)self <= (int)Token.Type.EQ;
 
+        public static Tuple<float, float> BINDING_POWERS_UNARY => new(11.1f, 11.0f);
         public Tuple<float, float> binding_powers() => self switch{
             Token.Type.EXP                                                => new(12.1f, 12.0f),
-            Token.Type.NOT or Token.Type.BITWISE_NEG                      => new(11.1f, 11.0f),
+            Token.Type.NOT or Token.Type.BITWISE_NEG                      => Token.Type.BINDING_POWERS_UNARY,
             Token.Type.ASTERISK or Token.Type.SLASH or Token.Type.PERCENT => new(10.1f, 10.0f),
             Token.Type.PLUS or Token.Type.MINUS                           => new( 9.0f,  9.1f),
             Token.Type.SHIFT_LEFT or Token.Type.SHIFT_RIGHT               => new( 8.0f,  8.1f),
@@ -89,15 +90,19 @@ public static class Parser{
             if (tokens.Count == 0)
                 throw new Syntax_error_exception($"On line {tok.line_number} no tokens are available");
 
-            lhs = tokens.Peek().type switch{
-                Token.Type.ID      or Token.Type.FALSE       or Token.Type.TRUE or
-                Token.Type.INT_LIT or Token.Type.FLOAT_LIT   or Token.Type.PLUS or
-                Token.Type.MINUS   or Token.Type.BITWISE_NEG or Token.Type.NOT =>
-                    new(){token = tok, m_sub_nodes = [parse_arithm_expr(tokens, Token.Type.NOT.binding_powers().Item2)]},
+            lhs = new(){
+                token = tok,
+                m_sub_nodes = [
+                    tokens.Peek().type switch{
+                        Token.Type.ID      or Token.Type.FALSE       or Token.Type.TRUE or
+                        Token.Type.INT_LIT or Token.Type.FLOAT_LIT   or Token.Type.PLUS or
+                        Token.Type.MINUS   or Token.Type.BITWISE_NEG or Token.Type.NOT => parse_arithm_expr(tokens, Token.Type.BINDING_POWERS_UNARY.Item2),
 
-                Token.Type.LPAREN => new(){token = tok, m_sub_nodes = [parse_arithm_expr(tokens, 0.0f)]},
+                        Token.Type.LPAREN => parse_arithm_expr(tokens, 0.0f),
 
-                _ => throw new Syntax_error_exception($"On line <{tok.line_number}> found invalid token <{tok.id}>"),
+                        _ => throw new Syntax_error_exception($"On line <{tok.line_number}> found invalid token <{tok.id}>"),
+                    }
+                ]
             };
         }
         else
