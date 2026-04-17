@@ -90,20 +90,7 @@ public static class Parser{
             if (tokens.Count == 0)
                 throw new Syntax_error_exception($"On line {tok.line_number} no tokens are available");
 
-            lhs = new(){
-                token = tok,
-                m_sub_nodes = [
-                    tokens.Peek().type switch{
-                        Token.Type.ID      or Token.Type.FALSE       or Token.Type.TRUE or
-                        Token.Type.INT_LIT or Token.Type.FLOAT_LIT   or Token.Type.PLUS or
-                        Token.Type.MINUS   or Token.Type.BITWISE_NEG or Token.Type.NOT => parse_arithm_expr(tokens, Token.Type.BINDING_POWERS_UNARY.Item2),
-
-                        Token.Type.LPAREN => parse_arithm_expr(tokens, 0.0f),
-
-                        _ => throw new Syntax_error_exception($"On line <{tok.line_number}> found invalid token <{tok.id}>"),
-                    }
-                ]
-            };
+            lhs = new(){token = tok, m_sub_nodes = [parse_arithm_expr(tokens, Token.Type.BINDING_POWERS_UNARY.Item2)]};
         }
         else
             throw new Syntax_error_exception($"On line <{tokens.Peek().line_number}> found invalid token <{tokens.Peek().id}>");
