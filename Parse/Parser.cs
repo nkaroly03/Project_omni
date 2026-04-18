@@ -99,12 +99,12 @@ public static class Parser{
             else if (!op.type.is_operation())
                 throw new Syntax_error_exception($"On line <{op.line_number}> found invalid token <{op.id}>");
 
-            (float l_bp, float r_bp) = op.type.binding_powers();
-            if (l_bp < prev_rbp)
+            (float lbp, float rbp) = op.type.binding_powers();
+            if (lbp < prev_rbp)
                 break;
             tokens.Pop();
 
-            Node rhs = parse_arithm_expr(tokens, r_bp);
+            Node rhs = parse_arithm_expr(tokens, rbp);
             lhs = new(){token = op, m_sub_nodes = [lhs, rhs]};
         }
 

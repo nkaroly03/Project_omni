@@ -1,12 +1,15 @@
 src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\test4.omni
 
-    1 ; PUSH 0
-    1 ; TO_INT
-    2 ; PUSH 3.14
-    1 ; MOV SP[-2]
-    2 ; PUSH 2
-    3 ; PUSH 3.14
-    2 ; POW
+    0 ; PRINT "\"hel\"lo, world!\n"
+    1 ; SCAN "val1: "
+    2 ; SCAN "val2: "
+    1 ; ADD
+    1 ; TO_FLOAT
+    1 ; PRINT "result: "
+    2 ; PUSH SP[-1]
+    1 ; PRINT
+    1 ; PRINT "\n"
+    2 ; PUSH 0
     1 ; RET
     0 ; POP
 

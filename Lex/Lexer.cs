@@ -122,7 +122,7 @@ public static class Lexer{
                 ")"
             ).Select((s) => s.Trim(' ')).Where((s) => s.Length > 0).ToArray()
         ){
-            Console.WriteLine($"tok: {System.Text.RegularExpressions.Regex.Escape(line)} | tok.Length: {line.Length}");
+            // Console.WriteLine($"tok: {System.Text.RegularExpressions.Regex.Escape(line)} | tok.Length: {line.Length}");
             if (line != Environment.NewLine && !line.StartsWith("//") && !line.StartsWith("/*/")){
                 string token_id = line;
 
