@@ -116,13 +116,13 @@ public static class Lexer{
             Regex.Split(
                 file_lines,
                 "(" +
-                    @"/\*/[^/]*/\*/|(?://.*)?(?:\r\n|\r|\n)|"".*""|" +
+                    @"/\*/[^/]*/\*/|(?://.*)?(?:\r\n|\r|\n)|""(?:[^""\\]|\\.)*?""|" +
                     @"\*\*|[:;(){}+*/%&|^~-]|<<|>>|!=|[<>=]=?|" +
                     @"\blet\b|\bbool\b|\bfalse\b|\btrue\b|\bint\b|\bfloat\b|\bprint\b|\bscan\b|\bif\b|\belse\b|\bwhile\b|\band\b|\bor\b|\bnot\b|\breturn\b" +
                 ")"
             ).Select((s) => s.Trim(' ')).Where((s) => s.Length > 0).ToArray()
         ){
-            // Console.WriteLine($"tok: {System.Text.RegularExpressions.Regex.Escape(line)} | tok.Length: {line.Length}");
+            Console.WriteLine($"tok: {System.Text.RegularExpressions.Regex.Escape(line)} | tok.Length: {line.Length}");
             if (line != Environment.NewLine && !line.StartsWith("//") && !line.StartsWith("/*/")){
                 string token_id = line;
 

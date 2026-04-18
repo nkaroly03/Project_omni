@@ -1,15 +1,12 @@
 src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\test4.omni
 
-    0 ; PRINT "val: "
-    1 ; PUSH 2
-    2 ; PUSH 2
-    3 ; PUSH 3
-    2 ; MUL
-    2 ; NEG
-    1 ; POW
-    0 ; PRINT
-    0 ; PRINT "\n"
-    0 ; PRINT "\n"
     1 ; PUSH 0
-    0 ; RET
+    1 ; TO_INT
+    2 ; PUSH 3.14
+    1 ; MOV SP[-2]
+    2 ; PUSH 2
+    3 ; PUSH 3.14
+    2 ; POW
+    1 ; RET
+    0 ; POP
 

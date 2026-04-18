@@ -59,7 +59,7 @@ public static class Parser{
 
         Token tok = tokens.Pop();
         if (tok.type.is_atom())
-            lhs = new(){token = tok};
+            lhs.token = tok;
         else if (tok.type == Token.Type.SCAN){
             lhs.token = tok;
 
@@ -75,16 +75,11 @@ public static class Parser{
                 throw new Syntax_error_exception($"On line <{tok.line_number}> <scan> must be closed by <)>");
         }
         else if (tok.type == Token.Type.LPAREN){
-            Node temp = parse_arithm_expr(tokens, 0.0f);
+            lhs = parse_arithm_expr(tokens, 0.0f);
 
-            if (tokens.Count == 0)
-                throw new Syntax_error_exception($"On line {tok.line_number} no tokens are available");
-
-            Token t = tokens.Pop();
-            if (t.type != Token.Type.RPAREN)
-                throw new Syntax_error_exception($"On line <{t.line_number}> expected <)>");
-
-            lhs = temp;
+            tok = tokens.Pop();
+            if (tok.type != Token.Type.RPAREN)
+                throw new Syntax_error_exception($"On line <{tok.line_number}> expected <)>");
         }
         else if (tok.type == Token.Type.PLUS || tok.type == Token.Type.MINUS || tok.type == Token.Type.BITWISE_NEG || tok.type == Token.Type.NOT){
             if (tokens.Count == 0)
@@ -95,11 +90,10 @@ public static class Parser{
         else
             throw new Syntax_error_exception($"On line <{tokens.Peek().line_number}> found invalid token <{tokens.Peek().id}>");
 
-        Token op;
         while (true){
             if (tokens.Count == 0)
                 throw new Syntax_error_exception($"On line <{tok.line_number}> no tokens are available");
-            op = tokens.Peek();
+            Token op = tokens.Peek();
             if (op.type == Token.Type.RPAREN || op.type == Token.Type.LBRACE || op.type == Token.Type.SEMICOLON)
                 break;
             else if (!op.type.is_operation())

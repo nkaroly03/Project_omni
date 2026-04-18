@@ -125,14 +125,7 @@ public static class Interpreter{
                 case Compiler.Op_code.XOR:  stack[^2]  ^= stack.pop(); break;
                                             
                 case Compiler.Op_code.POW:
-                    stack[^2] = stack[^2].data switch{
-                        bool  => new(Convert.ToBoolean(MathF.Pow(stack[^2].to_float(), stack[^1].to_float()))),
-                        int   => new((int)MathF.Pow(stack[^2].to_float(), stack[^1].to_float())),
-                        float => new(MathF.Pow(stack[^2].to_float(), stack[^1].to_float())),
-
-                        _ => throw new UnreachableException(),
-                    };
-                    stack.pop();
+                    stack[^2] = Value.pow(stack[^2], stack.pop());
                     break;
 
                 case Compiler.Op_code.BNEG:

@@ -9,34 +9,18 @@ public sealed class Value{
         switch (v1.data){
             case bool:
                 switch (v2.data){
-                    case bool:
-                        break;
                     case int:
                         temp.data = v1.to_int();
                         break;
                     case float:
                         temp.data = v1.to_float();
                         break;
-                    default:
-                        throw new UnreachableException();
                 }
                 break;
             case int:
-                switch (v2.data){
-                    case bool:
-                    case int:
-                        break;
-                    case float:
-                        temp.data = v1.to_float();
-                        break;
-                    default:
-                        throw new UnreachableException();
-                }
+                if (v2.data is float)
+                    temp.data = v1.to_float();
                 break;
-            case float:
-                break;
-            default:
-                throw new UnreachableException();
         }
 
         op(temp, v2);
@@ -50,30 +34,16 @@ public sealed class Value{
     }
 
     static bool cmp_op(Value v1, Value v2, Func<int, int, bool> int_cmp, Func<float, float, bool> float_cmp){
-        switch (v1.data){
-            case bool:
-            case int:
-                switch (v2.data){
-                    case bool:
-                    case int:
-                        return int_cmp(v1.to_int(), v2.to_int());
-                    case float:
-                        return float_cmp(v1.to_float(), v2.to_float());
-                    default:
-                        throw new UnreachableException();
-                }
-            case float:
-                switch (v2.data){
-                    case bool:
-                    case int:
-                    case float:
-                        return float_cmp(v1.to_float(), v2.to_float());
-                    default:
-                        throw new UnreachableException();
-                }
-            default:
-                throw new UnreachableException();
-        }
+        return v1.data switch{
+            bool or int => v2.data switch{
+                bool or int => int_cmp(v1.to_int(), v2.to_int()),
+                float       => float_cmp(v1.to_float(), v2.to_float()),
+                _           => throw new UnreachableException(),
+            },
+            float => float_cmp(v1.to_float(), v2.to_float()),
+
+            _ => throw new UnreachableException(),
+        };
     }
 
     public static Value operator+(Value v) => new(v);
@@ -85,29 +55,30 @@ public sealed class Value{
         _ => throw new UnreachableException(),
     };
 
-    public static Value operator+(Value v1, Value v2) => arithm_op(new(v1), new(v2), (_v1, _v2) => _v1 += _v2);
-    public static Value operator-(Value v1, Value v2) => arithm_op(new(v1), new(v2), (_v1, _v2) => _v1 -= _v2);
-    public static Value operator*(Value v1, Value v2) => arithm_op(new(v1), new(v2), (_v1, _v2) => _v1 *= _v2);
-    public static Value operator/(Value v1, Value v2) => arithm_op(new(v1), new(v2), (_v1, _v2) => _v1 /= _v2);
-    public static Value operator%(Value v1, Value v2) => arithm_op(new(v1), new(v2), (_v1, _v2) => _v1 %= _v2);
+    public static Value operator+(Value v1, Value v2) => arithm_op(new(v1), new(v2), (_v1, _v2) => _v1.add_eq(_v2));
+    public static Value operator-(Value v1, Value v2) => arithm_op(new(v1), new(v2), (_v1, _v2) => _v1.sub_eq(_v2));
+    public static Value operator*(Value v1, Value v2) => arithm_op(new(v1), new(v2), (_v1, _v2) => _v1.mul_eq(_v2));
+    public static Value operator/(Value v1, Value v2) => arithm_op(new(v1), new(v2), (_v1, _v2) => _v1.div_eq(_v2));
+    public static Value operator%(Value v1, Value v2) => arithm_op(new(v1), new(v2), (_v1, _v2) => _v1.mod_eq(_v2));
+    public static Value       pow(Value v1, Value v2) => arithm_op(new(v1), new(v2), (_v1, _v2) => _v1.pow_eq(_v2));
 
-    public static Value operator<<(Value v1, Value v2) => bitwise_arithm_op(new(v1), new(v2), (_v1, _v2) => _v1 <<= _v2);
-    public static Value operator>>(Value v1, Value v2) => bitwise_arithm_op(new(v1), new(v2), (_v1, _v2) => _v1 >>= _v2);
-    public static Value operator& (Value v1, Value v2) => bitwise_arithm_op(new(v1), new(v2), (_v1, _v2) => _v1  &= _v2);
-    public static Value operator| (Value v1, Value v2) => bitwise_arithm_op(new(v1), new(v2), (_v1, _v2) => _v1  |= _v2);
-    public static Value operator^ (Value v1, Value v2) => bitwise_arithm_op(new(v1), new(v2), (_v1, _v2) => _v1  ^= _v2);
+    public static Value operator<<(Value v1, Value v2) => bitwise_arithm_op(new(v1), new(v2), (_v1, _v2) => _v1.shl_eq (_v2));
+    public static Value operator>>(Value v1, Value v2) => bitwise_arithm_op(new(v1), new(v2), (_v1, _v2) => _v1.shr_eq (_v2));
+    public static Value operator& (Value v1, Value v2) => bitwise_arithm_op(new(v1), new(v2), (_v1, _v2) => _v1.band_eq(_v2));
+    public static Value operator| (Value v1, Value v2) => bitwise_arithm_op(new(v1), new(v2), (_v1, _v2) => _v1.bor_eq (_v2));
+    public static Value operator^ (Value v1, Value v2) => bitwise_arithm_op(new(v1), new(v2), (_v1, _v2) => _v1.xor_eq (_v2));
     public static Value operator~ (Value v) => v.data switch{
         int => new(~v.to_int()),
 
         _ => throw new InvalidOperationException("Trying to use bitwise operations on non integer types"),
     };
 
+    public static bool operator==(Value v1, Value v2) => cmp_op(v1, v2, (i1, i2) => (i1 == i2), (f1, f2) => (f1 == f2));
+    public static bool operator!=(Value v1, Value v2) => cmp_op(v1, v2, (i1, i2) => (i1 != i2), (f1, f2) => (f1 != f2));
     public static bool operator< (Value v1, Value v2) => cmp_op(v1, v2, (i1, i2) => (i1 <  i2), (f1, f2) => (f1 <  f2));
     public static bool operator<=(Value v1, Value v2) => cmp_op(v1, v2, (i1, i2) => (i1 <= i2), (f1, f2) => (f1 <= f2));
     public static bool operator> (Value v1, Value v2) => cmp_op(v1, v2, (i1, i2) => (i1 >  i2), (f1, f2) => (f1 >  f2));
     public static bool operator>=(Value v1, Value v2) => cmp_op(v1, v2, (i1, i2) => (i1 >= i2), (f1, f2) => (f1 >= f2));
-    public static bool operator==(Value v1, Value v2) => cmp_op(v1, v2, (i1, i2) => (i1 == i2), (f1, f2) => (f1 == f2));
-    public static bool operator!=(Value v1, Value v2) => cmp_op(v1, v2, (i1, i2) => (i1 != i2), (f1, f2) => (f1 != f2));
 
     public object data{ get; private set; }
 
@@ -145,67 +116,77 @@ public sealed class Value{
         _ => throw new UnreachableException()
     };
 
-    public void operator+=(Value v) => data = data switch{
+    public void add_eq(Value v) => data = data switch{
         bool  => (bool)data || v.to_bool(),
         int   => (int)data + v.to_int(),
         float => (float)data + v.to_float(),
 
         _ => throw new UnreachableException()
     };
-    public void operator-=(Value v) => data = data switch{
+    public void sub_eq(Value v) => data = data switch{
         bool  => Convert.ToBoolean(to_int() - v.to_int()),
         int   => (int)data - v.to_int(),
         float => (float)data - v.to_float(),
 
         _ => throw new UnreachableException()
     };
-    public void operator*=(Value v) => data = data switch{
+    public void mul_eq(Value v) => data = data switch{
         bool  => (bool)data && v.to_bool(),
         int   => (int)data * v.to_int(),
         float => (float)data * v.to_float(),
 
         _ => throw new UnreachableException()
     };
-    public void operator/=(Value v) => data = data switch{
+    public void div_eq(Value v) => data = data switch{
         bool  => Convert.ToBoolean(to_int() / v.to_int()),
         int   => (int)data / v.to_int(),
         float => (float)data / v.to_float(),
 
         _ => throw new UnreachableException()
     };
-    public void operator%=(Value v) => data = data switch{
+    public void mod_eq(Value v) => data = data switch{
         bool  => Convert.ToBoolean(to_int() % v.to_int()),
         int   => (int)data % v.to_int(),
         float => (float)data % v.to_float(),
 
         _ => throw new UnreachableException()
     };
+    public void pow_eq(Value v){
+        float result = MathF.Pow(to_float(), v.to_float());
+        data = data switch{
+            bool  => Convert.ToBoolean(result),
+            int   => (int)result,
+            float => result,
 
-    public void operator<<=(Value v){
+            _ => throw new UnreachableException()
+        };
+    }
+
+    public void shl_eq(Value v){
         if (data is not int || v.data is not int)
             throw new InvalidOperationException("Trying to use bitwise operations on non integer types");
 
         data = to_int() << v.to_int();
     }
-    public void operator>>=(Value v){
+    public void shr_eq(Value v){
         if (data is not int || v.data is not int)
             throw new InvalidOperationException("Trying to use bitwise operations on non integer types");
 
         data = to_int() >> v.to_int();
     }
-    public void operator&=(Value v){
+    public void band_eq(Value v){
         if (data is not int || v.data is not int)
             throw new InvalidOperationException("Trying to use bitwise operations on non integer types");
 
         data = to_int() & v.to_int();
     }
-    public void operator|=(Value v){
+    public void bor_eq(Value v){
         if (data is not int || v.data is not int)
             throw new InvalidOperationException("Trying to use bitwise operations on non integer types");
 
         data = to_int() | v.to_int();
     }
-    public void operator^=(Value v){
+    public void xor_eq(Value v){
         if (data is not int || v.data is not int)
             throw new InvalidOperationException("Trying to use bitwise operations on non integer types");
 

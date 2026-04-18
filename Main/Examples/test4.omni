@@ -1,31 +1,15 @@
-print("val: ");
-print(2 ** -(2 * 3));
-print("\n");
-
-// single line comment
-
-print(/*/ inline multiline comment /*/"\n"); // inline comment
-
-/*/
-
-    multiline comment
-    multiline comment
-    multiline comment
-    multiline comment
-
-/*/
-
-// print("1000000 and 2000000 and 0 (if form): ");
-// if (1000000){
-    // if (2000000){
-        // if (0)
-            // print(true);
-        // else
-            // print(false);
-    // }
-    // else
-        // print(false);
-// }
-// else
-    // print(false);
+// print(
+    // "\"hel\"lo"
+    // ", "
+    // "world"
+    // "!"
+    // "\n"
+// );
+// print(scan("val1: ") + scan("val2: "));
 // print("\n");
+
+let i: int = 0;
+
+i = 3.14;
+
+return 2 ** 3.14;
