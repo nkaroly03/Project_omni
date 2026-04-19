@@ -66,272 +66,265 @@ public static class Compiler{
         NEG,
     }
 
-    sealed class Stack_info{
-        public int size = 0;
-        public OrderedDictionary<string, int> id_positions = new();
-    }
+    sealed class State{
+        OrderedDictionary<string, int> m_id_positions = new();
+        public int stack_size{ get; private set; }
 
-    static void to_IR(
-        Stack_info info,
-        Node current_AST_node,
-		Node? next_AST_node,
-		StringBuilder sb,
-		ref int let_decl_counter,
-        bool push_back_after_assignment
-    ){
-        switch (current_AST_node.token.type){
-            case Token.Type.ID:
-                if (!info.id_positions.ContainsKey(current_AST_node.token.id))
-                    throw new Syntax_error_exception($"On line <{current_AST_node.token.line_number}> use of undeclared identifier <{current_AST_node.token.id}>");
-                ++info.size;
-                sb.add_instruction($"{info.size} ; PUSH SP[-{info.size - info.id_positions[current_AST_node.token.id] - 1}]");
-                break;
+        public void to_IR(Node current_AST_node, Node? next_AST_node, StringBuilder sb, ref int let_decl_counter, bool push_back_after_assignment){
+            switch (current_AST_node.token.type){
+                case Token.Type.ID:
+                    if (!m_id_positions.ContainsKey(current_AST_node.token.id))
+                        throw new Syntax_error_exception($"On line <{current_AST_node.token.line_number}> use of undeclared identifier <{current_AST_node.token.id}>");
+                    ++stack_size;
+                    sb.add_instruction($"{stack_size} ; PUSH SP[-{stack_size - m_id_positions[current_AST_node.token.id] - 1}]");
+                    break;
 
-            case Token.Type.FALSE:
-                ++info.size;
-                sb.add_instruction($"{info.size} ; PUSH FALSE");
-                break;
-            case Token.Type.TRUE:
-                ++info.size;
-                sb.add_instruction($"{info.size} ; PUSH TRUE");
-                break;
-            case Token.Type.INT_LIT:
-            case Token.Type.FLOAT_LIT:
-                ++info.size;
-                sb.add_instruction($"{info.size} ; PUSH {current_AST_node.token.id}");
-                break;
+                case Token.Type.FALSE:
+                    ++stack_size;
+                    sb.add_instruction($"{stack_size} ; PUSH FALSE");
+                    break;
+                case Token.Type.TRUE:
+                    ++stack_size;
+                    sb.add_instruction($"{stack_size} ; PUSH TRUE");
+                    break;
+                case Token.Type.INT_LIT:
+                case Token.Type.FLOAT_LIT:
+                    ++stack_size;
+                    sb.add_instruction($"{stack_size} ; PUSH {current_AST_node.token.id}");
+                    break;
 
-            case Token.Type.EQUALS:
-            case Token.Type.NOT_EQUALS:
-            case Token.Type.LESS_THAN:
-            case Token.Type.LESS_THAN_EQ:
-            case Token.Type.GREATER_THAN:
-            case Token.Type.GREATER_THAN_EQ:
-            case Token.Type.ASTERISK:
-            case Token.Type.SLASH:
-            case Token.Type.PERCENT:
-            case Token.Type.EXP:
-            case Token.Type.SHIFT_LEFT:
-            case Token.Type.SHIFT_RIGHT:
-            case Token.Type.BITWISE_AND:
-            case Token.Type.BITWISE_OR:
-            case Token.Type.XOR:
-            // case Token.Type.AND:
-            // case Token.Type.OR:
-                to_IR(info, current_AST_node.sub_nodes[0], null, sb, ref let_decl_counter, true);
-                to_IR(info, current_AST_node.sub_nodes[1], null, sb, ref let_decl_counter, true);
-                sb.add_instruction($"{info.size - 1} ; {current_AST_node.token.type switch{
-                    Token.Type.EQUALS          => "CMP_EQ",
-                    Token.Type.NOT_EQUALS      => "CMP_NEQ",
-                    Token.Type.LESS_THAN       => "CMP_LE",
-                    Token.Type.LESS_THAN_EQ    => "CMP_LEQ",
-                    Token.Type.GREATER_THAN    => "CMP_GE",
-                    Token.Type.GREATER_THAN_EQ => "CMP_GEQ",
-                    Token.Type.ASTERISK        => "MUL",
-                    Token.Type.SLASH           => "DIV",
-                    Token.Type.PERCENT         => "MOD",
-                    Token.Type.EXP             => "POW",
-                    Token.Type.SHIFT_LEFT      => "SHL",
-                    Token.Type.SHIFT_RIGHT     => "SHR",
-                    Token.Type.BITWISE_AND     => "BAND",
-                    Token.Type.BITWISE_OR      => "BOR",
-                    Token.Type.XOR             => "XOR",
-                    // Token.Type.AND             => "AND",
-                    // Token.Type.OR              => "OR",
-                    
-                    _ => throw new System.Diagnostics.UnreachableException(),
-                }}");
-                --info.size;
-                break;
+                case Token.Type.EQUALS:
+                case Token.Type.NOT_EQUALS:
+                case Token.Type.LESS_THAN:
+                case Token.Type.LESS_THAN_EQ:
+                case Token.Type.GREATER_THAN:
+                case Token.Type.GREATER_THAN_EQ:
+                case Token.Type.ASTERISK:
+                case Token.Type.SLASH:
+                case Token.Type.PERCENT:
+                case Token.Type.EXP:
+                case Token.Type.SHIFT_LEFT:
+                case Token.Type.SHIFT_RIGHT:
+                case Token.Type.BITWISE_AND:
+                case Token.Type.BITWISE_OR:
+                case Token.Type.XOR:
+                // case Token.Type.AND:
+                // case Token.Type.OR:
+                    to_IR(current_AST_node.sub_nodes[0], null, sb, ref let_decl_counter, true);
+                    to_IR(current_AST_node.sub_nodes[1], null, sb, ref let_decl_counter, true);
+                    sb.add_instruction($"{stack_size - 1} ; {current_AST_node.token.type switch{
+                        Token.Type.EQUALS          => "CMP_EQ",
+                        Token.Type.NOT_EQUALS      => "CMP_NEQ",
+                        Token.Type.LESS_THAN       => "CMP_LE",
+                        Token.Type.LESS_THAN_EQ    => "CMP_LEQ",
+                        Token.Type.GREATER_THAN    => "CMP_GE",
+                        Token.Type.GREATER_THAN_EQ => "CMP_GEQ",
+                        Token.Type.ASTERISK        => "MUL",
+                        Token.Type.SLASH           => "DIV",
+                        Token.Type.PERCENT         => "MOD",
+                        Token.Type.EXP             => "POW",
+                        Token.Type.SHIFT_LEFT      => "SHL",
+                        Token.Type.SHIFT_RIGHT     => "SHR",
+                        Token.Type.BITWISE_AND     => "BAND",
+                        Token.Type.BITWISE_OR      => "BOR",
+                        Token.Type.XOR             => "XOR",
+                        // Token.Type.AND             => "AND",
+                        // Token.Type.OR              => "OR",
+                        
+                        _ => throw new System.Diagnostics.UnreachableException(),
+                    }}");
+                    --stack_size;
+                    break;
 
-            case Token.Type.BITWISE_NEG:
-                to_IR(info, current_AST_node.sub_nodes[0], null, sb, ref let_decl_counter, true);
-                sb.add_instruction($"{info.size} ; BNEG");
-                break;
+                case Token.Type.BITWISE_NEG:
+                    to_IR(current_AST_node.sub_nodes[0], null, sb, ref let_decl_counter, true);
+                    sb.add_instruction($"{stack_size} ; BNEG");
+                    break;
 
-            case Token.Type.AND:
-            case Token.Type.OR:
-                StringBuilder and_or_sb = new();
-                to_IR(info, current_AST_node.sub_nodes[0], null, sb, ref let_decl_counter, true);
-                --info.size;
-                to_IR(info, current_AST_node.sub_nodes[1], null, and_or_sb, ref let_decl_counter, true);
-                if (sb.ToString()[(sb.ToString().LastIndexOf(';') + 1)..].Trim() != "TO_BOOL")
-                    sb.add_instruction($"{info.size} ; TO_BOOL");
-                if (current_AST_node.token.type == Token.Type.AND){
-                    sb.add_instruction($"{info.size} ; NEG");
-                    sb.add_instruction($"{info.size - 1} ; JMPZ 3");
-                    sb.add_instruction($"{info.size} ; PUSH FALSE");
-                }
-                else{
-                    sb.add_instruction($"{info.size - 1} ; JMPZ 3");
-                    sb.add_instruction($"{info.size} ; PUSH TRUE");
-                }
-                sb.add_instruction($"{info.size} ; JMP {and_or_sb.count_instructions() + 1}");
-                sb.Append(and_or_sb);
-                if (sb.ToString()[(sb.ToString().LastIndexOf(';') + 1)..].Trim() != "TO_BOOL")
-                    sb.add_instruction($"{info.size} ; TO_BOOL");
-                break;
-            case Token.Type.NOT:
-                to_IR(info, current_AST_node.sub_nodes[0], null, sb, ref let_decl_counter, true);
-                sb.add_instruction($"{info.size} ; TO_BOOL");
-                sb.add_instruction($"{info.size} ; NEG");
-                break;
-
-            case Token.Type.PLUS:
-                to_IR(info, current_AST_node.sub_nodes[0], null, sb, ref let_decl_counter, true);
-                if (current_AST_node.sub_nodes.Length > 1){
-                    to_IR(info, current_AST_node.sub_nodes[1], null, sb, ref let_decl_counter, true);
-                    sb.add_instruction($"{info.size - 1} ; ADD");
-                    --info.size;
-                }
-                break;
-            case Token.Type.MINUS:
-                to_IR(info, current_AST_node.sub_nodes[0], null, sb, ref let_decl_counter, true);
-                if (current_AST_node.sub_nodes.Length > 1){
-                    to_IR(info, current_AST_node.sub_nodes[1], null, sb, ref let_decl_counter, true);
-                    sb.add_instruction($"{info.size - 1} ; SUB");
-                    --info.size;
-                }
-                else
-                    sb.add_instruction($"{info.size} ; NEG");
-                break;
-
-            case Token.Type.EQ:
-                to_IR(info, current_AST_node.sub_nodes[1], null, sb, ref let_decl_counter, true);
-                Token eq_tok = current_AST_node.sub_nodes[0].token;
-                if (eq_tok.type != Token.Type.ID)
-                    throw new Syntax_error_exception($"On line <{eq_tok.line_number}> trying to assign to rvalue");
-                if (!info.id_positions.ContainsKey(eq_tok.id))
-                    throw new Syntax_error_exception($"On line <{eq_tok.line_number}> use of undeclared identifier <{eq_tok.id}>");
-                sb.add_instruction($"{info.size - 1} ; MOV SP[-{info.size - info.id_positions[eq_tok.id]}]");
-                --info.size;
-                if (push_back_after_assignment){
-                    sb.add_instruction($"{info.size + 1} ; PUSH SP[-{info.size - info.id_positions[eq_tok.id]}]");
-                    ++info.size;
-                }
-                break;
-
-            case Token.Type.LET_DECL:
-                to_IR(info, current_AST_node.sub_nodes[1].sub_nodes[0], null, sb, ref let_decl_counter, true);
-                to_IR(info, current_AST_node.sub_nodes[1], null, sb, ref let_decl_counter, true);
-                Token let_decl_tok = current_AST_node.sub_nodes[0].token;
-                if (!info.id_positions.TryAdd(let_decl_tok.id, info.id_positions.Count))
-                    throw new Syntax_error_exception($"On line <{let_decl_tok.line_number}> identifier <{let_decl_tok.id}> is already in use");
-                ++let_decl_counter;
-                break;
-
-            case Token.Type.BOOL:  sb.add_instruction($"{info.size} ; TO_BOOL");  break;
-            case Token.Type.INT:   sb.add_instruction($"{info.size} ; TO_INT");   break;
-            case Token.Type.FLOAT: sb.add_instruction($"{info.size} ; TO_FLOAT"); break;
-
-            case Token.Type.PRINT:
-                Node print_sub_node = current_AST_node.sub_nodes[0];
-                if (print_sub_node.token.type == Token.Type.STR_LIT)
-                    sb.add_instruction($"{info.size} ; PRINT \"{print_sub_node.token.id}\"");
-                else{
-                    to_IR(info, print_sub_node, null, sb, ref let_decl_counter, true);
-                    sb.add_instruction($"{info.size - 1} ; PRINT");
-                    --info.size;
-                }
-                break;
-            case Token.Type.SCAN:
-                sb.add_instruction($"{info.size + 1} ; SCAN \"{current_AST_node.sub_nodes[0].token.id}\"");
-                ++info.size;
-                break;
-
-            case Token.Type.IF:
-                StringBuilder if_else_sb = new();
-                bool has_else_after = (next_AST_node is not null && next_AST_node.token.type == Token.Type.ELSE);
-
-                to_IR(info, current_AST_node.sub_nodes[0], null, sb, ref let_decl_counter, true);
-                --info.size;
-
-                int if_let_decl_counter = 0;
-                ReadOnlySpan<Node> if_sub_nodes = current_AST_node.sub_nodes[1..];
-                if (if_sub_nodes.Length > 0){
-                    for (int i = 0; i < if_sub_nodes.Length - 1; ++i)
-                        if (if_sub_nodes[i].token.type != Token.Type.ELSE)
-                            to_IR(info, if_sub_nodes[i], if_sub_nodes[i + 1], if_else_sb, ref if_let_decl_counter, false);
-                    to_IR(info, if_sub_nodes[^1], null, if_else_sb, ref if_let_decl_counter, false);
-                }
-                while (if_let_decl_counter-- > 0){
-                    if_else_sb.add_instruction($"{--info.size} ; POP");
-                    info.id_positions.RemoveAt(info.id_positions.Count - 1);
-                }
-                sb.add_instruction($"{info.size} ; JMPZ {if_else_sb.count_instructions() + Convert.ToInt32(has_else_after)}");
-                sb.Append(if_else_sb);
-
-                if (has_else_after){
-                    int else_let_decl_counter = 0;
-
-                    if_else_sb.Clear();
-
-                    ReadOnlySpan<Node> else_sub_nodes = next_AST_node!.sub_nodes;
-                    if (else_sub_nodes.Length > 0){
-                        for (int i = 0; i < else_sub_nodes.Length - 1; ++i)
-                            if (else_sub_nodes[i].token.type != Token.Type.ELSE)
-                                to_IR(info, else_sub_nodes[i], else_sub_nodes[i + 1], if_else_sb, ref else_let_decl_counter, false);
-                        to_IR(info, else_sub_nodes[^1], null, if_else_sb, ref else_let_decl_counter, false);
+                case Token.Type.AND:
+                case Token.Type.OR:
+                    StringBuilder and_or_sb = new();
+                    to_IR(current_AST_node.sub_nodes[0], null, sb, ref let_decl_counter, true);
+                    --stack_size;
+                    to_IR(current_AST_node.sub_nodes[1], null, and_or_sb, ref let_decl_counter, true);
+                    if (sb.ToString()[(sb.ToString().LastIndexOf(';') + 1)..].Trim() != "TO_BOOL")
+                        sb.add_instruction($"{stack_size} ; TO_BOOL");
+                    if (current_AST_node.token.type == Token.Type.AND){
+                        sb.add_instruction($"{stack_size} ; NEG");
+                        sb.add_instruction($"{stack_size - 1} ; JMPZ 3");
+                        sb.add_instruction($"{stack_size} ; PUSH FALSE");
                     }
-                    while (else_let_decl_counter-- > 0){
-                        if_else_sb.add_instruction($"{--info.size} ; POP");
-                        info.id_positions.RemoveAt(info.id_positions.Count - 1);
+                    else{
+                        sb.add_instruction($"{stack_size - 1} ; JMPZ 3");
+                        sb.add_instruction($"{stack_size} ; PUSH TRUE");
                     }
-                    sb.add_instruction($"{info.size} ; JMP {if_else_sb.count_instructions()}");
+                    sb.add_instruction($"{stack_size} ; JMP {and_or_sb.count_instructions() + 1}");
+                    sb.Append(and_or_sb);
+                    if (sb.ToString()[(sb.ToString().LastIndexOf(';') + 1)..].Trim() != "TO_BOOL")
+                        sb.add_instruction($"{stack_size} ; TO_BOOL");
+                    break;
+                case Token.Type.NOT:
+                    to_IR(current_AST_node.sub_nodes[0], null, sb, ref let_decl_counter, true);
+                    sb.add_instruction($"{stack_size} ; TO_BOOL");
+                    sb.add_instruction($"{stack_size} ; NEG");
+                    break;
+
+                case Token.Type.PLUS:
+                    to_IR(current_AST_node.sub_nodes[0], null, sb, ref let_decl_counter, true);
+                    if (current_AST_node.sub_nodes.Length > 1){
+                        to_IR(current_AST_node.sub_nodes[1], null, sb, ref let_decl_counter, true);
+                        sb.add_instruction($"{stack_size - 1} ; ADD");
+                        --stack_size;
+                    }
+                    break;
+                case Token.Type.MINUS:
+                    to_IR(current_AST_node.sub_nodes[0], null, sb, ref let_decl_counter, true);
+                    if (current_AST_node.sub_nodes.Length > 1){
+                        to_IR(current_AST_node.sub_nodes[1], null, sb, ref let_decl_counter, true);
+                        sb.add_instruction($"{stack_size - 1} ; SUB");
+                        --stack_size;
+                    }
+                    else
+                        sb.add_instruction($"{stack_size} ; NEG");
+                    break;
+
+                case Token.Type.EQ:
+                    to_IR(current_AST_node.sub_nodes[1], null, sb, ref let_decl_counter, true);
+                    Token eq_tok = current_AST_node.sub_nodes[0].token;
+                    if (eq_tok.type != Token.Type.ID)
+                        throw new Syntax_error_exception($"On line <{eq_tok.line_number}> trying to assign to rvalue");
+                    if (!m_id_positions.ContainsKey(eq_tok.id))
+                        throw new Syntax_error_exception($"On line <{eq_tok.line_number}> use of undeclared identifier <{eq_tok.id}>");
+                    sb.add_instruction($"{stack_size - 1} ; MOV SP[-{stack_size - m_id_positions[eq_tok.id]}]");
+                    --stack_size;
+                    if (push_back_after_assignment){
+                        sb.add_instruction($"{stack_size + 1} ; PUSH SP[-{stack_size - m_id_positions[eq_tok.id]}]");
+                        ++stack_size;
+                    }
+                    break;
+
+                case Token.Type.LET_DECL:
+                    to_IR(current_AST_node.sub_nodes[1].sub_nodes[0], null, sb, ref let_decl_counter, true);
+                    to_IR(current_AST_node.sub_nodes[1], null, sb, ref let_decl_counter, true);
+                    Token let_decl_tok = current_AST_node.sub_nodes[0].token;
+                    if (!m_id_positions.TryAdd(let_decl_tok.id, m_id_positions.Count))
+                        throw new Syntax_error_exception($"On line <{let_decl_tok.line_number}> identifier <{let_decl_tok.id}> is already in use");
+                    ++let_decl_counter;
+                    break;
+
+                case Token.Type.BOOL:  sb.add_instruction($"{stack_size} ; TO_BOOL");  break;
+                case Token.Type.INT:   sb.add_instruction($"{stack_size} ; TO_INT");   break;
+                case Token.Type.FLOAT: sb.add_instruction($"{stack_size} ; TO_FLOAT"); break;
+
+                case Token.Type.PRINT:
+                    Node print_sub_node = current_AST_node.sub_nodes[0];
+                    if (print_sub_node.token.type == Token.Type.STR_LIT)
+                        sb.add_instruction($"{stack_size} ; PRINT \"{print_sub_node.token.id}\"");
+                    else{
+                        to_IR(print_sub_node, null, sb, ref let_decl_counter, true);
+                        sb.add_instruction($"{stack_size - 1} ; PRINT");
+                        --stack_size;
+                    }
+                    break;
+                case Token.Type.SCAN:
+                    sb.add_instruction($"{stack_size + 1} ; SCAN \"{current_AST_node.sub_nodes[0].token.id}\"");
+                    ++stack_size;
+                    break;
+
+                case Token.Type.IF:
+                    StringBuilder if_else_sb = new();
+                    bool has_else_after = (next_AST_node is not null && next_AST_node.token.type == Token.Type.ELSE);
+
+                    to_IR(current_AST_node.sub_nodes[0], null, sb, ref let_decl_counter, true);
+                    --stack_size;
+
+                    int if_let_decl_counter = 0;
+                    ReadOnlySpan<Node> if_sub_nodes = current_AST_node.sub_nodes[1..];
+                    if (if_sub_nodes.Length > 0){
+                        for (int i = 0; i < if_sub_nodes.Length - 1; ++i)
+                            if (if_sub_nodes[i].token.type != Token.Type.ELSE)
+                                to_IR(if_sub_nodes[i], if_sub_nodes[i + 1], if_else_sb, ref if_let_decl_counter, false);
+                        to_IR(if_sub_nodes[^1], null, if_else_sb, ref if_let_decl_counter, false);
+                    }
+                    while (if_let_decl_counter-- > 0){
+                        if_else_sb.add_instruction($"{--stack_size} ; POP");
+                        m_id_positions.RemoveAt(m_id_positions.Count - 1);
+                    }
+                    sb.add_instruction($"{stack_size} ; JMPZ {if_else_sb.count_instructions() + Convert.ToInt32(has_else_after)}");
                     sb.Append(if_else_sb);
-                }
-                break;
-            case Token.Type.WHILE:
-                StringBuilder while_condition_sb = new();
-                to_IR(info, current_AST_node.sub_nodes[0], null, while_condition_sb, ref let_decl_counter, true);
-                --info.size;
-                
-                StringBuilder while_sb = new();
 
-                ReadOnlySpan<Node> while_sub_nodes = current_AST_node.sub_nodes[1..];
-                if (while_sub_nodes.Length > 0){
-                    int while_let_decl_counter = 0;
+                    if (has_else_after){
+                        int else_let_decl_counter = 0;
 
-                    for (int i = 0; i < while_sub_nodes.Length - 1; ++i)
-                        to_IR(info, while_sub_nodes[i], while_sub_nodes[i + 1], while_sb, ref while_let_decl_counter, false);
-                    to_IR(info, while_sub_nodes[^1], null, while_sb, ref while_let_decl_counter, false);
+                        if_else_sb.Clear();
 
-                    while (while_let_decl_counter-- > 0){
-                        while_sb.add_instruction($"{--info.size} ; POP");
-                        info.id_positions.RemoveAt(info.id_positions.Count - 1);
+                        ReadOnlySpan<Node> else_sub_nodes = next_AST_node!.sub_nodes;
+                        if (else_sub_nodes.Length > 0){
+                            for (int i = 0; i < else_sub_nodes.Length - 1; ++i)
+                                if (else_sub_nodes[i].token.type != Token.Type.ELSE)
+                                    to_IR(else_sub_nodes[i], else_sub_nodes[i + 1], if_else_sb, ref else_let_decl_counter, false);
+                            to_IR(else_sub_nodes[^1], null, if_else_sb, ref else_let_decl_counter, false);
+                        }
+                        while (else_let_decl_counter-- > 0){
+                            if_else_sb.add_instruction($"{--stack_size} ; POP");
+                            m_id_positions.RemoveAt(m_id_positions.Count - 1);
+                        }
+                        sb.add_instruction($"{stack_size} ; JMP {if_else_sb.count_instructions()}");
+                        sb.Append(if_else_sb);
                     }
-                }
+                    break;
+                case Token.Type.WHILE:
+                    StringBuilder while_condition_sb = new();
+                    to_IR(current_AST_node.sub_nodes[0], null, while_condition_sb, ref let_decl_counter, true);
+                    --stack_size;
+                    
+                    StringBuilder while_sb = new();
 
-                while_condition_sb.add_instruction($"{info.size} ; JMPZ {while_sb.count_instructions() + 1}");
-                sb.Append(while_condition_sb);
-                sb.Append(while_sb);
-                sb.add_instruction($"{info.size} ; JMP -{while_condition_sb.count_instructions() + while_sb.count_instructions() - 2}");
-                break;
+                    ReadOnlySpan<Node> while_sub_nodes = current_AST_node.sub_nodes[1..];
+                    if (while_sub_nodes.Length > 0){
+                        int while_let_decl_counter = 0;
 
-            case Token.Type.RETURN:
-                to_IR(info, current_AST_node.sub_nodes[0], null, sb, ref let_decl_counter, true);
-                sb.add_instruction($"{info.size - 1} ; RET");
-                --info.size;
-                break;
+                        for (int i = 0; i < while_sub_nodes.Length - 1; ++i)
+                            to_IR(while_sub_nodes[i], while_sub_nodes[i + 1], while_sb, ref while_let_decl_counter, false);
+                        to_IR(while_sub_nodes[^1], null, while_sb, ref while_let_decl_counter, false);
+
+                        while (while_let_decl_counter-- > 0){
+                            while_sb.add_instruction($"{--stack_size} ; POP");
+                            m_id_positions.RemoveAt(m_id_positions.Count - 1);
+                        }
+                    }
+
+                    while_condition_sb.add_instruction($"{stack_size} ; JMPZ {while_sb.count_instructions() + 1}");
+                    sb.Append(while_condition_sb);
+                    sb.Append(while_sb);
+                    sb.add_instruction($"{stack_size} ; JMP -{while_condition_sb.count_instructions() + while_sb.count_instructions() - 2}");
+                    break;
+
+                case Token.Type.RETURN:
+                    to_IR(current_AST_node.sub_nodes[0], null, sb, ref let_decl_counter, true);
+                    sb.add_instruction($"{stack_size - 1} ; RET");
+                    --stack_size;
+                    break;
+            }
         }
     }
 
     public static string to_IR(ReadOnlySpan<Node> AST){
-        Stack_info info = new();
+        State state = new();
 
         StringBuilder sb = new();
         int let_decl_counter = 0;
 
         for (int i = 0; i < AST.Length - 1; ++i){
             if (AST[i].token.type != Token.Type.ELSE){
-                to_IR(info, AST[i], AST[i + 1], sb, ref let_decl_counter, false);
+                state.to_IR(AST[i], AST[i + 1], sb, ref let_decl_counter, false);
                 // sb.AppendLine();
             }
         }
-        to_IR(info, AST[^1], null, sb, ref let_decl_counter, false);
+        state.to_IR(AST[^1], null, sb, ref let_decl_counter, false);
 
-        while (info.size > 0)
-            sb.add_instruction($"{--info.size} ; POP");
+        for (int i = state.stack_size; i-- > 0;)
+            sb.add_instruction($"{i} ; POP");
 
         return sb.ToString();
     }
