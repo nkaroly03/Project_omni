@@ -36,7 +36,7 @@ static class Parse_extensions{
             Node lhs = new();
 
             if (self.Count == 0)
-                throw new Syntax_error_exception("No self are available");
+                throw new Syntax_error_exception("No tokens are available");
 
             Token tok = self.Pop();
             if (tok.type.is_atom())
@@ -64,7 +64,7 @@ static class Parse_extensions{
             }
             else if (tok.type == Token.Type.PLUS || tok.type == Token.Type.MINUS || tok.type == Token.Type.BITWISE_NEG || tok.type == Token.Type.NOT){
                 if (self.Count == 0)
-                    throw new Syntax_error_exception($"On line {tok.line_number} no self are available");
+                    throw new Syntax_error_exception($"On line {tok.line_number} no tokens are available");
 
                 lhs = new(){token = tok, m_sub_nodes = [self.parse_arithm_expr(Token.Type.BINDING_POWERS_UNARY.Item2)]};
             }
@@ -73,7 +73,7 @@ static class Parse_extensions{
 
             while (true){
                 if (self.Count == 0)
-                    throw new Syntax_error_exception($"On line <{tok.line_number}> no self are available");
+                    throw new Syntax_error_exception($"On line <{tok.line_number}> no tokens are available");
                 Token op = self.Peek();
                 if (op.type == Token.Type.RPAREN || op.type == Token.Type.LBRACE || op.type == Token.Type.SEMICOLON)
                     break;
@@ -231,7 +231,7 @@ static class Parse_extensions{
                     throw new Syntax_error_exception($"On line <{tok.line_number}> found invalid token <{tok.id}>");
             }
 
-            return new (node1, node2);
+            return new(node1, node2);
         }
     }
 }

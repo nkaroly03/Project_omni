@@ -315,12 +315,9 @@ public static class Compiler{
         StringBuilder sb = new();
         int let_decl_counter = 0;
 
-        for (int i = 0; i < AST.Length - 1; ++i){
-            if (AST[i].token.type != Token.Type.ELSE){
+        for (int i = 0; i < AST.Length - 1; ++i)
+            if (AST[i].token.type != Token.Type.ELSE)
                 state.to_IR(AST[i], AST[i + 1], sb, ref let_decl_counter, false);
-                // sb.AppendLine();
-            }
-        }
         state.to_IR(AST[^1], null, sb, ref let_decl_counter, false);
 
         for (int i = state.stack_size; i-- > 0;)

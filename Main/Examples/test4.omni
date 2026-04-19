@@ -8,17 +8,17 @@
 // print(scan("val1: ") + scan("val2: "));
 // print("\n");
 
-while (true){
-    let num_to_align: int = scan("num_to_align: ");
-
-    if (num_to_align > 0){
-        let clz: int = 0;
-        while (clz < 32 and ((num_to_align - 1) << clz & 0x80000000) == 0)
-            clz = clz + 1;
-        print("aligned number: ");
-        print(1 << (32 - clz));
-        print("\n");
-    }
-    else
-        return 0;
-}
+// while (true){
+    // let num_to_align: int = scan("num_to_align: ");
+// 
+    // if (num_to_align > 0){
+        // let clz: int = 0;
+        // while (clz < 32 and ((num_to_align - 1) << clz & 0x80000000) == 0)
+            // clz = clz + 1;
+        // print("aligned number: ");
+        // print(1 << (32 - clz));
+        // print("\n");
+    // }
+    // else
+        // return 0;
+// }
