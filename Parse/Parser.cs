@@ -114,9 +114,9 @@ public static class Parser{
         Node node1 = new();
         Node? node2 = null;
 
-        Token tok_original = tokens.Pop(), tok = tok_original;
+        Token tok = tokens.Pop();
         node1.token = tok;
-        switch (tok_original.type){
+        switch (tok.type){
             case Token.Type.ID:
                 tokens.Push(tok);
 
@@ -174,6 +174,8 @@ public static class Parser{
 
             case Token.Type.IF:
             case Token.Type.WHILE:
+                bool is_while = (tok.type == Token.Type.WHILE);
+
                 if (tokens.Count == 0 || (tok = tokens.Pop()).type != Token.Type.LPAREN)
                     throw new Syntax_error_exception($"On line <{tok.line_number}> statement must start with <(>");
                 node1.m_sub_nodes.Add(parse_arithm_expr(tokens, 0.0f));
@@ -206,7 +208,7 @@ public static class Parser{
 
                 if (tokens.Count > 0 && tokens.Peek().type == Token.Type.ELSE){
                     tok = tokens.Pop();
-                    if (tok_original.type == Token.Type.WHILE)
+                    if (is_while)
                         throw new Syntax_error_exception($"On line <{tok.line_number}> while statement is followed by else statement");
 
                     node2 = new(){token = tok};
