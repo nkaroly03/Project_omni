@@ -36,6 +36,8 @@ public static class Compiler{
 
         SCAN,
 
+        GET_ARGV,
+
         TO_BOOL,
         TO_INT,
         TO_FLOAT,
@@ -231,6 +233,11 @@ public static class Compiler{
                     ++stack_size;
                     break;
 
+                case Token.Type.ARGV:
+                    to_IR(current_AST_node.sub_nodes[0], null, sb, ref let_decl_counter, true);
+                    sb.add_instruction($"{stack_size} ; GET_ARGV");
+                    break;
+
                 case Token.Type.IF:
                     StringBuilder if_else_sb = new();
                     bool has_else_after = (next_AST_node is not null && next_AST_node.token.type == Token.Type.ELSE);
@@ -424,6 +431,7 @@ public static class Compiler{
                     bytecode.AddRange(as_bytes);
                     break;
 
+                case "GET_ARGV": bytecode.Add((byte)Op_code.GET_ARGV); break;
                 case "TO_BOOL":  bytecode.Add((byte)Op_code.TO_BOOL);  break;
                 case "TO_INT":   bytecode.Add((byte)Op_code.TO_INT);   break;
                 case "TO_FLOAT": bytecode.Add((byte)Op_code.TO_FLOAT); break;

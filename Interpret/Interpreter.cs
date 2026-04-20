@@ -17,7 +17,7 @@ static class Interpreter_extensions{
 }
 
 public static class Interpreter{
-    public static Value run(ReadOnlySpan<byte> bytecode){
+    public static Value run(ReadOnlySpan<byte> bytecode, ReadOnlySpan<Value> argv){
         List<Value> stack = new();
         
         for (int pc = 0; pc < bytecode.Length;){
@@ -101,6 +101,10 @@ public static class Interpreter{
                         }
                     }
                     break;
+                
+                case Compiler.Op_code.GET_ARGV:
+                    stack[^1] = argv[(stack[^1].data is int) ? stack[^1].to_int() : throw new ArgumentOutOfRangeException("<argv> must be indexed with a Value that holds an int")];
+                    break;
 
                 case Compiler.Op_code.TO_BOOL:  stack[^1] = new(stack[^1].to_bool());  break;
                 case Compiler.Op_code.TO_INT:   stack[^1] = new(stack[^1].to_int());   break;
@@ -148,4 +152,5 @@ public static class Interpreter{
 
         return stack[^1];
     }
+    public static Value run(ReadOnlySpan<byte> bytecode) => run(bytecode, new());
 }

@@ -74,6 +74,17 @@ static class Parse_extensions{
                 if (self.Count == 0 || (tok = self.Pop()).type != Token.Type.RPAREN)
                     throw new Syntax_error_exception($"On line <{tok.line_number}> <scan> must be closed by <)>");
             }
+            else if (tok.type == Token.Type.ARGV){
+                lhs.token = tok;
+
+                if (self.Count == 0 || (tok = self.Pop()).type != Token.Type.LPAREN)
+                    throw new Syntax_error_exception($"On line <{tok.line_number}> <argv> must be followed by <(>");
+
+                lhs.m_sub_nodes.Add(self.parse_arithm_expr(0.0f));
+
+                if (self.Count == 0 || (tok = self.Pop()).type != Token.Type.RPAREN)
+                    throw new Syntax_error_exception($"On line <{tok.line_number}> <argv> must be closed by <)>");
+            }
             else if (tok.type == Token.Type.LPAREN){
                 lhs = self.parse_arithm_expr(0.0f);
 
@@ -118,6 +129,9 @@ static class Parse_extensions{
             node1.token = tok;
             switch (tok.type){
                 case Token.Type.ID:
+                    if (self.Count == 0 || self.Peek().type != Token.Type.EQ)
+                        throw new Syntax_error_exception($"On line <{tok.line_number}> <{tok.id}> must be followed by <=>");
+
                     self.Push(tok);
 
                     node1 = self.parse_arithm_expr(0.0f);
@@ -170,7 +184,8 @@ static class Parse_extensions{
                         throw new Syntax_error_exception($"On line <{tok.line_number}> <print> statement must be close by <;>");
                     break;
                 case Token.Type.SCAN:
-                    throw new Syntax_error_exception($"On line <{tok.line_number}> discarding the result of <scan> statement is a bug");
+                case Token.Type.ARGV:
+                    throw new Syntax_error_exception($"On line <{tok.line_number}> discarding the result of <{tok.id}> statement is a bug");
 
                 case Token.Type.IF:
                 case Token.Type.WHILE:
@@ -260,7 +275,7 @@ public static class Parser{
         Array.Reverse(token_array);
 
         if (token_array.Count((t) => t.type == Token.Type.LPAREN) != token_array.Count((t) => t.type == Token.Type.RPAREN))
-            throw new Syntax_error_exception("The number of opening and closing parenthesis' must match");
+            throw new Syntax_error_exception("The number of opening and closing parentheses must match");
         if (token_array.Count((t) => t.type == Token.Type.LBRACE) != token_array.Count((t) => t.type == Token.Type.RBRACE))
             throw new Syntax_error_exception("The number of opening and closing braces must match");
 

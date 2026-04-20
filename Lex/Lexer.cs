@@ -62,6 +62,8 @@ public readonly record struct Token{
         PRINT,
         SCAN,
 
+        ARGV,
+
         IF,
         ELSE,
 
@@ -116,7 +118,7 @@ public static class Lexer{
                 "(" +
                     @"/\*/[^/]*/\*/|(?://.*)?(?:\r\n|\r|\n)|""(?:[^""\\]|\\.)*?""|" +
                     @"\*\*|[:;(){}+*/%&|^~-]|<<|>>|!=|[<>=]=?|" +
-                    @"\blet\b|\bbool\b|\bfalse\b|\btrue\b|\bint\b|\bfloat\b|\bprint\b|\bscan\b|\bif\b|\belse\b|\bwhile\b|\band\b|\bor\b|\bnot\b|\breturn\b" +
+                    @"\blet\b|\bbool\b|\bfalse\b|\btrue\b|\bint\b|\bfloat\b|\bprint\b|\bscan\b|\bargv\b|\bif\b|\belse\b|\bwhile\b|\band\b|\bor\b|\bnot\b|\breturn\b" +
                 ")"
             ).Select((s) => s.Trim(' ')).Where((s) => s.Length > 0).ToArray()
         ){
@@ -169,6 +171,8 @@ public static class Lexer{
 
                     "print"  => Token.Type.PRINT,
                     "scan"   => Token.Type.SCAN,
+
+                    "argv"   => Token.Type.ARGV,
 
                     "if"     => Token.Type.IF,
                     "else"   => Token.Type.ELSE,
