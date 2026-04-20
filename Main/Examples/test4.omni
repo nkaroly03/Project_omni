@@ -1,24 +1,19 @@
-// print(
-    // "\"hel\"lo"
-    // ", "
-    // "world"
-    // "!"
-    // "\n"
-// );
-// print(scan("val1: ") + scan("val2: "));
-// print("\n");
+let SHIFT_COUNT: int = 32;
 
-// while (true){
-    // let num_to_align: int = scan("num_to_align: ");
-// 
-    // if (num_to_align > 0){
-        // let clz: int = 0;
-        // while (clz < 32 and ((num_to_align - 1) << clz & 0x80000000) == 0)
-            // clz = clz + 1;
-        // print("aligned number: ");
-        // print(1 << (32 - clz));
-        // print("\n");
-    // }
-    // else
-        // return 0;
-// }
+let value: int = 0x80ff0000;
+
+print("value: ");
+print(value);
+print("\n");
+
+let i: int = 32;
+while ((i = i - 1) >= 0)
+    print(value >> i & 1);
+print("\n");
+
+value = value >> SHIFT_COUNT & (1 << (32 - SHIFT_COUNT) % 32) - (1 + (SHIFT_COUNT % 32 == 0));
+
+i = 32;
+while ((i = i - 1) >= 0)
+    print(value >> i & 1);
+print("\n");

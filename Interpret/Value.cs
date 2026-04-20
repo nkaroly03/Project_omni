@@ -2,7 +2,7 @@
 
 using System.Diagnostics;
 
-public sealed class Value{
+public sealed class Value : IEquatable<Value>, IComparable<Value>{
     static Value arithm_op(Value v1, Value v2, Action<Value, Value> op){
         v1.data = v1.data switch{
             bool  => v2.data switch{
@@ -27,14 +27,11 @@ public sealed class Value{
 
         return v1;
     }
-    static Value bitwise_arithm_op(Value v1, Value v2, Action<Value, Value> op){
+    static Value barithm_op(Value v1, Value v2, Action<Value, Value> op){
         op(v1, v2);
 
         return v1;
     }
-
-    static bool cmp_op(Value v1, Value v2, Func<int, int, bool> int_cmp, Func<float, float, bool> float_cmp) =>
-        (v1.data is float || v2.data is float) ? float_cmp(v1.to_float(), v2.to_float()) : int_cmp(v1.to_int(), v2.to_int());
 
     public static Value operator+(Value v) => new(v);
     public static Value operator-(Value v) => v.data switch{
@@ -52,19 +49,19 @@ public sealed class Value{
     public static Value operator%(Value v1, Value v2) => arithm_op(new(v1), new(v2), (_v1, _v2) => _v1.mod_eq(_v2));
     public static Value       pow(Value v1, Value v2) => arithm_op(new(v1), new(v2), (_v1, _v2) => _v1.pow_eq(_v2));
 
-    public static Value operator<<(Value v1, Value v2) => bitwise_arithm_op(new(v1), new(v2), (_v1, _v2) => _v1.shl_eq (_v2));
-    public static Value operator>>(Value v1, Value v2) => bitwise_arithm_op(new(v1), new(v2), (_v1, _v2) => _v1.shr_eq (_v2));
-    public static Value operator& (Value v1, Value v2) => bitwise_arithm_op(new(v1), new(v2), (_v1, _v2) => _v1.band_eq(_v2));
-    public static Value operator| (Value v1, Value v2) => bitwise_arithm_op(new(v1), new(v2), (_v1, _v2) => _v1.bor_eq (_v2));
-    public static Value operator^ (Value v1, Value v2) => bitwise_arithm_op(new(v1), new(v2), (_v1, _v2) => _v1.xor_eq (_v2));
+    public static Value operator<<(Value v1, Value v2) => barithm_op(new(v1), new(v2), (_v1, _v2) => _v1. shl_eq(_v2));
+    public static Value operator>>(Value v1, Value v2) => barithm_op(new(v1), new(v2), (_v1, _v2) => _v1. shr_eq(_v2));
+    public static Value operator& (Value v1, Value v2) => barithm_op(new(v1), new(v2), (_v1, _v2) => _v1.band_eq(_v2));
+    public static Value operator| (Value v1, Value v2) => barithm_op(new(v1), new(v2), (_v1, _v2) => _v1. bor_eq(_v2));
+    public static Value operator^ (Value v1, Value v2) => barithm_op(new(v1), new(v2), (_v1, _v2) => _v1. xor_eq(_v2));
     public static Value operator~ (Value v) => new((v.data is int) ? ~v.to_int() : throw new InvalidOperationException("Trying to use bitwise operations on non integer types"));
 
-    public static bool operator==(Value v1, Value v2) => cmp_op(v1, v2, (i1, i2) => (i1 == i2), (f1, f2) => (f1 == f2));
-    public static bool operator!=(Value v1, Value v2) => cmp_op(v1, v2, (i1, i2) => (i1 != i2), (f1, f2) => (f1 != f2));
-    public static bool operator< (Value v1, Value v2) => cmp_op(v1, v2, (i1, i2) => (i1 <  i2), (f1, f2) => (f1 <  f2));
-    public static bool operator<=(Value v1, Value v2) => cmp_op(v1, v2, (i1, i2) => (i1 <= i2), (f1, f2) => (f1 <= f2));
-    public static bool operator> (Value v1, Value v2) => cmp_op(v1, v2, (i1, i2) => (i1 >  i2), (f1, f2) => (f1 >  f2));
-    public static bool operator>=(Value v1, Value v2) => cmp_op(v1, v2, (i1, i2) => (i1 >= i2), (f1, f2) => (f1 >= f2));
+    public static bool operator==(Value v1, Value v2) =>  v1.Equals(v2);
+    public static bool operator!=(Value v1, Value v2) => !v1.Equals(v2);
+    public static bool operator< (Value v1, Value v2) =>  v1.CompareTo(v2) <  0;
+    public static bool operator<=(Value v1, Value v2) =>  v1.CompareTo(v2) <= 0;
+    public static bool operator> (Value v1, Value v2) =>  v1.CompareTo(v2) >  0;
+    public static bool operator>=(Value v1, Value v2) =>  v1.CompareTo(v2) >= 0;
 
     public object data{ get; private set; }
 
@@ -75,10 +72,15 @@ public sealed class Value{
     public Value(Value other) => data = other.data;
 
     public override string ToString() => data.ToString()!;
-
-    public override bool Equals(object? obj) => obj is Value && this == (Value)obj;
-
+    public override bool Equals(object? obj) => Equals(this as Value);
     public override int GetHashCode() => data.GetHashCode();
+
+    public bool Equals(Value? other) => (other is not null)
+        ? ((data is float || other.data is float) ? to_float().Equals(other.to_float()) : to_int().Equals(other.to_int()))
+        : false;
+    public int CompareTo(Value? other) => (other is not null)
+        ? ((data is float || other.data is float) ? to_float().CompareTo(other.to_float()) : to_int().CompareTo(other.to_int()))
+        : 1;
 
     public bool to_bool() => data switch{
         bool  => (bool)data,

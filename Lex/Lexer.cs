@@ -10,7 +10,7 @@ public static class Lex_extensions{
     }
 }
 
-public readonly struct Token{
+public readonly record struct Token{
     public enum Type{
         ID,
 
@@ -73,8 +73,6 @@ public readonly struct Token{
     public readonly int line_number{ get; init; }
     public required readonly Type type{ get; init; }
     public required readonly string id{ get; init; }
-
-    public override string ToString() => $"{{.{nameof(line_number)} = {line_number}, .{nameof(type)} = {type}, .{nameof(id)} = {id}}}";
 }
 
 public class Syntax_error_exception : Exception{
