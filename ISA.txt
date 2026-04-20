@@ -1,10 +1,11 @@
 Symbols:
     SP:   stack pointer (the stack used is of type List<Value>, SP is the Count property)
     PC:   program counter (a variable of type int, which acts as an index into the readonly byte span)
+    ARGC: argument count
     ARGV: argument vector
 
 Instructions:
-    PUSH [arg]:   pushes <arg> on the stack, where <arg> is either FALSE, TRUE, an integer literal, a float literal or a value on the stack
+    PUSH [arg]:   pushes <arg> on the stack, where <arg> is either ARGC, FALSE, TRUE, an integer literal, a float literal or a value on the stack
     POP:          pops the last value from the stack
 
     RET:          returns SP[-1], then pops the stack (for completeness, but is unnecessary)

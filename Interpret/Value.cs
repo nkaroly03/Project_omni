@@ -63,6 +63,18 @@ public sealed class Value : IEquatable<Value>, IComparable<Value>{
     public static bool operator> (Value v1, Value v2) =>  v1.CompareTo(v2) >  0;
     public static bool operator>=(Value v1, Value v2) =>  v1.CompareTo(v2) >= 0;
 
+    public static Value from_str(string str){
+        try{ return new(bool.Parse(str)); }
+        catch (FormatException){
+            try{ return new(int.Parse(str)); }
+            catch (OverflowException){ return new((str.Trim()[0] == '-') ? int.MinValue : int.MaxValue); }
+            catch (FormatException){
+                try{ return new(float.Parse(str, System.Globalization.CultureInfo.InvariantCulture)); }
+                catch (OverflowException){ return new((str.Trim()[0] == '-') ? float.MinValue : float.MaxValue); }
+            }
+        }
+    }
+
     public object data{ get; private set; }
 
     public Value(bool data)  => this.data = data;

@@ -26,6 +26,9 @@ public static class Interpreter{
                     stack.Add(new(stack[stack.Count + BitConverter.ToInt32(bytecode[pc..][..sizeof(int)])]));
                     pc += sizeof(int);
                     break;
+                case Compiler.Op_code.PUSH_ARGC:
+                    stack.Add(new(argv.Length));
+                    break;
                 case Compiler.Op_code.PUSH_FALSE:
                     stack.Add(new(false));
                     break;
@@ -90,16 +93,7 @@ public static class Interpreter{
                     string scan_str = Encoding.UTF8.GetString(bytecode[pc..][..scan_strlen]);
                     pc += scan_strlen;
                     Console.Write(scan_str);
-                    string line_read = Console.ReadLine()!;
-                    try{ stack.Add(new(bool.Parse(line_read))); }
-                    catch (FormatException){
-                        try{ stack.Add(new(int.Parse(line_read))); }
-                        catch (OverflowException){ stack.Add(new((line_read.Trim()[0] == '-') ? int.MinValue : int.MaxValue)); }
-                        catch (FormatException){
-                            try{ stack.Add(new(float.Parse(line_read, System.Globalization.CultureInfo.InvariantCulture))); }
-                            catch (OverflowException){ stack.Add(new((line_read.Trim()[0] == '-') ? float.MinValue : float.MaxValue)); }
-                        }
-                    }
+                    stack.Add(Value.from_str(Console.ReadLine()!));
                     break;
                 
                 case Compiler.Op_code.GET_ARGV:

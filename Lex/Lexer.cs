@@ -14,6 +14,8 @@ public readonly record struct Token{
     public enum Type{
         ID,
 
+        ARGC,
+
         FALSE,
         TRUE,
         INT_LIT,
@@ -118,7 +120,7 @@ public static class Lexer{
                 "(" +
                     @"/\*/[^/]*/\*/|(?://.*)?(?:\r\n|\r|\n)|""(?:[^""\\]|\\.)*?""|" +
                     @"\*\*|[:;(){}+*/%&|^~-]|<<|>>|!=|[<>=]=?|" +
-                    @"\blet\b|\bbool\b|\bfalse\b|\btrue\b|\bint\b|\bfloat\b|\bprint\b|\bscan\b|\bargv\b|\bif\b|\belse\b|\bwhile\b|\band\b|\bor\b|\bnot\b|\breturn\b" +
+                    @"\blet\b|\bbool\b|\bfalse\b|\btrue\b|\bint\b|\bfloat\b|\bprint\b|\bscan\b|\bargc\b|\bargv\b|\bif\b|\belse\b|\bwhile\b|\band\b|\bor\b|\bnot\b|\breturn\b" +
                 ")"
             ).Select((s) => s.Trim(' ')).Where((s) => s.Length > 0).ToArray()
         ){
@@ -127,6 +129,8 @@ public static class Lexer{
                 string token_id = line;
 
                 Token.Type token_type = line switch{
+                    "argc"   => Token.Type.ARGC,
+
                     "false"  => Token.Type.FALSE,
                     "true"   => Token.Type.TRUE,
 

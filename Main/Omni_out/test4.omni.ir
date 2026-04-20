@@ -1,10 +1,29 @@
 src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\test4.omni
 
-    0 ; PRINT "argv(0): "
     1 ; PUSH 0
-    1 ; GET_ARGV
-    0 ; PRINT
-    0 ; PRINT "\n"
-    1 ; PUSH 0
-    0 ; RET
+    1 ; TO_INT
+    1 ; PRINT "argc: "
+    2 ; PUSH ARGC
+    1 ; PRINT
+    1 ; PRINT "\n"
+    2 ; PUSH SP[-1]
+    3 ; PUSH ARGC
+    2 ; CMP_LE
+    1 ; JMPZ 14
+    1 ; PRINT "argv("
+    2 ; PUSH SP[-1]
+    1 ; PRINT
+    1 ; PRINT "): "
+    2 ; PUSH SP[-1]
+    2 ; GET_ARGV
+    1 ; PRINT
+    1 ; PRINT "\n"
+    2 ; PUSH SP[-1]
+    3 ; PUSH 1
+    2 ; ADD
+    1 ; MOV SP[-2]
+    1 ; JMP -16
+    2 ; PUSH 0
+    1 ; RET
+    0 ; POP
 

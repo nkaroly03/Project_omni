@@ -17,6 +17,7 @@ static class Compile_extensions{
 public static class Compiler{
     public enum Op_code : byte{
         PUSH_FROM_SP,
+        PUSH_ARGC,
         PUSH_FALSE,
         PUSH_TRUE,
         PUSH_INT,
@@ -81,18 +82,19 @@ public static class Compiler{
                     sb.add_instruction($"{stack_size} ; PUSH SP[-{stack_size - m_id_positions[current_AST_node.token.id] - 1}]");
                     break;
 
+                case Token.Type.ARGC:
+                    sb.add_instruction($"{++stack_size} ; PUSH ARGC");
+                    break;
+
                 case Token.Type.FALSE:
-                    ++stack_size;
-                    sb.add_instruction($"{stack_size} ; PUSH FALSE");
+                    sb.add_instruction($"{++stack_size} ; PUSH FALSE");
                     break;
                 case Token.Type.TRUE:
-                    ++stack_size;
-                    sb.add_instruction($"{stack_size} ; PUSH TRUE");
+                    sb.add_instruction($"{++stack_size} ; PUSH TRUE");
                     break;
                 case Token.Type.INT_LIT:
                 case Token.Type.FLOAT_LIT:
-                    ++stack_size;
-                    sb.add_instruction($"{stack_size} ; PUSH {current_AST_node.token.id}");
+                    sb.add_instruction($"{++stack_size} ; PUSH {current_AST_node.token.id}");
                     break;
 
                 case Token.Type.EQUALS:
@@ -114,7 +116,7 @@ public static class Compiler{
                 // case Token.Type.OR:
                     to_IR(current_AST_node.sub_nodes[0], null, sb, ref let_decl_counter, true);
                     to_IR(current_AST_node.sub_nodes[1], null, sb, ref let_decl_counter, true);
-                    sb.add_instruction($"{stack_size - 1} ; {current_AST_node.token.type switch{
+                    sb.add_instruction($"{--stack_size} ; {current_AST_node.token.type switch{
                         Token.Type.EQUALS          => "CMP_EQ",
                         Token.Type.NOT_EQUALS      => "CMP_NEQ",
                         Token.Type.LESS_THAN       => "CMP_LE",
@@ -135,7 +137,6 @@ public static class Compiler{
                         
                         _ => throw new System.Diagnostics.UnreachableException(),
                     }}");
-                    --stack_size;
                     break;
 
                 case Token.Type.BITWISE_NEG:
@@ -175,16 +176,14 @@ public static class Compiler{
                     to_IR(current_AST_node.sub_nodes[0], null, sb, ref let_decl_counter, true);
                     if (current_AST_node.sub_nodes.Length > 1){
                         to_IR(current_AST_node.sub_nodes[1], null, sb, ref let_decl_counter, true);
-                        sb.add_instruction($"{stack_size - 1} ; ADD");
-                        --stack_size;
+                        sb.add_instruction($"{--stack_size} ; ADD");
                     }
                     break;
                 case Token.Type.MINUS:
                     to_IR(current_AST_node.sub_nodes[0], null, sb, ref let_decl_counter, true);
                     if (current_AST_node.sub_nodes.Length > 1){
                         to_IR(current_AST_node.sub_nodes[1], null, sb, ref let_decl_counter, true);
-                        sb.add_instruction($"{stack_size - 1} ; SUB");
-                        --stack_size;
+                        sb.add_instruction($"{--stack_size} ; SUB");
                     }
                     else
                         sb.add_instruction($"{stack_size} ; NEG");
@@ -224,13 +223,11 @@ public static class Compiler{
                         sb.add_instruction($"{stack_size} ; PRINT \"{print_sub_node.token.id}\"");
                     else{
                         to_IR(print_sub_node, null, sb, ref let_decl_counter, true);
-                        sb.add_instruction($"{stack_size - 1} ; PRINT");
-                        --stack_size;
+                        sb.add_instruction($"{--stack_size} ; PRINT");
                     }
                     break;
                 case Token.Type.SCAN:
-                    sb.add_instruction($"{stack_size + 1} ; SCAN \"{current_AST_node.sub_nodes[0].token.id}\"");
-                    ++stack_size;
+                    sb.add_instruction($"{++stack_size} ; SCAN \"{current_AST_node.sub_nodes[0].token.id}\"");
                     break;
 
                 case Token.Type.ARGV:
@@ -309,8 +306,7 @@ public static class Compiler{
 
                 case Token.Type.RETURN:
                     to_IR(current_AST_node.sub_nodes[0], null, sb, ref let_decl_counter, true);
-                    sb.add_instruction($"{stack_size - 1} ; RET");
-                    --stack_size;
+                    sb.add_instruction($"{--stack_size} ; RET");
                     break;
             }
         }
@@ -344,7 +340,7 @@ public static class Compiler{
             (string lhs, string rhs) = (space_idx >= 0) ? (instruction[..space_idx], instruction[(space_idx + 1)..]) : (instruction, "");
             switch (lhs){
                 case "PUSH":
-                    if (rhs != "FALSE" && rhs != "TRUE")
+                    if (rhs != "ARGC" && rhs != "FALSE" && rhs != "TRUE")
                         instruction_byte_count += ((rhs.StartsWith("SP") || rhs.IndexOf('.') < 0) ? sizeof(int) : sizeof(float));
                     break;
                 case "MOV":
@@ -379,6 +375,8 @@ public static class Compiler{
                         bytecode.Add((byte)Op_code.PUSH_FROM_SP);
                         bytecode.AddRange(as_bytes);
                     }
+                    else if (rhs == "ARGC")
+                        bytecode.Add((byte)Op_code.PUSH_ARGC);
                     else if (rhs == "FALSE")
                         bytecode.Add((byte)Op_code.PUSH_FALSE);
                     else if (rhs == "TRUE")

@@ -1,3 +1,14 @@
-print("argv(0): ");
-print(argv(0));
+let i: int = 0;
+
+print("argc: ");
+print(argc);
 print("\n");
+
+while (i < argc){
+    print("argv(");
+    print(i);
+    print("): ");
+    print(argv(i));
+    print("\n");
+    i = i + 1;
+}
