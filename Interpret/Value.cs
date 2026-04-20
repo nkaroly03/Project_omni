@@ -72,7 +72,7 @@ public sealed class Value : IEquatable<Value>, IComparable<Value>{
     public Value(Value other) => data = other.data;
 
     public override string ToString() => data.ToString()!;
-    public override bool Equals(object? obj) => Equals(this as Value);
+    public override bool Equals(object? obj) => Equals(obj as Value);
     public override int GetHashCode() => data.GetHashCode();
 
     public bool Equals(Value? other) => (other is not null)
