@@ -2,30 +2,49 @@
 
 using Lex;
 
+public sealed class Node{
+    internal List<Node> m_sub_nodes = new();
+
+    public Token token{ get; internal set; }
+    public ReadOnlySpan<Node> sub_nodes => System.Runtime.InteropServices.CollectionsMarshal.AsSpan(m_sub_nodes);
+
+    string tostring_helper(System.Text.StringBuilder sb, int indent = 0){
+        sb.Append(' ', indent);
+        sb.AppendLine(token.id);
+
+        foreach (Node n in m_sub_nodes)
+            n.tostring_helper(sb, indent + 4);
+
+        return sb.ToString();
+    }
+
+    public override string ToString() => tostring_helper(new());
+}
+
 static class Parse_extensions{
     extension(Token.Type self){
-        public static Tuple<float, float> BINDING_POWERS_UNARY => new(11.1f, 11.0f);
+        public static (float, float) BINDING_POWERS_UNARY => (11.1f, 11.0f);
 
         public bool is_atom() => (int)self >= (int)Token.Type.ID && (int)self <= (int)Token.Type.STR_LIT;
         public bool is_operation() => (int)self >= (int)Token.Type.EQUALS && (int)self <= (int)Token.Type.EQ;
 
-        public Tuple<float, float> binding_powers() => self switch{
-            Token.Type.EXP                                                => new(12.1f, 12.0f),
+        public (float, float) binding_powers() => self switch{
+            Token.Type.EXP                                                => (12.1f, 12.0f),
             Token.Type.NOT or Token.Type.BITWISE_NEG                      => Token.Type.BINDING_POWERS_UNARY,
-            Token.Type.ASTERISK or Token.Type.SLASH or Token.Type.PERCENT => new(10.1f, 10.0f),
-            Token.Type.PLUS or Token.Type.MINUS                           => new( 9.0f,  9.1f),
-            Token.Type.SHIFT_LEFT or Token.Type.SHIFT_RIGHT               => new( 8.0f,  8.1f),
+            Token.Type.ASTERISK or Token.Type.SLASH or Token.Type.PERCENT => (10.1f, 10.0f),
+            Token.Type.PLUS or Token.Type.MINUS                           => ( 9.0f,  9.1f),
+            Token.Type.SHIFT_LEFT or Token.Type.SHIFT_RIGHT               => ( 8.0f,  8.1f),
 
             Token.Type.EQUALS       or Token.Type.NOT_EQUALS      or
             Token.Type.LESS_THAN    or Token.Type.LESS_THAN_EQ    or
-            Token.Type.GREATER_THAN or Token.Type.GREATER_THAN_EQ         => new(7.0f, 7.1f),
+            Token.Type.GREATER_THAN or Token.Type.GREATER_THAN_EQ         => (7.0f, 7.1f),
 
-            Token.Type.BITWISE_AND                                        => new(6.0f, 6.1f),
-            Token.Type.XOR                                                => new(5.0f, 5.1f),
-            Token.Type.BITWISE_OR                                         => new(4.0f, 4.1f),
-            Token.Type.AND                                                => new(3.0f, 3.1f),
-            Token.Type.OR                                                 => new(2.0f, 2.1f),
-            Token.Type.EQ                                                 => new(1.1f, 1.0f),
+            Token.Type.BITWISE_AND                                        => (6.0f, 6.1f),
+            Token.Type.XOR                                                => (5.0f, 5.1f),
+            Token.Type.BITWISE_OR                                         => (4.0f, 4.1f),
+            Token.Type.AND                                                => (3.0f, 3.1f),
+            Token.Type.OR                                                 => (2.0f, 2.1f),
+            Token.Type.EQ                                                 => (1.1f, 1.0f),
 
             _ => throw new ArgumentOutOfRangeException($"<{self}> of type <Token.Type> does not have an associated binding power"),
         };
@@ -92,9 +111,8 @@ static class Parse_extensions{
             return lhs;
         }
 
-        public Tuple<Node, Node?> parse_expr(){
-            Node node1 = new();
-            Node? node2 = null;
+        public (Node, Node?) parse_expr(){
+            (Node node1, Node? node2) = (new(), null);
 
             Token tok = self.Pop();
             node1.token = tok;
@@ -231,40 +249,22 @@ static class Parse_extensions{
                     throw new Syntax_error_exception($"On line <{tok.line_number}> found invalid token <{tok.id}>");
             }
 
-            return new(node1, node2);
+            return (node1, node2);
         }
     }
-}
-
-public sealed class Node{
-    internal List<Node> m_sub_nodes = new();
-
-    public Token token{ get; internal set; }
-    public ReadOnlySpan<Node> sub_nodes => System.Runtime.InteropServices.CollectionsMarshal.AsSpan(m_sub_nodes);
-
-    string tostring_helper(System.Text.StringBuilder sb, int indent = 0){
-        sb.Append(' ', indent);
-        sb.AppendLine(token.id);
-
-        foreach (Node n in m_sub_nodes)
-            n.tostring_helper(sb, indent + 4);
-
-        return sb.ToString();
-    }
-
-    public override string ToString() => tostring_helper(new());
 }
 
 public static class Parser{
     public static ReadOnlySpan<Node> build_AST(ReadOnlySpan<Token> tokens){
         Token[] token_array = tokens.ToArray();
+        Array.Reverse(token_array);
 
         if (token_array.Count((t) => t.type == Token.Type.LPAREN) != token_array.Count((t) => t.type == Token.Type.RPAREN))
             throw new Syntax_error_exception("The number of opening and closing parenthesis' must match");
         if (token_array.Count((t) => t.type == Token.Type.LBRACE) != token_array.Count((t) => t.type == Token.Type.RBRACE))
             throw new Syntax_error_exception("The number of opening and closing braces must match");
 
-        Stack<Token> token_stack = new(new Stack<Token>(token_array));
+        Stack<Token> token_stack = new(token_array);
         List<Node> nodes = new(); 
 
         while (((Func<bool>)(() => {

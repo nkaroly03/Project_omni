@@ -4,7 +4,7 @@ using Lex;
 using Parse;
 using System.Text;
 
-static class Compiler_extensions{
+static class Compile_extensions{
     extension(StringBuilder self){
         public void add_instruction(string str) => self.AppendLine($"    {str}");
         public int count_instructions() => self.ToString().Split(Environment.NewLine).Length;
