@@ -1,0 +1,17 @@
+let PI: float = 3.14159265;
+
+let val: float = argv(0);
+
+let k: int = val * 2 / PI;
+val = val - k * PI / 2;
+let region: int = k % 4;
+
+if (region % 2 == 1)
+    val = PI / 2 - val;
+
+val = val - val ** 3 / 6 + val ** 5 / 120;
+
+if (region > 1)
+    val = -val;
+
+return val;

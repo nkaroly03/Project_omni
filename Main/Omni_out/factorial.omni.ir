@@ -1,0 +1,37 @@
+src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\factorial.omni
+
+    1 ; PUSH 0
+    1 ; GET_ARGV
+    1 ; TO_INT
+    2 ; PUSH SP[-1]
+    3 ; PUSH 0
+    2 ; CMP_LE
+    1 ; JMPZ 6
+    2 ; PUSH 1
+    2 ; NEG
+    2 ; GET_ARGV
+    2 ; TO_INT
+    1 ; POP
+    2 ; PUSH 1
+    2 ; TO_INT
+    3 ; PUSH 1
+    3 ; TO_FLOAT
+    4 ; PUSH SP[-2]
+    5 ; PUSH 1
+    4 ; ADD
+    3 ; MOV SP[-3]
+    4 ; PUSH SP[-2]
+    5 ; PUSH SP[-4]
+    4 ; CMP_LEQ
+    3 ; JMPZ 6
+    4 ; PUSH SP[-1]
+    5 ; PUSH SP[-3]
+    4 ; MUL
+    3 ; MOV SP[-2]
+    3 ; JMP -12
+    4 ; PUSH SP[-1]
+    3 ; RET
+    2 ; POP
+    1 ; POP
+    0 ; POP
+

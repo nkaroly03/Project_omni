@@ -31,7 +31,7 @@ static class Parse_extensions{
         public (float, float) binding_powers() => self switch{
             Token.Type.EXP                                                => (12.1f, 12.0f),
             Token.Type.NOT or Token.Type.BITWISE_NEG                      => Token.Type.BINDING_POWERS_UNARY,
-            Token.Type.ASTERISK or Token.Type.SLASH or Token.Type.PERCENT => (10.1f, 10.0f),
+            Token.Type.ASTERISK or Token.Type.SLASH or Token.Type.PERCENT => (10.0f, 10.1f),
             Token.Type.PLUS or Token.Type.MINUS                           => ( 9.0f,  9.1f),
             Token.Type.SHIFT_LEFT or Token.Type.SHIFT_RIGHT               => ( 8.0f,  8.1f),
 

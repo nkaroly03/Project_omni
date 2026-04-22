@@ -1,0 +1,12 @@
+let factorial: int = argv(0);
+
+if (factorial < 0)
+    let exception: int = argv(-1);
+
+let i: int = 1;
+let result: float = 1;
+
+while ((i = i + 1) <= factorial)
+    result = result * i;
+
+return result;

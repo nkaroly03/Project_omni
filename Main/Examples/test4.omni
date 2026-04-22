@@ -1,14 +1,49 @@
-let i: int = 0;
+let WIDTH: int = 128;
+let HEIGHT: int = 32;
 
-print("argc: ");
-print(argc);
-print("\n");
+let PI: float = 3.14159265;
 
-while (i < argc){
-    print("argv(");
-    print(i);
-    print("): ");
-    print(argv(i));
+/*/
+    for (size_t y = 0; y <= HEIGHT; ++y){
+        for (size_t x = 0; x <= WIDTH; ++x)
+            putchar((HEIGHT / 2 - (int)y == (int)roundf(HEIGHT / 2.0f * sinf(2.0f * PI * x / WIDTH))) ? '*' : ' ');
+        putchar('\n');
+    }
+/*/
+
+let y: int = 0;
+while (y <= HEIGHT){
+    let x: int = 0;
+    while (x <= WIDTH){
+        let sin: float = 2 * PI * x / WIDTH;
+        let k: int = 2 * sin / PI;
+        sin = sin - k * PI / 2;
+
+        let region: int = k % 4;
+        if (region % 2 == 1)
+            sin = PI / 2 - sin;
+        sin = sin - sin ** 3 / 6 + sin ** 5 / 120;
+        if (region > 1)
+            sin = -sin;
+
+        sin = sin * HEIGHT / 2;
+        if (sin >= 0){
+            if (sin % 1 >= 0.5)
+                sin = sin + 1;
+        }
+        else{
+            if (sin % 1 < -0.5)
+                sin = sin - 1;
+        }
+
+        let int_cast: int = sin;
+        if (HEIGHT / 2 - y == int_cast)
+            print("*");
+        else
+            print(" ");
+
+        x = x + 1;
+    }
     print("\n");
-    i = i + 1;
+    y = y + 1;
 }
