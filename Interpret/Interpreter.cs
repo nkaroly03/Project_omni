@@ -4,7 +4,7 @@ using Compile;
 using System.Diagnostics;
 using System.Text;
 
-static class Interpreter_extensions{
+public static class Interpreter{
     extension(List<Value> self){
         public Value pop(){
             Value temp = self[^1];
@@ -14,9 +14,7 @@ static class Interpreter_extensions{
             return temp;
         }
     }
-}
 
-public static class Interpreter{
     public static Value run(ReadOnlySpan<byte> bytecode, ReadOnlySpan<Value> argv){
         List<Value> stack = new();
         

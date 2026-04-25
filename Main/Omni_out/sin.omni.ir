@@ -7,16 +7,16 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\sin.omni
     2 ; TO_FLOAT
     3 ; PUSH SP[-1]
     4 ; PUSH 2
-    5 ; PUSH SP[-4]
-    4 ; DIV
     3 ; MUL
+    4 ; PUSH SP[-3]
+    3 ; DIV
     3 ; TO_INT
     4 ; PUSH SP[-2]
     5 ; PUSH SP[-2]
     6 ; PUSH SP[-5]
-    7 ; PUSH 2
-    6 ; DIV
     5 ; MUL
+    6 ; PUSH 2
+    5 ; DIV
     4 ; SUB
     3 ; MOV SP[-3]
     4 ; PUSH SP[-1]

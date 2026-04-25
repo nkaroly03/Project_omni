@@ -3,13 +3,6 @@
 using System.Globalization;
 using System.Text.RegularExpressions;
 
-public static class Lex_extensions{
-    extension(string self){
-        public string colour_str(byte r, byte g, byte b) => $"\x1b[38;2;{r};{g};{b}m{self}\x1b[0m";
-        public string colour_str() => self.colour_str(255, 0, 0);
-    }
-}
-
 public readonly record struct Token{
     public enum Type{
         ID,
@@ -87,6 +80,11 @@ public class Syntax_error_exception : Exception{
 }
 
 public static class Lexer{
+    extension(string self){
+        public string colour_str(byte r, byte g, byte b) => $"\x1b[38;2;{r};{g};{b}m{self}\x1b[0m";
+        public string colour_str() => self.colour_str(255, 0, 0);
+    }
+
     public static ReadOnlySpan<Token> tokenize(string path){
         List<Token> tokens = new();
 
@@ -98,7 +96,7 @@ public static class Lexer{
         if (!((Func<bool>)(() => {
             bool quote_is_closed = true;
             bool was_escaped = false;
-            foreach ((int i, char c) in file_lines.Index()){
+            foreach (char c in file_lines){
                 if (!was_escaped){
                     if (c == '\\')
                         was_escaped = true;

@@ -1,25 +1,21 @@
-src: C:\Users\giganibba840\Desktop\C#\Project_omni\Examples\test3.omni
+src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\test3.omni
 
     1 ; PUSH 1
     1 ; TO_INT
-
     2 ; PUSH 0
     2 ; TO_INT
-
     2 ; PRINT "i << (int_cast = 3.14): "
-
     3 ; PUSH SP[-2]
     4 ; PUSH 3.14
     3 ; MOV SP[-3]
-    2 ; SHL
-    1 ; PRINT
-
-    1 ; PRINT "\n"
-
-    2 ; PUSH 3.14
-    1 ; MOV SP[-1]
-
-    2 ; PUSH 0
-    1 ; RET
+    4 ; PUSH SP[-2]
+    3 ; SHL
+    2 ; PRINT
+    2 ; PRINT "\n"
+    3 ; PUSH 3.14
+    2 ; MOV SP[-2]
+    3 ; PUSH 0
+    2 ; RET
+    1 ; POP
     0 ; POP
 

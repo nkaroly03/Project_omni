@@ -4,7 +4,7 @@ using Lex;
 using Parse;
 using System.Text;
 
-static class Compile_extensions{
+public static class Compiler{
     extension(StringBuilder self){
         public void add_instruction(string str) => self.AppendLine($"    {str}");
         public int count_instructions() => self.ToString().Split(Environment.NewLine).Length;
@@ -12,9 +12,7 @@ static class Compile_extensions{
     extension(string self){
         public string get_string_literal() => System.Text.RegularExpressions.Regex.Unescape(self[1..(self.Length - 1)]);
     }
-}
 
-public static class Compiler{
     public enum Op_code : byte{
         PUSH_FROM_SP,
         PUSH_ARGC,
@@ -405,8 +403,8 @@ public static class Compiler{
                 case "JMPZ":
                     int jmp_count = int.Parse(rhs);
                     int jmp_byte_count = (jmp_count >= 0)
-                        ? count_bytes_in_instructions(instructions[(i + 1)..][..(jmp_count - 1)]) - 1
-                        : -(count_bytes_in_instructions(instructions[(i + jmp_count)..][..(1 - jmp_count)]) + 1)
+                        ? count_bytes_in_instructions(instructions.AsSpan()[(i + 1)..][..(jmp_count - 1)]) - 1
+                        : -(count_bytes_in_instructions(instructions.AsSpan()[(i + jmp_count)..][..(1 - jmp_count)]) + 1)
                     ;
                     as_bytes = BitConverter.GetBytes(jmp_byte_count);
                     bytecode.Add((lhs == "JMP") ? (byte)Op_code.JMP : (byte)Op_code.JMPZ);

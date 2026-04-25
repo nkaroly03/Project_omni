@@ -2,10 +2,8 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\fib.omni
 
     1 ; PUSH 0
     1 ; TO_INT
-
     2 ; PUSH 1
     2 ; TO_INT
-
     3 ; PUSH SP[-2]
     4 ; PUSH 1
     5 ; PUSH 8
@@ -27,7 +25,6 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\fib.omni
     3 ; MOV SP[-3]
     2 ; POP
     2 ; JMP -20
-
     3 ; PUSH SP[-2]
     2 ; RET
     1 ; POP

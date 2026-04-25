@@ -1,5 +1,9 @@
-let WIDTH: int = 128;
-let HEIGHT: int = 32;
+let WIDTH: int = 1800;
+let HEIGHT: int = 256;
+
+let frequency: float = 1;
+if (argc > 0 and argv(0) > 0)
+    frequency = argv(0);
 
 let PI: float = 3.14159265;
 
@@ -15,7 +19,7 @@ let y: int = 0;
 while (y <= HEIGHT){
     let x: int = 0;
     while (x <= WIDTH){
-        let sin: float = 2 * PI * x / WIDTH;
+        let sin: float = 2 * PI * frequency * x / WIDTH;
         let k: int = 2 * sin / PI;
         sin = sin - k * PI / 2;
 
@@ -36,7 +40,7 @@ while (y <= HEIGHT){
                 sin = sin - 1;
         }
 
-        let int_cast: int = sin;
+        let int_cast: int = 0.99 ** x * sin;
         if (HEIGHT / 2 - y == int_cast)
             print("*");
         else

@@ -21,7 +21,7 @@ public sealed class Node{
     public override string ToString() => tostring_helper(new());
 }
 
-static class Parse_extensions{
+public static class Parser{
     extension(Token.Type self){
         public static (float, float) BINDING_POWERS_UNARY => (11.1f, 11.0f);
 
@@ -267,9 +267,7 @@ static class Parse_extensions{
             return (node1, node2);
         }
     }
-}
 
-public static class Parser{
     public static ReadOnlySpan<Node> build_AST(ReadOnlySpan<Token> tokens){
         Token[] token_array = tokens.ToArray();
         Array.Reverse(token_array);
