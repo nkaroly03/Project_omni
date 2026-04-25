@@ -23,12 +23,12 @@ public sealed class Node{
 
 public static class Parser{
     extension(Token.Type self){
-        public static (float, float) BINDING_POWERS_UNARY => (11.1f, 11.0f);
+        static (float, float) BINDING_POWERS_UNARY => (11.1f, 11.0f);
 
-        public bool is_atom() => (int)self >= (int)Token.Type.ID && (int)self <= (int)Token.Type.STR_LIT;
-        public bool is_operation() => (int)self >= (int)Token.Type.EQUALS && (int)self <= (int)Token.Type.EQ;
+        bool is_atom() => (int)self >= (int)Token.Type.ID && (int)self <= (int)Token.Type.STR_LIT;
+        bool is_operation() => (int)self >= (int)Token.Type.EQUALS && (int)self <= (int)Token.Type.EQ;
 
-        public (float, float) binding_powers() => self switch{
+        (float, float) binding_powers() => self switch{
             Token.Type.EXP                                                => (12.1f, 12.0f),
             Token.Type.NOT or Token.Type.BITWISE_NEG                      => Token.Type.BINDING_POWERS_UNARY,
             Token.Type.ASTERISK or Token.Type.SLASH or Token.Type.PERCENT => (10.0f, 10.1f),
@@ -122,7 +122,7 @@ public static class Parser{
             return lhs;
         }
 
-        public (Node, Node?) parse_expr(){
+        (Node, Node?) parse_expr(){
             (Node node1, Node? node2) = (new(), null);
 
             Token tok = self.Pop();

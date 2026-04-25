@@ -6,11 +6,11 @@ using System.Text;
 
 public static class Compiler{
     extension(StringBuilder self){
-        public void add_instruction(string str) => self.AppendLine($"    {str}");
-        public int count_instructions() => self.ToString().Split(Environment.NewLine).Length;
+        void add_instruction(string str) => self.AppendLine($"    {str}");
+        int count_instructions() => self.ToString().Split(Environment.NewLine).Length;
     }
     extension(string self){
-        public string get_string_literal() => System.Text.RegularExpressions.Regex.Unescape(self[1..(self.Length - 1)]);
+        string get_string_literal() => System.Text.RegularExpressions.Regex.Unescape(self[1..(self.Length - 1)]);
     }
 
     public enum Op_code : byte{
