@@ -140,6 +140,18 @@ public static class Parser{
                         throw new Syntax_error_exception($"On line <{tok.line_number}> <id> expression must be closed by <;>");
                     break;
 
+                case Token.Type.LBRACE:
+                    if (self.Count == 0)
+                        throw new Syntax_error_exception($"On line <{tok.line_number}> found missing token(s)");
+                    while (self.Peek().type != Token.Type.RBRACE){
+                        (Node n1, Node? n2) = self.parse_expr();
+                        node1.m_sub_nodes.Add(n1);
+                        if (n2 is not null)
+                            node1.m_sub_nodes.Add(n2);
+                    }
+                    self.Pop();
+                    break;
+
                 case Token.Type.LET_DECL:
                     if (self.Count == 0 || (tok = self.Peek()).type != Token.Type.ID)
                         throw new Syntax_error_exception($"On line <{tok.line_number}> <let> must be followed by an identifier");
@@ -200,19 +212,7 @@ public static class Parser{
                     if (self.Count == 0)
                         throw new Syntax_error_exception($"On line <{tok.line_number}> found missing token(s)");
                     tok = self.Peek();
-                    if (tok.type == Token.Type.LBRACE){
-                        self.Pop();
-                        if (self.Count == 0)
-                            throw new Syntax_error_exception($"On line <{tok.line_number}> found missing token(s)");
-                        while (self.Peek().type != Token.Type.RBRACE){
-                            (Node n1, Node? n2) = self.parse_expr();
-                            node1.m_sub_nodes.Add(n1);
-                            if (n2 is not null)
-                                node1.m_sub_nodes.Add(n2);
-                        }
-                        self.Pop();
-                    }
-                    else if (tok.type != Token.Type.SEMICOLON){
+                    if (tok.type != Token.Type.SEMICOLON){
                         (Node n1, Node? n2) = self.parse_expr();
                         node1.m_sub_nodes.Add(n1);
                         if (n2 is not null)
@@ -230,20 +230,9 @@ public static class Parser{
 
                         if (self.Count == 0)
                             throw new Syntax_error_exception($"On line <{tok.line_number}> found missing token(s)");
+
                         tok = self.Peek();
-                        if (tok.type == Token.Type.LBRACE){
-                            self.Pop();
-                            if (self.Count == 0)
-                                throw new Syntax_error_exception($"On line <{tok.line_number}> found missing token(s)");
-                            while (self.Peek().type != Token.Type.RBRACE){
-                                (Node n1, Node? n2) = self.parse_expr();
-                                node2.m_sub_nodes.Add(n1);
-                                if (n2 is not null)
-                                    node2.m_sub_nodes.Add(n2);
-                            }
-                            self.Pop();
-                        }
-                        else if (tok.type != Token.Type.SEMICOLON){
+                        if (tok.type != Token.Type.SEMICOLON){
                             (Node n1, Node? n2) = self.parse_expr();
                             node2.m_sub_nodes.Add(n1);
                             if (n2 is not null)

@@ -95,6 +95,21 @@ public static class Compiler{
                     sb.add_instruction($"{++stack_size} ; PUSH {current_AST_node.token.id}");
                     break;
 
+                case Token.Type.LBRACE:
+                    StringBuilder block_sb = new();
+                    int block_let_decl_counter = 0;
+                    if (current_AST_node.sub_nodes.Length > 0){
+                        for (int i = 0; i < current_AST_node.sub_nodes.Length - 1; ++i)
+                            to_IR(current_AST_node.sub_nodes[i], current_AST_node.sub_nodes[i + 1], block_sb, ref block_let_decl_counter, false);
+                        to_IR(current_AST_node.sub_nodes[^1], null, block_sb, ref block_let_decl_counter, false);
+                    }
+                    while (block_let_decl_counter-- > 0){
+                        block_sb.add_instruction($"{--stack_size} ; POP");
+                        m_id_positions.RemoveAt(m_id_positions.Count - 1);
+                    }
+                    sb.Append(block_sb);
+                    break;
+
                 case Token.Type.EQUALS:
                 case Token.Type.NOT_EQUALS:
                 case Token.Type.LESS_THAN:
@@ -240,36 +255,32 @@ public static class Compiler{
                     to_IR(current_AST_node.sub_nodes[0], null, sb, ref let_decl_counter, true);
                     --stack_size;
 
-                    int if_let_decl_counter = 0;
-                    ReadOnlySpan<Node> if_sub_nodes = current_AST_node.sub_nodes[1..];
-                    if (if_sub_nodes.Length > 0){
-                        for (int i = 0; i < if_sub_nodes.Length - 1; ++i)
-                            if (if_sub_nodes[i].token.type != Token.Type.ELSE)
-                                to_IR(if_sub_nodes[i], if_sub_nodes[i + 1], if_else_sb, ref if_let_decl_counter, false);
-                        to_IR(if_sub_nodes[^1], null, if_else_sb, ref if_let_decl_counter, false);
-                    }
-                    while (if_let_decl_counter-- > 0){
-                        if_else_sb.add_instruction($"{--stack_size} ; POP");
-                        m_id_positions.RemoveAt(m_id_positions.Count - 1);
+                    if (current_AST_node.sub_nodes.Length > 1){
+                        int if_let_decl_counter = 0;
+                        to_IR(current_AST_node.sub_nodes[1], null, if_else_sb, ref if_let_decl_counter, false);
+                        while (if_let_decl_counter-- > 0){
+                            if_else_sb.add_instruction($"{--stack_size} ; POP");
+                            m_id_positions.RemoveAt(m_id_positions.Count - 1);
+                        }
                     }
                     sb.add_instruction($"{stack_size} ; JMPZ {if_else_sb.count_instructions() + Convert.ToInt32(has_else_after)}");
                     sb.Append(if_else_sb);
 
                     if (has_else_after){
-                        int else_let_decl_counter = 0;
-
                         if_else_sb.Clear();
-
-                        ReadOnlySpan<Node> else_sub_nodes = next_AST_node!.sub_nodes;
-                        if (else_sub_nodes.Length > 0){
-                            for (int i = 0; i < else_sub_nodes.Length - 1; ++i)
-                                if (else_sub_nodes[i].token.type != Token.Type.ELSE)
-                                    to_IR(else_sub_nodes[i], else_sub_nodes[i + 1], if_else_sb, ref else_let_decl_counter, false);
-                            to_IR(else_sub_nodes[^1], null, if_else_sb, ref else_let_decl_counter, false);
-                        }
-                        while (else_let_decl_counter-- > 0){
-                            if_else_sb.add_instruction($"{--stack_size} ; POP");
-                            m_id_positions.RemoveAt(m_id_positions.Count - 1);
+                        if (next_AST_node!.sub_nodes.Length > 0){
+                            int else_let_decl_counter = 0;
+                            to_IR(
+                                next_AST_node.sub_nodes[0],
+                                (next_AST_node!.sub_nodes.Length > 1) ? next_AST_node!.sub_nodes[1] : null,
+                                if_else_sb,
+                                ref else_let_decl_counter,
+                                false
+                            );
+                            while (else_let_decl_counter-- > 0){
+                                if_else_sb.add_instruction($"{--stack_size} ; POP");
+                                m_id_positions.RemoveAt(m_id_positions.Count - 1);
+                            }
                         }
                         sb.add_instruction($"{stack_size} ; JMP {if_else_sb.count_instructions()}");
                         sb.Append(if_else_sb);
@@ -282,14 +293,9 @@ public static class Compiler{
                     
                     StringBuilder while_sb = new();
 
-                    ReadOnlySpan<Node> while_sub_nodes = current_AST_node.sub_nodes[1..];
-                    if (while_sub_nodes.Length > 0){
+                    if (current_AST_node.sub_nodes.Length > 1){
                         int while_let_decl_counter = 0;
-
-                        for (int i = 0; i < while_sub_nodes.Length - 1; ++i)
-                            to_IR(while_sub_nodes[i], while_sub_nodes[i + 1], while_sb, ref while_let_decl_counter, false);
-                        to_IR(while_sub_nodes[^1], null, while_sb, ref while_let_decl_counter, false);
-
+                        to_IR(current_AST_node.sub_nodes[1], null, while_sb, ref while_let_decl_counter, false);
                         while (while_let_decl_counter-- > 0){
                             while_sb.add_instruction($"{--stack_size} ; POP");
                             m_id_positions.RemoveAt(m_id_positions.Count - 1);

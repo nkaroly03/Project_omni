@@ -5,20 +5,20 @@ using System.Diagnostics;
 public sealed class Value : IEquatable<Value>, IComparable<Value>{
     static Value arithm_op(Value v1, Value v2, Action<Value, Value> op){
         v1.data = v1.data switch{
-            bool  => v2.data switch{
+            bool b => v2.data switch{
                 bool  => v1.data,
-                int   => v1.to_int(),
-                float => v1.to_float(),
+                int   => Convert.ToInt32(b),
+                float => Convert.ToSingle(b),
 
                 _ => throw new UnreachableException(),
             },
-            int   => v2.data switch{
+            int  i => v2.data switch{
                 bool or int => v1.data,
-                float       => v1.to_float(),
+                float       => (float)i,
 
                 _ => throw new UnreachableException(),
             },
-            float => v1.data,
+            float  => v1.data,
 
             _ => throw new UnreachableException(),
         };
@@ -35,9 +35,9 @@ public sealed class Value : IEquatable<Value>, IComparable<Value>{
 
     public static Value operator+(Value v) => new(v);
     public static Value operator-(Value v) => v.data switch{
-        bool  => new(!(bool)v.data),
-        int   => new(-(int)v.data),
-        float => new(-(float)v.data),
+        bool  b => new(!b),
+        int   i => new(-i),
+        float f => new(-f),
 
         _ => throw new UnreachableException(),
     };
@@ -89,65 +89,67 @@ public sealed class Value : IEquatable<Value>, IComparable<Value>{
 
     public bool Equals(Value? other) => (other is not null)
         ? ((data is float || other.data is float) ? to_float().Equals(other.to_float()) : to_int().Equals(other.to_int()))
-        : false;
+        : false
+    ;
     public int CompareTo(Value? other) => (other is not null)
         ? ((data is float || other.data is float) ? to_float().CompareTo(other.to_float()) : to_int().CompareTo(other.to_int()))
-        : 1;
+        : 1
+    ;
 
     public bool to_bool() => data switch{
-        bool  => (bool)data,
-        int   => Convert.ToBoolean(data),
-        float => Convert.ToBoolean(data),
+        bool  b => b,
+        int   i => Convert.ToBoolean(i),
+        float f => Convert.ToBoolean(f),
 
         _ => throw new UnreachableException()
     };
     public int to_int() => data switch{
-        bool  => Convert.ToInt32(data),
-        int   => (int)data,
-        float => (int)((float)data),
+        bool  b => Convert.ToInt32(b),
+        int   i => i,
+        float f => (int)f,
 
         _ => throw new UnreachableException()
     };
     public float to_float() => data switch{
-        bool  => Convert.ToSingle(data),
-        int   => (float)((int)data),
-        float => (float)data,
+        bool  b => Convert.ToSingle(b),
+        int   i => (float)i,
+        float f => f,
 
         _ => throw new UnreachableException()
     };
 
     public void add_eq(Value other) => data = data switch{
-        bool  => (bool)data || other.to_bool(),
-        int   => (int)data + other.to_int(),
-        float => (float)data + other.to_float(),
+        bool  b => b || other.to_bool(),
+        int   i => i + other.to_int(),
+        float f => f + other.to_float(),
 
         _ => throw new UnreachableException()
     };
     public void sub_eq(Value other) => data = data switch{
-        bool  => Convert.ToBoolean(to_int() - other.to_int()),
-        int   => (int)data - other.to_int(),
-        float => (float)data - other.to_float(),
+        bool  b => Convert.ToBoolean(Convert.ToInt32(b) - other.to_int()),
+        int   i => i - other.to_int(),
+        float f => f - other.to_float(),
 
         _ => throw new UnreachableException()
     };
     public void mul_eq(Value other) => data = data switch{
-        bool  => (bool)data && other.to_bool(),
-        int   => (int)data * other.to_int(),
-        float => (float)data * other.to_float(),
+        bool  b => b && other.to_bool(),
+        int   i => i * other.to_int(),
+        float f => f * other.to_float(),
 
         _ => throw new UnreachableException()
     };
     public void div_eq(Value other) => data = data switch{
-        bool  => Convert.ToBoolean(to_int() / other.to_int()),
-        int   => (int)data / other.to_int(),
-        float => (float)data / other.to_float(),
+        bool  b => Convert.ToBoolean(Convert.ToInt32(b) / other.to_int()),
+        int   i => i / other.to_int(),
+        float f => f / other.to_float(),
 
         _ => throw new UnreachableException()
     };
     public void mod_eq(Value other) => data = data switch{
-        bool  => Convert.ToBoolean(to_int() % other.to_int()),
-        int   => (int)data % other.to_int(),
-        float => (float)data % other.to_float(),
+        bool  b => Convert.ToBoolean(Convert.ToInt32(b) % other.to_int()),
+        int   i => i % other.to_int(),
+        float f => f % other.to_float(),
 
         _ => throw new UnreachableException()
     };
