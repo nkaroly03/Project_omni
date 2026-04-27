@@ -22,6 +22,7 @@ public static class Compiler{
         PUSH_CHAR,
         PUSH_INT,
         PUSH_FLOAT,
+        PUSH_STR,
 
         POP,
 
@@ -32,10 +33,9 @@ public static class Compiler{
         JMP,
         JMPZ,
 
-        PRINT_STR,
         PRINT,
-
         SCAN,
+        SCAN_STR,
 
         GET_ARGV,
 
@@ -43,6 +43,7 @@ public static class Compiler{
         TO_CHAR,
         TO_INT,
         TO_FLOAT,
+        TO_STR,
 
         CMP_EQ,
         CMP_NEQ,
@@ -97,6 +98,9 @@ public static class Compiler{
                 case Token.Type.INT_LIT:
                 case Token.Type.FLOAT_LIT:
                     sb.add_instruction($"{++stack_size} ; PUSH {current_AST_node.token.id}");
+                    break;
+                case Token.Type.STR_LIT:
+                    sb.add_instruction($"{++stack_size} ; PUSH \"{current_AST_node.token.id}\"");
                     break;
 
                 case Token.Type.LBRACE:
@@ -234,18 +238,16 @@ public static class Compiler{
                 case Token.Type.CHAR:  sb.add_instruction($"{stack_size} ; TO_CHAR");  break;
                 case Token.Type.INT:   sb.add_instruction($"{stack_size} ; TO_INT");   break;
                 case Token.Type.FLOAT: sb.add_instruction($"{stack_size} ; TO_FLOAT"); break;
+                case Token.Type.STR:   sb.add_instruction($"{stack_size} ; TO_STR");   break;
 
                 case Token.Type.PRINT:
-                    Node print_sub_node = current_AST_node.sub_nodes[0];
-                    if (print_sub_node.token.type == Token.Type.STR_LIT)
-                        sb.add_instruction($"{stack_size} ; PRINT \"{print_sub_node.token.id}\"");
-                    else{
-                        to_IR(print_sub_node, null, sb, ref let_decl_counter, true);
-                        sb.add_instruction($"{--stack_size} ; PRINT");
-                    }
+                    to_IR(current_AST_node.sub_nodes[0], null, sb, ref let_decl_counter, true);
+                    sb.add_instruction($"{--stack_size} ; PRINT");
                     break;
                 case Token.Type.SCAN:
-                    sb.add_instruction($"{++stack_size} ; SCAN \"{current_AST_node.sub_nodes[0].token.id}\"");
+                case Token.Type.SCAN_STR:
+                    to_IR(current_AST_node.sub_nodes[0], null, sb, ref let_decl_counter, true);
+                    sb.add_instruction($"{stack_size} ; {current_AST_node.token.id.ToUpper()}");
                     break;
 
                 case Token.Type.ARGV:
@@ -349,26 +351,24 @@ public static class Compiler{
             (string lhs, string rhs) = (space_idx >= 0) ? (instruction[..space_idx], instruction[(space_idx + 1)..]) : (instruction, "");
             switch (lhs){
                 case "PUSH":
-                    if (rhs != "ARGC" && rhs != "FALSE" && rhs != "TRUE")
-                        instruction_byte_count += (
-                            (rhs.StartsWith('\''))
-                                ? sizeof(char)
-                                : (rhs.StartsWith("SP") || rhs.IndexOf('.') < 0)
-                                    ? sizeof(int)
-                                    : sizeof(float)
-                        );
+                    if (rhs != "ARGC" && rhs != "FALSE" && rhs != "TRUE"){
+                        if (rhs.StartsWith("\""))
+                            instruction_byte_count += (sizeof(int) + Encoding.UTF8.GetBytes(rhs.get_string_literal()).Length);
+                        else{
+                            instruction_byte_count += (
+                                (rhs.StartsWith('\''))
+                                    ? sizeof(char)
+                                    : (rhs.StartsWith("SP") || rhs.IndexOf('.') < 0)
+                                        ? sizeof(int)
+                                        : sizeof(float)
+                            );
+                        }
+                    }
                     break;
                 case "MOV":
                 case "JMP":
                 case "JMPZ":
                     instruction_byte_count += sizeof(int);
-                    break;
-                case "PRINT":
-                    if (rhs.Length > 0)
-                        instruction_byte_count += (sizeof(int) + Encoding.UTF8.GetBytes(rhs.get_string_literal()).Length);
-                    break;
-                case "SCAN":
-                    instruction_byte_count += (sizeof(int) + Encoding.UTF8.GetBytes(rhs.get_string_literal()).Length);
                     break;
             }
         }
@@ -399,6 +399,12 @@ public static class Compiler{
                     else if (rhs.StartsWith('\'')){
                         as_bytes = BitConverter.GetBytes(rhs.get_char_literal());
                         bytecode.Add((byte)Op_code.PUSH_CHAR);
+                        bytecode.AddRange(as_bytes);
+                    }
+                    else if (rhs.StartsWith("\"")){
+                        as_bytes = Encoding.UTF8.GetBytes(rhs.get_string_literal());
+                        bytecode.Add((byte)Op_code.PUSH_STR);
+                        bytecode.AddRange(BitConverter.GetBytes(as_bytes.Length));
                         bytecode.AddRange(as_bytes);
                     }
                     else if (rhs.IndexOf('.') < 0){
@@ -432,28 +438,16 @@ public static class Compiler{
                     bytecode.Add((lhs == "JMP") ? (byte)Op_code.JMP : (byte)Op_code.JMPZ);
                     bytecode.AddRange(as_bytes);
                     break;
-                case "PRINT":
-                    if (rhs.Length > 0){
-                        as_bytes = Encoding.UTF8.GetBytes(rhs.get_string_literal());
-                        bytecode.Add((byte)Op_code.PRINT_STR);
-                        bytecode.AddRange(BitConverter.GetBytes(as_bytes.Length));
-                        bytecode.AddRange(as_bytes);
-                    }
-                    else
-                        bytecode.Add((byte)Op_code.PRINT);
-                    break;
-                case "SCAN":
-                    as_bytes = Encoding.UTF8.GetBytes(rhs.get_string_literal());
-                    bytecode.Add((byte)Op_code.SCAN);
-                    bytecode.AddRange(BitConverter.GetBytes(as_bytes.Length));
-                    bytecode.AddRange(as_bytes);
-                    break;
 
+                case "PRINT":    bytecode.Add((byte)Op_code.PRINT);    break;
+                case "SCAN":     bytecode.Add((byte)Op_code.SCAN);     break;
+                case "SCAN_STR": bytecode.Add((byte)Op_code.SCAN_STR); break;
                 case "GET_ARGV": bytecode.Add((byte)Op_code.GET_ARGV); break;
                 case "TO_BOOL":  bytecode.Add((byte)Op_code.TO_BOOL);  break;
-                case "TO_CHAR":   bytecode.Add((byte)Op_code.TO_CHAR);   break;
+                case "TO_CHAR":  bytecode.Add((byte)Op_code.TO_CHAR);  break;
                 case "TO_INT":   bytecode.Add((byte)Op_code.TO_INT);   break;
                 case "TO_FLOAT": bytecode.Add((byte)Op_code.TO_FLOAT); break;
+                case "TO_STR":   bytecode.Add((byte)Op_code.TO_STR);   break;
                 case "CMP_EQ":   bytecode.Add((byte)Op_code.CMP_EQ);   break;
                 case "CMP_NEQ":  bytecode.Add((byte)Op_code.CMP_NEQ);  break;
                 case "CMP_LE":   bytecode.Add((byte)Op_code.CMP_LE);   break;

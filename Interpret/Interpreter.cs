@@ -45,6 +45,12 @@ public static class Interpreter{
                     stack.Add(new(BitConverter.ToSingle(bytecode[pc..][..sizeof(float)])));
                     pc += sizeof(float);
                     break;
+                case Compiler.Op_code.PUSH_STR:
+                    int strlen = BitConverter.ToInt32(bytecode[pc..][..sizeof(int)]);
+                    pc += sizeof(int);
+                    stack.Add(new(new StringBuilder(Encoding.UTF8.GetString(bytecode[pc..][..strlen]))));
+                    pc += strlen;
+                    break;
 
                 case Compiler.Op_code.POP:
                     stack.pop();
@@ -57,10 +63,11 @@ public static class Interpreter{
                 case Compiler.Op_code.MOV:
                     int value_idx = stack.Count + BitConverter.ToInt32(bytecode[pc..][..sizeof(int)]);
                     stack[value_idx] = stack[value_idx].data switch{
-                        bool  => new(stack[^1].to_bool()),
-                        char  => new(stack[^1].to_char()),
-                        int   => new(stack[^1].to_int()),
-                        float => new(stack[^1].to_float()),
+                        bool          => new(stack[^1].to_bool()),
+                        char          => new(stack[^1].to_char()),
+                        int           => new(stack[^1].to_int()),
+                        float         => new(stack[^1].to_float()),
+                        StringBuilder => new(stack[^1].to_string()),
 
                         _ => throw new UnreachableException(),
                     };
@@ -79,34 +86,28 @@ public static class Interpreter{
                     pc += (Convert.ToInt32(!stack.pop().to_bool()) * (jmpz_count + 1));
                     break;
 
-                case Compiler.Op_code.PRINT_STR:
-                    int print_strlen = BitConverter.ToInt32(bytecode[pc..][..sizeof(int)]);
-                    pc += sizeof(int);
-                    string print_str = Encoding.UTF8.GetString(bytecode[pc..][..print_strlen]);
-                    pc += print_strlen;
-                    Console.Write(print_str);
-                    break;
                 case Compiler.Op_code.PRINT:
                     Console.Write(stack.pop());
                     break;
 
                 case Compiler.Op_code.SCAN:
-                    int scan_strlen = BitConverter.ToInt32(bytecode[pc..][..sizeof(int)]);
-                    pc += sizeof(int);
-                    string scan_str = Encoding.UTF8.GetString(bytecode[pc..][..scan_strlen]);
-                    pc += scan_strlen;
-                    Console.Write(scan_str);
-                    stack.Add(Value.from_str(Console.ReadLine()!));
+                    Console.Write(stack[^1]);
+                    stack[^1] = Value.from_str(Console.ReadLine()!);
+                    break;
+                case Compiler.Op_code.SCAN_STR:
+                    Console.Write(stack[^1]);
+                    stack[^1] = new(new StringBuilder(Console.ReadLine()!));
                     break;
                 
                 case Compiler.Op_code.GET_ARGV:
                     stack[^1] = argv[(stack[^1].data is int) ? stack[^1].to_int() : throw new ArgumentOutOfRangeException("<argv> must be indexed with a Value that holds an int")];
                     break;
 
-                case Compiler.Op_code.TO_BOOL:  stack[^1] = new(stack[^1].to_bool());  break;
-                case Compiler.Op_code.TO_CHAR:  stack[^1] = new(stack[^1].to_char());  break;
-                case Compiler.Op_code.TO_INT:   stack[^1] = new(stack[^1].to_int());   break;
-                case Compiler.Op_code.TO_FLOAT: stack[^1] = new(stack[^1].to_float()); break;
+                case Compiler.Op_code.TO_BOOL:  stack[^1] = new(stack[^1].to_bool());   break;
+                case Compiler.Op_code.TO_CHAR:  stack[^1] = new(stack[^1].to_char());   break;
+                case Compiler.Op_code.TO_INT:   stack[^1] = new(stack[^1].to_int());    break;
+                case Compiler.Op_code.TO_FLOAT: stack[^1] = new(stack[^1].to_float());  break;
+                case Compiler.Op_code.TO_STR:   stack[^1] = new(stack[^1].to_string()); break;
 
                 case Compiler.Op_code.CMP_EQ:  stack[^2] = new(stack[^2] == stack.pop()); break;
                 case Compiler.Op_code.CMP_NEQ: stack[^2] = new(stack[^2] != stack.pop()); break;

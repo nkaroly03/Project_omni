@@ -22,6 +22,9 @@
     }
 /*/
 
-let c: char = 'A';
+let temp: str = "Hello";
+let s: str = scan_str((temp = temp + " input: ")) + 'o';
+
+print("s: " + s + '\n');
 
 print("\n---test success---\n");

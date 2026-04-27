@@ -18,11 +18,11 @@ string IR = Compiler.to_IR(AST);
 // Console.WriteLine(IR);
 ReadOnlySpan<byte> bytecode = Compiler.to_bytecode(IR);
 
-for (int i = 0; i < bytecode.Length; ++i){
-    Console.Write($"{bytecode[i].ToString().PadLeft(3)}, ");
-    if ((i + 1) % 10 == 0)
-        Console.WriteLine();
-}
+// for (int i = 0; i < bytecode.Length; ++i){
+    // Console.Write($"{bytecode[i].ToString().PadLeft(3)}, ");
+    // if ((i + 1) % 10 == 0)
+        // Console.WriteLine();
+// }
 
 string out_dir_name = "Omni_out";
 string file_name = Path.GetFileName(argv[1]);

@@ -1,6 +1,7 @@
 ﻿namespace Interpret;
 
 using System.Diagnostics;
+using System.Text;
 
 public sealed class Value : IEquatable<Value>, IComparable<Value>{
     static Value arithm_op(Value v1, Value v2, Action<Value, Value> op){
@@ -11,22 +12,32 @@ public sealed class Value : IEquatable<Value>, IComparable<Value>{
                 int   => Convert.ToInt32(b),
                 float => Convert.ToSingle(b),
 
-                _ => throw new UnreachableException(),
+                _ => throw new ArgumentOutOfRangeException("Trying to use arithmetic operation on bool with string"),
             },
             char c => v2.data switch{
-                bool or char => v1.data,
-                int          => (int)c,
-                float        => (float)c,
+                bool or char  => v1.data,
+                int           => (int)c,
+                float         => (float)c,
+                StringBuilder => new StringBuilder(c.ToString()),
 
                 _ => throw new UnreachableException(),
             },
-            int  i => v2.data switch{
+            int i => v2.data switch{
                 bool or char or int => v1.data,
                 float               => (float)i,
 
-                _ => throw new UnreachableException(),
+                _ => throw new ArgumentOutOfRangeException("Trying to use arithmetic operation on int with string"),
             },
-            float  => v1.data,
+            float => v2.data switch{
+                bool or char or int or float => v1.data,
+
+                _ => throw new ArgumentOutOfRangeException("Trying to use arithmetic operation on float with string"),
+            },
+            StringBuilder => v2.data switch{
+                char or StringBuilder => v1.data,
+
+                _ => throw new ArgumentOutOfRangeException("Trying to use arithmetic operation on string with bool, int or float"),
+            },
 
             _ => throw new UnreachableException(),
         };
@@ -41,14 +52,14 @@ public sealed class Value : IEquatable<Value>, IComparable<Value>{
         return v1;
     }
 
-    public static Value operator+(Value v) => new(v);
+    public static Value operator+(Value v) => (v.data is not StringBuilder) ? new(v) : throw new ArgumentOutOfRangeException("Trying to use unary + on string");
     public static Value operator-(Value v) => v.data switch{
         bool  b => new(!b),
         char  c => new(-c),
         int   i => new(-i),
         float f => new(-f),
 
-        _ => throw new UnreachableException(),
+        _ => throw new ArgumentOutOfRangeException("Trying to use unary - on string"),
     };
 
     public static Value operator+(Value v1, Value v2) => arithm_op(new(v1), new(v2), (_v1, _v2) => _v1.add_eq(_v2));
@@ -80,30 +91,51 @@ public sealed class Value : IEquatable<Value>, IComparable<Value>{
             catch (FormatException){
                 try{ return new(float.Parse(str, System.Globalization.CultureInfo.InvariantCulture)); }
                 catch (OverflowException){ return new((str.Trim()[0] == '-') ? float.MinValue : float.MaxValue); }
-                catch (FormatException){ return (str.Length == 1) ? new(str[0]) : throw new NotImplementedException("string is not implemented yet"); }
             }
         }
     }
 
     public object data{ get; private set; }
 
-    public Value(bool data)  => this.data = data;
-    public Value(char data)  => this.data = data;
-    public Value(int data)   => this.data = data;
-    public Value(float data) => this.data = data;
+    public Value(bool data)          => this.data = data;
+    public Value(char data)          => this.data = data;
+    public Value(int data)           => this.data = data;
+    public Value(float data)         => this.data = data;
+    public Value(StringBuilder data) => this.data = data;
 
-    public Value(Value other) => data = other.data;
+    public Value(Value other) => data = other.data switch{
+        bool or char or int or float => other.data,
+        StringBuilder sb             => new StringBuilder(sb.ToString()),
+
+        _ => throw new UnreachableException(),
+    };
 
     public override string ToString() => data.ToString()!;
     public override bool Equals(object? obj) => Equals(obj as Value);
     public override int GetHashCode() => data.GetHashCode();
 
     public bool Equals(Value? other) => (other is not null)
-        ? ((data is float || other.data is float) ? to_float().Equals(other.to_float()) : to_int().Equals(other.to_int()))
+        ? (
+            (data is StringBuilder || other.data is StringBuilder)
+                ? (
+                    (data is StringBuilder sb1 && other.data is StringBuilder sb2)
+                        ? sb1.ToString().Equals(sb2.ToString())
+                        : throw new ArgumentOutOfRangeException("Trying to compare a string to a non string")
+                )
+                : ((data is float || other.data is float) ? to_float().Equals(other.to_float()) : to_int().Equals(other.to_int()))
+        )
         : false
     ;
     public int CompareTo(Value? other) => (other is not null)
-        ? ((data is float || other.data is float) ? to_float().CompareTo(other.to_float()) : to_int().CompareTo(other.to_int()))
+        ? (
+            (data is StringBuilder || other.data is StringBuilder)
+                ? (
+                    (data is StringBuilder sb1 && other.data is StringBuilder sb2)
+                        ? sb1.ToString().CompareTo(sb2.ToString())
+                        : throw new ArgumentOutOfRangeException("Trying to compare a string to a non string")
+                )
+                : ((data is float || other.data is float) ? to_float().CompareTo(other.to_float()) : to_int().CompareTo(other.to_int()))
+        )
         : 1
     ;
 
@@ -113,7 +145,7 @@ public sealed class Value : IEquatable<Value>, IComparable<Value>{
         int   i => Convert.ToBoolean(i),
         float f => Convert.ToBoolean(f),
 
-        _ => throw new UnreachableException()
+        _ => throw new ArgumentOutOfRangeException("Trying to convert a string to bool"),
     };
     public char to_char() => data switch{
         bool  b => (char)Convert.ToInt32(b),
@@ -121,7 +153,7 @@ public sealed class Value : IEquatable<Value>, IComparable<Value>{
         int   i => (char)i,
         float f => (char)f,
 
-        _ => throw new UnreachableException()
+        _ => throw new ArgumentOutOfRangeException("Trying to convert a string to char"),
     };
     public int to_int() => data switch{
         bool  b => Convert.ToInt32(b),
@@ -129,7 +161,7 @@ public sealed class Value : IEquatable<Value>, IComparable<Value>{
         int   i => i,
         float f => (int)f,
 
-        _ => throw new UnreachableException()
+        _ => throw new ArgumentOutOfRangeException("Trying to convert a string to int"),
     };
     public float to_float() => data switch{
         bool  b => Convert.ToSingle(b),
@@ -137,24 +169,36 @@ public sealed class Value : IEquatable<Value>, IComparable<Value>{
         int   i => (float)i,
         float f => f,
 
-        _ => throw new UnreachableException()
+        _ => throw new ArgumentOutOfRangeException("Trying to convert a string to float"),
     };
+    public StringBuilder to_string() => (data is StringBuilder sb) ? new(sb.ToString()) : throw new ArgumentOutOfRangeException("Trying to convert a non string into a string");
 
-    public void add_eq(Value other) => data = data switch{
-        bool  b => b || other.to_bool(),
-        char  c => (char)(c + other.to_char()),
-        int   i => i + other.to_int(),
-        float f => f + other.to_float(),
+    public void add_eq(Value other){
+        if (data is not StringBuilder && other.data is StringBuilder)
+            throw new ArgumentOutOfRangeException("Trying to do addition on a non string with a string");
 
-        _ => throw new UnreachableException()
-    };
+        data = data switch{
+            bool           b => b || other.to_bool(),
+            char           c => (char)(c + other.to_char()),
+            int            i => i + other.to_int(),
+            float          f => f + other.to_float(),
+            StringBuilder sb => other.data switch{
+                char           other_c => sb.Append(other_c),
+                StringBuilder other_sb => sb.Append(other_sb.ToString()),
+
+                _ => throw new ArgumentOutOfRangeException("Trying to do addition on a string with bool, int or float"),
+            },
+
+            _ => throw new UnreachableException()
+        };
+    }
     public void sub_eq(Value other) => data = data switch{
         bool  b => Convert.ToBoolean(Convert.ToInt32(b) - other.to_int()),
         char  c => (char)(c - other.to_char()),
         int   i => i - other.to_int(),
         float f => f - other.to_float(),
 
-        _ => throw new UnreachableException()
+        _ => throw new ArgumentOutOfRangeException("Trying to do subtraction with strings"),
     };
     public void mul_eq(Value other) => data = data switch{
         bool  b => b && other.to_bool(),
@@ -162,7 +206,7 @@ public sealed class Value : IEquatable<Value>, IComparable<Value>{
         int   i => i * other.to_int(),
         float f => f * other.to_float(),
 
-        _ => throw new UnreachableException()
+        _ => throw new ArgumentOutOfRangeException("Trying to do multiplication with strings"),
     };
     public void div_eq(Value other) => data = data switch{
         bool  b => Convert.ToBoolean(Convert.ToInt32(b) / other.to_int()),
@@ -170,7 +214,7 @@ public sealed class Value : IEquatable<Value>, IComparable<Value>{
         int   i => i / other.to_int(),
         float f => f / other.to_float(),
 
-        _ => throw new UnreachableException()
+        _ => throw new ArgumentOutOfRangeException("Trying to do division with strings"),
     };
     public void mod_eq(Value other) => data = data switch{
         bool  b => Convert.ToBoolean(Convert.ToInt32(b) % other.to_int()),
@@ -178,9 +222,12 @@ public sealed class Value : IEquatable<Value>, IComparable<Value>{
         int   i => i % other.to_int(),
         float f => f % other.to_float(),
 
-        _ => throw new UnreachableException()
+        _ => throw new ArgumentOutOfRangeException("Trying to do modulo with strings"),
     };
     public void pow_eq(Value other){
+        if (data is StringBuilder || other.data is StringBuilder)
+            throw new ArgumentOutOfRangeException("Trying to do exponentiation strings");
+
         float result = MathF.Pow(to_float(), other.to_float());
         data = data switch{
             bool  => Convert.ToBoolean(result),

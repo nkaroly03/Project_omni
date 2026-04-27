@@ -60,30 +60,16 @@ public static class Parser{
             Token tok = self.Pop();
             if (tok.type.is_atom())
                 lhs.token = tok;
-            else if (tok.type == Token.Type.SCAN){
+            else if (tok.type == Token.Type.SCAN || tok.type == Token.Type.SCAN_STR || tok.type == Token.Type.ARGV){
                 lhs.token = tok;
 
                 if (self.Count == 0 || (tok = self.Pop()).type != Token.Type.LPAREN)
-                    throw new Syntax_error_exception($"On line <{tok.line_number}> <scan> must be followed by <(>");
-
-                if (self.Count == 0 || (tok = self.Pop()).type != Token.Type.STR_LIT)
-                    throw new Syntax_error_exception($"On line <{tok.line_number}> <scan> must contain a string literal");
-
-                lhs.m_sub_nodes.Add(new(){token = tok});
-
-                if (self.Count == 0 || (tok = self.Pop()).type != Token.Type.RPAREN)
-                    throw new Syntax_error_exception($"On line <{tok.line_number}> <scan> must be closed by <)>");
-            }
-            else if (tok.type == Token.Type.ARGV){
-                lhs.token = tok;
-
-                if (self.Count == 0 || (tok = self.Pop()).type != Token.Type.LPAREN)
-                    throw new Syntax_error_exception($"On line <{tok.line_number}> <argv> must be followed by <(>");
+                    throw new Syntax_error_exception($"On line <{tok.line_number}> <{lhs.token.id}> must be followed by <(>");
 
                 lhs.m_sub_nodes.Add(self.parse_arithm_expr(0.0f));
 
                 if (self.Count == 0 || (tok = self.Pop()).type != Token.Type.RPAREN)
-                    throw new Syntax_error_exception($"On line <{tok.line_number}> <argv> must be closed by <)>");
+                    throw new Syntax_error_exception($"On line <{tok.line_number}> <{lhs.token.id}> must be closed by <)>");
             }
             else if (tok.type == Token.Type.LPAREN){
                 lhs = self.parse_arithm_expr(0.0f);
@@ -163,7 +149,13 @@ public static class Parser{
                         throw new Syntax_error_exception($"On line <{tok.line_number}> <{tok.id}> must be followed by <:>");
                     self.Pop();
 
-                    if (self.Count == 0 || ((tok = self.Peek()).type != Token.Type.BOOL && tok.type != Token.Type.CHAR && tok.type != Token.Type.INT && tok.type != Token.Type.FLOAT))
+                    if (
+                        self.Count == 0 ||
+                        (
+                            (tok = self.Peek()).type != Token.Type.BOOL && tok.type != Token.Type.CHAR &&
+                            tok.type != Token.Type.INT && tok.type != Token.Type.FLOAT && tok.type != Token.Type.STR
+                        )
+                    )
                         throw new Syntax_error_exception($"On line <{tok.line_number}> <:> must be followed by a valid type");
 
                     node1.m_sub_nodes.Add(new(){token = self.Pop()});
@@ -182,12 +174,7 @@ public static class Parser{
                     if (self.Count == 0 || (tok = self.Pop()).type != Token.Type.LPAREN)
                         throw new Syntax_error_exception($"On line <{tok.line_number}> <print> must be followed by <(>");
 
-                    if (self.Count == 0 || (tok = self.Peek()).type == Token.Type.STR_LIT){
-                        node1.m_sub_nodes.Add(new(){token = tok});
-                        self.Pop();
-                    }
-                    else
-                        node1.m_sub_nodes.Add(self.parse_arithm_expr(0.0f));
+                    node1.m_sub_nodes.Add(self.parse_arithm_expr(0.0f));
 
                     if (self.Count == 0 || (tok = self.Pop()).type != Token.Type.RPAREN)
                         throw new Syntax_error_exception($"On line <{tok.line_number}> <print> must be closed by <)>");
