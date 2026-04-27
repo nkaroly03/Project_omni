@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Lex")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+439b0fab903d85ad675aeb964a09f76f8817703d")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4be5080efdd530d1d4a13c5cdfcfb31a9d4cc974")]
 [assembly: System.Reflection.AssemblyProductAttribute("Lex")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Lex")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

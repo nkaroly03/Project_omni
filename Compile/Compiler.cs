@@ -116,15 +116,15 @@ public static class Compiler{
                 case Token.Type.LESS_THAN_EQ:
                 case Token.Type.GREATER_THAN:
                 case Token.Type.GREATER_THAN_EQ:
-                case Token.Type.ASTERISK:
+                case Token.Type.ASTERISK1:
+                case Token.Type.ASTERISK2:
                 case Token.Type.SLASH:
                 case Token.Type.PERCENT:
-                case Token.Type.EXP:
                 case Token.Type.SHIFT_LEFT:
                 case Token.Type.SHIFT_RIGHT:
-                case Token.Type.BITWISE_AND:
-                case Token.Type.BITWISE_OR:
-                case Token.Type.XOR:
+                case Token.Type.AMPERSAND:
+                case Token.Type.PIPE:
+                case Token.Type.CARET:
                 // case Token.Type.AND:
                 // case Token.Type.OR:
                     to_IR(current_AST_node.sub_nodes[0], null, sb, ref let_decl_counter, true);
@@ -136,15 +136,15 @@ public static class Compiler{
                         Token.Type.LESS_THAN_EQ    => "CMP_LEQ",
                         Token.Type.GREATER_THAN    => "CMP_GE",
                         Token.Type.GREATER_THAN_EQ => "CMP_GEQ",
-                        Token.Type.ASTERISK        => "MUL",
+                        Token.Type.ASTERISK1       => "MUL",
+                        Token.Type.ASTERISK2       => "POW",
                         Token.Type.SLASH           => "DIV",
                         Token.Type.PERCENT         => "MOD",
-                        Token.Type.EXP             => "POW",
                         Token.Type.SHIFT_LEFT      => "SHL",
                         Token.Type.SHIFT_RIGHT     => "SHR",
-                        Token.Type.BITWISE_AND     => "BAND",
-                        Token.Type.BITWISE_OR      => "BOR",
-                        Token.Type.XOR             => "XOR",
+                        Token.Type.AMPERSAND       => "BAND",
+                        Token.Type.PIPE            => "BOR",
+                        Token.Type.CARET           => "XOR",
                         // Token.Type.AND             => "AND",
                         // Token.Type.OR              => "OR",
                         
@@ -152,7 +152,7 @@ public static class Compiler{
                     }}");
                     break;
 
-                case Token.Type.BITWISE_NEG:
+                case Token.Type.TILDE:
                     to_IR(current_AST_node.sub_nodes[0], null, sb, ref let_decl_counter, true);
                     sb.add_instruction($"{stack_size} ; BNEG");
                     break;
@@ -203,12 +203,12 @@ public static class Compiler{
                     break;
 
                 case Token.Type.EQ:
-                    to_IR(current_AST_node.sub_nodes[1], null, sb, ref let_decl_counter, true);
                     Token eq_tok = current_AST_node.sub_nodes[0].token;
                     if (eq_tok.type != Token.Type.ID)
                         throw new Syntax_error_exception($"On line <{eq_tok.line_number}> trying to assign to rvalue");
                     if (!m_id_positions.ContainsKey(eq_tok.id))
                         throw new Syntax_error_exception($"On line <{eq_tok.line_number}> use of undeclared identifier <{eq_tok.id}>");
+                    to_IR(current_AST_node.sub_nodes[1], null, sb, ref let_decl_counter, true);
                     sb.add_instruction($"{stack_size - 1} ; MOV SP[-{stack_size - m_id_positions[eq_tok.id]}]");
                     --stack_size;
                     if (push_back_after_assignment){

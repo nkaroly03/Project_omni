@@ -6,9 +6,7 @@ using System.Text.RegularExpressions;
 public readonly record struct Token{
     public enum Type{
         ID,
-
         ARGC,
-
         FALSE,
         TRUE,
         INT_LIT,
@@ -17,6 +15,7 @@ public readonly record struct Token{
 
         COLON,
         SEMICOLON,
+        DOT2,
         LPAREN,
         RPAREN,
         LBRACE,
@@ -30,22 +29,19 @@ public readonly record struct Token{
         GREATER_THAN_EQ,
         PLUS,
         MINUS,
-        ASTERISK,
+        ASTERISK1,
+        ASTERISK2,
         SLASH,
         PERCENT,
-        EXP,
-
         SHIFT_LEFT,
         SHIFT_RIGHT,
-        BITWISE_AND,
-        BITWISE_OR,
-        XOR,
-        BITWISE_NEG,
-
+        AMPERSAND,
+        PIPE,
+        CARET,
+        TILDE,
         AND,
         OR,
         NOT,
-
         EQ,
         
         LET_DECL,
@@ -63,6 +59,7 @@ public readonly record struct Token{
         ELSE,
 
         WHILE,
+        FOR,
 
         RETURN
     }
@@ -117,8 +114,8 @@ public static class Lexer{
                 file_lines,
                 "(" +
                     @"/\*/(?:\r\n|\r|\n|.)*?/\*/|(?://.*)?(?:\r\n|\r|\n)|""(?:[^""\\]|\\.)*?""|" +
-                    @"\*\*|[:;(){}+*/%&|^~-]|<<|>>|!=|[<>=]=?|" +
-                    @"\blet\b|\bbool\b|\bfalse\b|\btrue\b|\bint\b|\bfloat\b|\bprint\b|\bscan\b|\bargc\b|\bargv\b|\bif\b|\belse\b|\bwhile\b|\band\b|\bor\b|\bnot\b|\breturn\b" +
+                    @"\.\.|\*\*|[:;(){}+*/%&|^~-]|<<|>>|!=|[<>=]=?|" +
+                    @"\bargc\b|\bfalse\b|\btrue\b|\band\b|\bor\b|\bnot\b|\blet\b|\bbool\b|\bint\b|\bfloat\b|\bprint\b|\bscan\b|\bargv\b|\bif\b|\belse\b|\bwhile\b|\bfor\b|\breturn\b" +
                 ")"
             ).Select((s) => s.Trim(' ')).Where((s) => s.Length > 0).ToArray()
         ){
@@ -128,12 +125,12 @@ public static class Lexer{
 
                 Token.Type token_type = line switch{
                     "argc"   => Token.Type.ARGC,
-
                     "false"  => Token.Type.FALSE,
                     "true"   => Token.Type.TRUE,
 
                     ":"      => Token.Type.COLON,
                     ";"      => Token.Type.SEMICOLON,
+                    ".."     => Token.Type.DOT2,
                     "("      => Token.Type.LPAREN,
                     ")"      => Token.Type.RPAREN,
                     "{"      => Token.Type.LBRACE,
@@ -147,22 +144,19 @@ public static class Lexer{
                     ">="     => Token.Type.GREATER_THAN_EQ,
                     "+"      => Token.Type.PLUS,
                     "-"      => Token.Type.MINUS,
-                    "*"      => Token.Type.ASTERISK,
+                    "*"      => Token.Type.ASTERISK1,
+                    "**"     => Token.Type.ASTERISK2,
                     "/"      => Token.Type.SLASH,
                     "%"      => Token.Type.PERCENT,
-                    "**"     => Token.Type.EXP,
-
                     "<<"     => Token.Type.SHIFT_LEFT,
                     ">>"     => Token.Type.SHIFT_RIGHT,
-                    "&"      => Token.Type.BITWISE_AND,
-                    "|"      => Token.Type.BITWISE_OR,
-                    "^"      => Token.Type.XOR,
-                    "~"      => Token.Type.BITWISE_NEG,
-
+                    "&"      => Token.Type.AMPERSAND,
+                    "|"      => Token.Type.PIPE,
+                    "^"      => Token.Type.CARET,
+                    "~"      => Token.Type.TILDE,
                     "and"    => Token.Type.AND,
                     "or"     => Token.Type.OR,
                     "not"    => Token.Type.NOT,
-
                     "="      => Token.Type.EQ,
 
                     "let"    => Token.Type.LET_DECL,
@@ -180,6 +174,7 @@ public static class Lexer{
                     "else"   => Token.Type.ELSE,
 
                     "while"  => Token.Type.WHILE,
+                    "for"    => Token.Type.FOR,
 
                     "return" => Token.Type.RETURN,
 
