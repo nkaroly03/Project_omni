@@ -1,21 +1,27 @@
-// forloop
-for (0..10) |i|{
-    print("i: ");
-    print(i);
-    print("\n");
-}
-
-print("------------------------------------------------\n");
-
-// forloop transformed into while loop
-{
-    let i: int = 0;
-    while (i < 10){
-        {
-            print("i: ");
-            print(i);
-            print("\n");
-        }
-        i = i + 1;
+/*/
+    // forloop
+    for (0..10) |i|{
+        print("i: ");
+        print(i);
+        print("\n");
     }
-}
+
+    print("------------------------------------------------\n");
+
+    // forloop transformed into while loop
+    {
+        let i: int = 0;
+        while (i < 10){
+            {
+                print("i: ");
+                print(i);
+                print("\n");
+            }
+            i = i + 1;
+        }
+    }
+/*/
+
+let c: char = 'A';
+
+print("\n---test success---\n");

@@ -15,10 +15,8 @@ let PI: float = 3.14159265;
     }
 /*/
 
-let y: int = 0;
-while (y <= HEIGHT){
-    let x: int = 0;
-    while (x <= WIDTH){
+for (0..HEIGHT + 1) |y|{
+    for (0..WIDTH + 1)|x|{
         let sin: float = 2 * PI * frequency * x / WIDTH;
         {
             let k: int = 2 * sin / PI;
@@ -47,9 +45,6 @@ while (y <= HEIGHT){
             print("*");
         else
             print(" ");
-
-        x = x + 1;
     }
     print("\n");
-    y = y + 1;
 }

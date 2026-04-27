@@ -7,14 +7,22 @@ public sealed class Value : IEquatable<Value>, IComparable<Value>{
         v1.data = v1.data switch{
             bool b => v2.data switch{
                 bool  => v1.data,
+                char  => (char)Convert.ToInt32(b),
                 int   => Convert.ToInt32(b),
                 float => Convert.ToSingle(b),
 
                 _ => throw new UnreachableException(),
             },
+            char c => v2.data switch{
+                bool or char => v1.data,
+                int          => (int)c,
+                float        => (float)c,
+
+                _ => throw new UnreachableException(),
+            },
             int  i => v2.data switch{
-                bool or int => v1.data,
-                float       => (float)i,
+                bool or char or int => v1.data,
+                float               => (float)i,
 
                 _ => throw new UnreachableException(),
             },
@@ -36,6 +44,7 @@ public sealed class Value : IEquatable<Value>, IComparable<Value>{
     public static Value operator+(Value v) => new(v);
     public static Value operator-(Value v) => v.data switch{
         bool  b => new(!b),
+        char  c => new(-c),
         int   i => new(-i),
         float f => new(-f),
 
@@ -71,6 +80,7 @@ public sealed class Value : IEquatable<Value>, IComparable<Value>{
             catch (FormatException){
                 try{ return new(float.Parse(str, System.Globalization.CultureInfo.InvariantCulture)); }
                 catch (OverflowException){ return new((str.Trim()[0] == '-') ? float.MinValue : float.MaxValue); }
+                catch (FormatException){ return (str.Length == 1) ? new(str[0]) : throw new NotImplementedException("string is not implemented yet"); }
             }
         }
     }
@@ -78,6 +88,7 @@ public sealed class Value : IEquatable<Value>, IComparable<Value>{
     public object data{ get; private set; }
 
     public Value(bool data)  => this.data = data;
+    public Value(char data)  => this.data = data;
     public Value(int data)   => this.data = data;
     public Value(float data) => this.data = data;
 
@@ -98,13 +109,23 @@ public sealed class Value : IEquatable<Value>, IComparable<Value>{
 
     public bool to_bool() => data switch{
         bool  b => b,
+        char  c => Convert.ToBoolean((int)c),
         int   i => Convert.ToBoolean(i),
         float f => Convert.ToBoolean(f),
 
         _ => throw new UnreachableException()
     };
+    public char to_char() => data switch{
+        bool  b => (char)Convert.ToInt32(b),
+        char  c => c,
+        int   i => (char)i,
+        float f => (char)f,
+
+        _ => throw new UnreachableException()
+    };
     public int to_int() => data switch{
         bool  b => Convert.ToInt32(b),
+        char  c => (int)c,
         int   i => i,
         float f => (int)f,
 
@@ -112,6 +133,7 @@ public sealed class Value : IEquatable<Value>, IComparable<Value>{
     };
     public float to_float() => data switch{
         bool  b => Convert.ToSingle(b),
+        char  c => (float)c,
         int   i => (float)i,
         float f => f,
 
@@ -120,6 +142,7 @@ public sealed class Value : IEquatable<Value>, IComparable<Value>{
 
     public void add_eq(Value other) => data = data switch{
         bool  b => b || other.to_bool(),
+        char  c => (char)(c + other.to_char()),
         int   i => i + other.to_int(),
         float f => f + other.to_float(),
 
@@ -127,6 +150,7 @@ public sealed class Value : IEquatable<Value>, IComparable<Value>{
     };
     public void sub_eq(Value other) => data = data switch{
         bool  b => Convert.ToBoolean(Convert.ToInt32(b) - other.to_int()),
+        char  c => (char)(c - other.to_char()),
         int   i => i - other.to_int(),
         float f => f - other.to_float(),
 
@@ -134,6 +158,7 @@ public sealed class Value : IEquatable<Value>, IComparable<Value>{
     };
     public void mul_eq(Value other) => data = data switch{
         bool  b => b && other.to_bool(),
+        char  c => (char)(c * other.to_char()),
         int   i => i * other.to_int(),
         float f => f * other.to_float(),
 
@@ -141,6 +166,7 @@ public sealed class Value : IEquatable<Value>, IComparable<Value>{
     };
     public void div_eq(Value other) => data = data switch{
         bool  b => Convert.ToBoolean(Convert.ToInt32(b) / other.to_int()),
+        char  c => (char)(c / other.to_char()),
         int   i => i / other.to_int(),
         float f => f / other.to_float(),
 
@@ -148,6 +174,7 @@ public sealed class Value : IEquatable<Value>, IComparable<Value>{
     };
     public void mod_eq(Value other) => data = data switch{
         bool  b => Convert.ToBoolean(Convert.ToInt32(b) % other.to_int()),
+        char  c => (char)(c % other.to_char()),
         int   i => i % other.to_int(),
         float f => f % other.to_float(),
 
@@ -157,6 +184,7 @@ public sealed class Value : IEquatable<Value>, IComparable<Value>{
         float result = MathF.Pow(to_float(), other.to_float());
         data = data switch{
             bool  => Convert.ToBoolean(result),
+            char  => (char)result,
             int   => (int)result,
             float => result,
 

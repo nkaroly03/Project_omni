@@ -33,6 +33,10 @@ public static class Interpreter{
                 case Compiler.Op_code.PUSH_TRUE:
                     stack.Add(new(true));
                     break;
+                case Compiler.Op_code.PUSH_CHAR:
+                    stack.Add(new(BitConverter.ToChar(bytecode[pc..][..sizeof(char)])));
+                    pc += sizeof(char);
+                    break;
                 case Compiler.Op_code.PUSH_INT:
                     stack.Add(new(BitConverter.ToInt32(bytecode[pc..][..sizeof(int)])));
                     pc += sizeof(int);
@@ -54,6 +58,7 @@ public static class Interpreter{
                     int value_idx = stack.Count + BitConverter.ToInt32(bytecode[pc..][..sizeof(int)]);
                     stack[value_idx] = stack[value_idx].data switch{
                         bool  => new(stack[^1].to_bool()),
+                        char  => new(stack[^1].to_char()),
                         int   => new(stack[^1].to_int()),
                         float => new(stack[^1].to_float()),
 
@@ -99,6 +104,7 @@ public static class Interpreter{
                     break;
 
                 case Compiler.Op_code.TO_BOOL:  stack[^1] = new(stack[^1].to_bool());  break;
+                case Compiler.Op_code.TO_CHAR:  stack[^1] = new(stack[^1].to_char());  break;
                 case Compiler.Op_code.TO_INT:   stack[^1] = new(stack[^1].to_int());   break;
                 case Compiler.Op_code.TO_FLOAT: stack[^1] = new(stack[^1].to_float()); break;
 

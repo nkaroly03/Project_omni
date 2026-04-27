@@ -163,7 +163,7 @@ public static class Parser{
                         throw new Syntax_error_exception($"On line <{tok.line_number}> <{tok.id}> must be followed by <:>");
                     self.Pop();
 
-                    if (self.Count == 0 || ((tok = self.Peek()).type != Token.Type.BOOL && tok.type != Token.Type.INT && tok.type != Token.Type.FLOAT))
+                    if (self.Count == 0 || ((tok = self.Peek()).type != Token.Type.BOOL && tok.type != Token.Type.CHAR && tok.type != Token.Type.INT && tok.type != Token.Type.FLOAT))
                         throw new Syntax_error_exception($"On line <{tok.line_number}> <:> must be followed by a valid type");
 
                     node1.m_sub_nodes.Add(new(){token = self.Pop()});

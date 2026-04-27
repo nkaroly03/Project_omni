@@ -9,6 +9,7 @@ public readonly record struct Token{
         ARGC,
         FALSE,
         TRUE,
+        CHAR_LIT,
         INT_LIT,
         FLOAT_LIT,
         STR_LIT,
@@ -47,6 +48,7 @@ public readonly record struct Token{
         LET_DECL,
 
         BOOL,
+        CHAR,
         INT,
         FLOAT,
 
@@ -113,9 +115,10 @@ public static class Lexer{
             Regex.Split(
                 file_lines,
                 "(" +
-                    @"/\*/(?:\r\n|\r|\n|.)*?/\*/|(?://.*)?(?:\r\n|\r|\n)|""(?:[^""\\]|\\.)*?""|" +
+                    @"/\*/(?:\r\n|\r|\n|.)*?/\*/|(?://.*)?(?:\r\n|\r|\n)|""(?:[^""\\]|\\.)*?""|'(?:[^'\\]|\\.)*?'|" +
                     @"\.\.|\*\*|[:;(){}+*/%&|^~-]|<<|>>|!=|[<>=]=?|" +
-                    @"\bargc\b|\bfalse\b|\btrue\b|\band\b|\bor\b|\bnot\b|\blet\b|\bbool\b|\bint\b|\bfloat\b|\bprint\b|\bscan\b|\bargv\b|\bif\b|\belse\b|\bwhile\b|\bfor\b|\breturn\b" +
+                    @"\bargc\b|\bfalse\b|\btrue\b|\band\b|\bor\b|\bnot\b|\blet\b|" +
+                    @"\bbool\b|\bchar\b|\bint\b|\bfloat\b|\bprint\b|\bscan\b|\bargv\b|\bif\b|\belse\b|\bwhile\b|\bfor\b|\breturn\b" +
                 ")"
             ).Select((s) => s.Trim(' ')).Where((s) => s.Length > 0).ToArray()
         ){
@@ -162,6 +165,7 @@ public static class Lexer{
                     "let"    => Token.Type.LET_DECL,
 
                     "bool"   => Token.Type.BOOL,
+                    "char"   => Token.Type.CHAR,
                     "int"    => Token.Type.INT,
                     "float"  => Token.Type.FLOAT,
 
@@ -191,8 +195,14 @@ public static class Lexer{
                         }
                         else if (line.Count((c) => c == '.') == 1 && line[0] != '.' && line.All((c) => char.IsDigit(c) || c == '.'))
                             return Token.Type.FLOAT_LIT;
+                        else if (line[0] == '\''){
+                            token_id = line[1..^1];
+                            if (Regex.Unescape(token_id).Length != 1)
+                                throw new Syntax_error_exception($"On line <{line_idx + 1}> found invalid char literal");
+                            return Token.Type.CHAR_LIT;
+                        }
                         else if (line[0] == '"'){
-                            token_id = line[1..(line.Length - 1)];
+                            token_id = line[1..^1];
                             return Token.Type.STR_LIT;
                         }
                         else if (!char.IsDigit(line[0]) && line.All((c) => char.IsAsciiLetter(c) || char.IsDigit(c) || c == '_'))
@@ -202,7 +212,7 @@ public static class Lexer{
                     }))(),
                 };
                 if (tokens.Count > 0 && tokens[^1].type == Token.Type.STR_LIT && token_type == Token.Type.STR_LIT)
-                    tokens[^1] = tokens[^1] with{id = tokens[^1].id + line[1..(line.Length - 1)]};
+                    tokens[^1] = tokens[^1] with{id = tokens[^1].id + line[1..^1]};
                 else
                     tokens.Add(new(){type = token_type, id = token_id, line_number = line_idx + 1});
             }

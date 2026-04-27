@@ -10,7 +10,8 @@ public static class Compiler{
         int count_instructions() => self.ToString().Split(Environment.NewLine).Length;
     }
     extension(string self){
-        string get_string_literal() => System.Text.RegularExpressions.Regex.Unescape(self[1..(self.Length - 1)]);
+        char get_char_literal() => System.Text.RegularExpressions.Regex.Unescape(self[1..^1])[0];
+        string get_string_literal() => System.Text.RegularExpressions.Regex.Unescape(self[1..^1]);
     }
 
     public enum Op_code : byte{
@@ -18,6 +19,7 @@ public static class Compiler{
         PUSH_ARGC,
         PUSH_FALSE,
         PUSH_TRUE,
+        PUSH_CHAR,
         PUSH_INT,
         PUSH_FLOAT,
 
@@ -38,6 +40,7 @@ public static class Compiler{
         GET_ARGV,
 
         TO_BOOL,
+        TO_CHAR,
         TO_INT,
         TO_FLOAT,
 
@@ -85,10 +88,11 @@ public static class Compiler{
                     break;
 
                 case Token.Type.FALSE:
-                    sb.add_instruction($"{++stack_size} ; PUSH FALSE");
-                    break;
                 case Token.Type.TRUE:
-                    sb.add_instruction($"{++stack_size} ; PUSH TRUE");
+                    sb.add_instruction($"{++stack_size} ; PUSH {current_AST_node.token.id.ToUpper()}");
+                    break;
+                case Token.Type.CHAR_LIT:
+                    sb.add_instruction($"{++stack_size} ; PUSH '{current_AST_node.token.id}'");
                     break;
                 case Token.Type.INT_LIT:
                 case Token.Type.FLOAT_LIT:
@@ -227,6 +231,7 @@ public static class Compiler{
                     break;
 
                 case Token.Type.BOOL:  sb.add_instruction($"{stack_size} ; TO_BOOL");  break;
+                case Token.Type.CHAR:  sb.add_instruction($"{stack_size} ; TO_CHAR");  break;
                 case Token.Type.INT:   sb.add_instruction($"{stack_size} ; TO_INT");   break;
                 case Token.Type.FLOAT: sb.add_instruction($"{stack_size} ; TO_FLOAT"); break;
 
@@ -345,7 +350,13 @@ public static class Compiler{
             switch (lhs){
                 case "PUSH":
                     if (rhs != "ARGC" && rhs != "FALSE" && rhs != "TRUE")
-                        instruction_byte_count += ((rhs.StartsWith("SP") || rhs.IndexOf('.') < 0) ? sizeof(int) : sizeof(float));
+                        instruction_byte_count += (
+                            (rhs.StartsWith('\''))
+                                ? sizeof(char)
+                                : (rhs.StartsWith("SP") || rhs.IndexOf('.') < 0)
+                                    ? sizeof(int)
+                                    : sizeof(float)
+                        );
                     break;
                 case "MOV":
                 case "JMP":
@@ -385,6 +396,11 @@ public static class Compiler{
                         bytecode.Add((byte)Op_code.PUSH_FALSE);
                     else if (rhs == "TRUE")
                         bytecode.Add((byte)Op_code.PUSH_TRUE);
+                    else if (rhs.StartsWith('\'')){
+                        as_bytes = BitConverter.GetBytes(rhs.get_char_literal());
+                        bytecode.Add((byte)Op_code.PUSH_CHAR);
+                        bytecode.AddRange(as_bytes);
+                    }
                     else if (rhs.IndexOf('.') < 0){
                         as_bytes = BitConverter.GetBytes(int.Parse(rhs));
                         bytecode.Add((byte)Op_code.PUSH_INT);
@@ -435,6 +451,7 @@ public static class Compiler{
 
                 case "GET_ARGV": bytecode.Add((byte)Op_code.GET_ARGV); break;
                 case "TO_BOOL":  bytecode.Add((byte)Op_code.TO_BOOL);  break;
+                case "TO_CHAR":   bytecode.Add((byte)Op_code.TO_CHAR);   break;
                 case "TO_INT":   bytecode.Add((byte)Op_code.TO_INT);   break;
                 case "TO_FLOAT": bytecode.Add((byte)Op_code.TO_FLOAT); break;
                 case "CMP_EQ":   bytecode.Add((byte)Op_code.CMP_EQ);   break;
