@@ -5,6 +5,11 @@
     <ProjectReference Include="..\Parse\Parse.csproj" />
     <ProjectReference Include="..\Interpret\Interpret.csproj" />
     <ProjectReference Include="..\Compile\Compile.csproj" />
+    <Compile Include="..\Database\DatabaseManager.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.7" />
   </ItemGroup>
 
   <PropertyGroup>

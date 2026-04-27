@@ -1,38 +1,36 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\giganibba840\\Desktop\\C#\\Project_omni\\Interpret\\Interpret.csproj": {}
+    "/Applications/Egyetem/C#/bytecode_interpreter/Project_omni/Interpret/Interpret.csproj": {}
   },
   "projects": {
-    "C:\\Users\\giganibba840\\Desktop\\C#\\Project_omni\\Compile\\Compile.csproj": {
+    "/Applications/Egyetem/C#/bytecode_interpreter/Project_omni/Compile/Compile.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\giganibba840\\Desktop\\C#\\Project_omni\\Compile\\Compile.csproj",
+        "projectUniqueName": "/Applications/Egyetem/C#/bytecode_interpreter/Project_omni/Compile/Compile.csproj",
         "projectName": "Compile",
-        "projectPath": "C:\\Users\\giganibba840\\Desktop\\C#\\Project_omni\\Compile\\Compile.csproj",
-        "packagesPath": "C:\\Users\\giganibba840\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\giganibba840\\Desktop\\C#\\Project_omni\\Compile\\obj\\",
+        "projectPath": "/Applications/Egyetem/C#/bytecode_interpreter/Project_omni/Compile/Compile.csproj",
+        "packagesPath": "/Users/tomasoczkibence/.nuget/packages/",
+        "outputPath": "/Applications/Egyetem/C#/bytecode_interpreter/Project_omni/Compile/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\giganibba840\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "/Users/tomasoczkibence/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net10.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net10.0": {
             "targetAlias": "net10.0",
             "projectReferences": {
-              "C:\\Users\\giganibba840\\Desktop\\C#\\Project_omni\\Lex\\Lex.csproj": {
-                "projectPath": "C:\\Users\\giganibba840\\Desktop\\C#\\Project_omni\\Lex\\Lex.csproj"
+              "/Applications/Egyetem/C#/bytecode_interpreter/Project_omni/Lex/Lex.csproj": {
+                "projectPath": "/Applications/Egyetem/C#/bytecode_interpreter/Project_omni/Lex/Lex.csproj"
               },
-              "C:\\Users\\giganibba840\\Desktop\\C#\\Project_omni\\Parse\\Parse.csproj": {
-                "projectPath": "C:\\Users\\giganibba840\\Desktop\\C#\\Project_omni\\Parse\\Parse.csproj"
+              "/Applications/Egyetem/C#/bytecode_interpreter/Project_omni/Parse/Parse.csproj": {
+                "projectPath": "/Applications/Egyetem/C#/bytecode_interpreter/Project_omni/Parse/Parse.csproj"
               }
             }
           }
@@ -68,7 +66,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.103/PortableRuntimeIdentifierGraph.json",
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/10.0.103/PortableRuntimeIdentifierGraph.json",
           "packagesToPrune": {
             "Microsoft.CSharp": "(,4.7.32767]",
             "Microsoft.VisualBasic": "(,10.4.32767]",
@@ -346,32 +344,30 @@
         }
       }
     },
-    "C:\\Users\\giganibba840\\Desktop\\C#\\Project_omni\\Interpret\\Interpret.csproj": {
+    "/Applications/Egyetem/C#/bytecode_interpreter/Project_omni/Interpret/Interpret.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\giganibba840\\Desktop\\C#\\Project_omni\\Interpret\\Interpret.csproj",
+        "projectUniqueName": "/Applications/Egyetem/C#/bytecode_interpreter/Project_omni/Interpret/Interpret.csproj",
         "projectName": "Interpret",
-        "projectPath": "C:\\Users\\giganibba840\\Desktop\\C#\\Project_omni\\Interpret\\Interpret.csproj",
-        "packagesPath": "C:\\Users\\giganibba840\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\giganibba840\\Desktop\\C#\\Project_omni\\Interpret\\obj\\",
+        "projectPath": "/Applications/Egyetem/C#/bytecode_interpreter/Project_omni/Interpret/Interpret.csproj",
+        "packagesPath": "/Users/tomasoczkibence/.nuget/packages/",
+        "outputPath": "/Applications/Egyetem/C#/bytecode_interpreter/Project_omni/Interpret/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\giganibba840\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "/Users/tomasoczkibence/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net10.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net10.0": {
             "targetAlias": "net10.0",
             "projectReferences": {
-              "C:\\Users\\giganibba840\\Desktop\\C#\\Project_omni\\Compile\\Compile.csproj": {
-                "projectPath": "C:\\Users\\giganibba840\\Desktop\\C#\\Project_omni\\Compile\\Compile.csproj"
+              "/Applications/Egyetem/C#/bytecode_interpreter/Project_omni/Compile/Compile.csproj": {
+                "projectPath": "/Applications/Egyetem/C#/bytecode_interpreter/Project_omni/Compile/Compile.csproj"
               }
             }
           }
@@ -407,7 +403,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.103/PortableRuntimeIdentifierGraph.json",
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/10.0.103/PortableRuntimeIdentifierGraph.json",
           "packagesToPrune": {
             "Microsoft.CSharp": "(,4.7.32767]",
             "Microsoft.VisualBasic": "(,10.4.32767]",
@@ -685,24 +681,22 @@
         }
       }
     },
-    "C:\\Users\\giganibba840\\Desktop\\C#\\Project_omni\\Lex\\Lex.csproj": {
+    "/Applications/Egyetem/C#/bytecode_interpreter/Project_omni/Lex/Lex.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\giganibba840\\Desktop\\C#\\Project_omni\\Lex\\Lex.csproj",
+        "projectUniqueName": "/Applications/Egyetem/C#/bytecode_interpreter/Project_omni/Lex/Lex.csproj",
         "projectName": "Lex",
-        "projectPath": "C:\\Users\\giganibba840\\Desktop\\C#\\Project_omni\\Lex\\Lex.csproj",
-        "packagesPath": "C:\\Users\\giganibba840\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\giganibba840\\Desktop\\C#\\Project_omni\\Lex\\obj\\",
+        "projectPath": "/Applications/Egyetem/C#/bytecode_interpreter/Project_omni/Lex/Lex.csproj",
+        "packagesPath": "/Users/tomasoczkibence/.nuget/packages/",
+        "outputPath": "/Applications/Egyetem/C#/bytecode_interpreter/Project_omni/Lex/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\giganibba840\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "/Users/tomasoczkibence/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net10.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -742,7 +736,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.103/PortableRuntimeIdentifierGraph.json",
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/10.0.103/PortableRuntimeIdentifierGraph.json",
           "packagesToPrune": {
             "Microsoft.CSharp": "(,4.7.32767]",
             "Microsoft.VisualBasic": "(,10.4.32767]",
@@ -1020,32 +1014,30 @@
         }
       }
     },
-    "C:\\Users\\giganibba840\\Desktop\\C#\\Project_omni\\Parse\\Parse.csproj": {
+    "/Applications/Egyetem/C#/bytecode_interpreter/Project_omni/Parse/Parse.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\giganibba840\\Desktop\\C#\\Project_omni\\Parse\\Parse.csproj",
+        "projectUniqueName": "/Applications/Egyetem/C#/bytecode_interpreter/Project_omni/Parse/Parse.csproj",
         "projectName": "Parse",
-        "projectPath": "C:\\Users\\giganibba840\\Desktop\\C#\\Project_omni\\Parse\\Parse.csproj",
-        "packagesPath": "C:\\Users\\giganibba840\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\giganibba840\\Desktop\\C#\\Project_omni\\Parse\\obj\\",
+        "projectPath": "/Applications/Egyetem/C#/bytecode_interpreter/Project_omni/Parse/Parse.csproj",
+        "packagesPath": "/Users/tomasoczkibence/.nuget/packages/",
+        "outputPath": "/Applications/Egyetem/C#/bytecode_interpreter/Project_omni/Parse/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\giganibba840\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "/Users/tomasoczkibence/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net10.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net10.0": {
             "targetAlias": "net10.0",
             "projectReferences": {
-              "C:\\Users\\giganibba840\\Desktop\\C#\\Project_omni\\Lex\\Lex.csproj": {
-                "projectPath": "C:\\Users\\giganibba840\\Desktop\\C#\\Project_omni\\Lex\\Lex.csproj"
+              "/Applications/Egyetem/C#/bytecode_interpreter/Project_omni/Lex/Lex.csproj": {
+                "projectPath": "/Applications/Egyetem/C#/bytecode_interpreter/Project_omni/Lex/Lex.csproj"
               }
             }
           }
@@ -1081,7 +1073,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.103/PortableRuntimeIdentifierGraph.json",
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/10.0.103/PortableRuntimeIdentifierGraph.json",
           "packagesToPrune": {
             "Microsoft.CSharp": "(,4.7.32767]",
             "Microsoft.VisualBasic": "(,10.4.32767]",
