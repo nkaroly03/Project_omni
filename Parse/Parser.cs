@@ -60,7 +60,7 @@ public static class Parser{
             Token tok = self.Pop();
             if (tok.type.is_atom())
                 lhs.token = tok;
-            else if (tok.type == Token.Type.SCAN || tok.type == Token.Type.SCAN_STR || tok.type == Token.Type.ARGV){
+            else if (tok.type == Token.Type.SCAN || tok.type == Token.Type.ARGV){
                 lhs.token = tok;
 
                 if (self.Count == 0 || (tok = self.Pop()).type != Token.Type.LPAREN)

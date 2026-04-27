@@ -83,18 +83,6 @@ public sealed class Value : IEquatable<Value>, IComparable<Value>{
     public static bool operator> (Value v1, Value v2) =>  v1.CompareTo(v2) >  0;
     public static bool operator>=(Value v1, Value v2) =>  v1.CompareTo(v2) >= 0;
 
-    public static Value from_str(string str){
-        try{ return new(bool.Parse(str)); }
-        catch (FormatException){
-            try{ return new(int.Parse(str)); }
-            catch (OverflowException){ return new((str.Trim()[0] == '-') ? int.MinValue : int.MaxValue); }
-            catch (FormatException){
-                try{ return new(float.Parse(str, System.Globalization.CultureInfo.InvariantCulture)); }
-                catch (OverflowException){ return new((str.Trim()[0] == '-') ? float.MinValue : float.MaxValue); }
-            }
-        }
-    }
-
     public object data{ get; private set; }
 
     public Value(bool data)          => this.data = data;
@@ -104,74 +92,86 @@ public sealed class Value : IEquatable<Value>, IComparable<Value>{
     public Value(StringBuilder data) => this.data = data;
 
     public Value(Value other) => data = other.data switch{
-        bool or char or int or float => other.data,
-        StringBuilder sb             => new StringBuilder(sb.ToString()),
+        bool or char or int or float    => other.data,
+        StringBuilder                sb => new StringBuilder(sb.ToString()),
 
         _ => throw new UnreachableException(),
     };
 
-    public override string ToString() => data.ToString()!;
     public override bool Equals(object? obj) => Equals(obj as Value);
     public override int GetHashCode() => data.GetHashCode();
+    public override string ToString() => data.ToString()!;
 
-    public bool Equals(Value? other) => (other is not null)
-        ? (
-            (data is StringBuilder || other.data is StringBuilder)
-                ? (
-                    (data is StringBuilder sb1 && other.data is StringBuilder sb2)
-                        ? sb1.ToString().Equals(sb2.ToString())
-                        : throw new ArgumentOutOfRangeException("Trying to compare a string to a non string")
-                )
-                : ((data is float || other.data is float) ? to_float().Equals(other.to_float()) : to_int().Equals(other.to_int()))
-        )
-        : false
-    ;
-    public int CompareTo(Value? other) => (other is not null)
-        ? (
-            (data is StringBuilder || other.data is StringBuilder)
-                ? (
-                    (data is StringBuilder sb1 && other.data is StringBuilder sb2)
-                        ? sb1.ToString().CompareTo(sb2.ToString())
-                        : throw new ArgumentOutOfRangeException("Trying to compare a string to a non string")
-                )
-                : ((data is float || other.data is float) ? to_float().CompareTo(other.to_float()) : to_int().CompareTo(other.to_int()))
-        )
-        : 1
-    ;
+    public bool Equals(Value? other){
+        if (other is null)
+            return false;
+
+        if (data is StringBuilder || other.data is StringBuilder){
+            if (data is StringBuilder sb1 && other.data is StringBuilder sb2)
+                return sb1.ToString().Equals(sb2.ToString());
+            throw new ArgumentOutOfRangeException("Trying to compare a string to a non string");
+        }
+
+        return (data is float || other.data is float) ? to_float().Equals(other.to_float()) : to_int().Equals(other.to_int());
+    }
+    public int CompareTo(Value? other){
+        if (other is null)
+            return 1;
+
+        if (data is StringBuilder || other.data is StringBuilder){
+            if (data is StringBuilder sb1 && other.data is StringBuilder sb2)
+                return sb1.ToString().CompareTo(sb2.ToString());
+            throw new ArgumentOutOfRangeException("Trying to compare a string to a non string");
+        }
+
+        return (data is float || other.data is float) ? to_float().CompareTo(other.to_float()) : to_int().CompareTo(other.to_int());
+    }
 
     public bool to_bool() => data switch{
-        bool  b => b,
-        char  c => Convert.ToBoolean((int)c),
-        int   i => Convert.ToBoolean(i),
-        float f => Convert.ToBoolean(f),
+        bool           b => b,
+        char           c => Convert.ToBoolean((int)c),
+        int            i => Convert.ToBoolean(i),
+        float          f => Convert.ToBoolean(f),
+        StringBuilder sb => bool.Parse(sb.ToString()),
 
-        _ => throw new ArgumentOutOfRangeException("Trying to convert a string to bool"),
+        _ => throw new UnreachableException(),
     };
     public char to_char() => data switch{
-        bool  b => (char)Convert.ToInt32(b),
-        char  c => c,
-        int   i => (char)i,
-        float f => (char)f,
+        bool           b => (char)Convert.ToInt32(b),
+        char           c => c,
+        int            i => (char)i,
+        float          f => (char)f,
+        StringBuilder sb => char.Parse(sb.ToString()),
 
-        _ => throw new ArgumentOutOfRangeException("Trying to convert a string to char"),
+        _ => throw new UnreachableException(),
     };
     public int to_int() => data switch{
-        bool  b => Convert.ToInt32(b),
-        char  c => (int)c,
-        int   i => i,
-        float f => (int)f,
+        bool           b => Convert.ToInt32(b),
+        char           c => (int)c,
+        int            i => i,
+        float          f => (int)f,
+        StringBuilder sb => int.Parse(sb.ToString()),
 
-        _ => throw new ArgumentOutOfRangeException("Trying to convert a string to int"),
+        _ => throw new UnreachableException(),
     };
     public float to_float() => data switch{
-        bool  b => Convert.ToSingle(b),
-        char  c => (float)c,
-        int   i => (float)i,
-        float f => f,
+        bool           b => Convert.ToSingle(b),
+        char           c => (float)c,
+        int            i => (float)i,
+        float          f => f,
+        StringBuilder sb => float.Parse(sb.ToString()),
 
-        _ => throw new ArgumentOutOfRangeException("Trying to convert a string to float"),
+        _ => throw new UnreachableException(),
     };
-    public StringBuilder to_string() => (data is StringBuilder sb) ? new(sb.ToString()) : throw new ArgumentOutOfRangeException("Trying to convert a non string into a string");
+    public StringBuilder to_string() => data switch{
+        bool           b => new( b.ToString()),
+        char           c => new( c.ToString()),
+        int            i => new( i.ToString()),
+        float          f => new( f.ToString()),
+        StringBuilder sb => new(sb.ToString()),
+
+        _ => throw new UnreachableException(),
+    };
 
     public void add_eq(Value other){
         if (data is not StringBuilder && other.data is StringBuilder)

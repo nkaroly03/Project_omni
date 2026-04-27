@@ -92,10 +92,6 @@ public static class Interpreter{
 
                 case Compiler.Op_code.SCAN:
                     Console.Write(stack[^1]);
-                    stack[^1] = Value.from_str(Console.ReadLine()!);
-                    break;
-                case Compiler.Op_code.SCAN_STR:
-                    Console.Write(stack[^1]);
                     stack[^1] = new(new StringBuilder(Console.ReadLine()!));
                     break;
                 

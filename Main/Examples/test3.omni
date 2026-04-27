@@ -1,5 +1,5 @@
 /*/
-    // forloop
+    // for loop
     for (0..10) |i|{
         print("i: ");
         print(i);
@@ -8,7 +8,7 @@
 
     print("------------------------------------------------\n");
 
-    // forloop transformed into while loop
+    // for loop transformed into while loop
     {
         let i: int = 0;
         while (i < 10){
@@ -22,9 +22,14 @@
     }
 /*/
 
-let temp: str = "Hello";
-let s: str = scan_str((temp = temp + " input: ")) + 'o';
+let s: str = "";
 
-print("s: " + s + '\n');
+let int_cast: int = 0;
+for ('\x20'..(int_cast = "128")) |i|{
+    let char_cast: char = i;
+    s = s + char_cast;
+}
+
+print(s + '\n');
 
 print("\n---test success---\n");

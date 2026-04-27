@@ -31,4 +31,4 @@ Directory.CreateDirectory(out_dir_name);
 File.WriteAllLines($"{out_dir_name}/{file_name}.ir", [$"src: {Path.GetFullPath(argv[1])}{Environment.NewLine}", IR]);
 File.WriteAllBytes($"{out_dir_name}/{file_name}.bc", bytecode);
 
-Console.WriteLine($"return value: {Interpreter.run(bytecode, argv[2..].Select((s) => Value.from_str(s)).ToArray().AsSpan())}");
+Console.WriteLine($"return value: {Interpreter.run(bytecode, argv[2..].Select((s) => new Value(new System.Text.StringBuilder(s))).ToArray().AsSpan())}");

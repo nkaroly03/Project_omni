@@ -35,7 +35,6 @@ public static class Compiler{
 
         PRINT,
         SCAN,
-        SCAN_STR,
 
         GET_ARGV,
 
@@ -245,9 +244,8 @@ public static class Compiler{
                     sb.add_instruction($"{--stack_size} ; PRINT");
                     break;
                 case Token.Type.SCAN:
-                case Token.Type.SCAN_STR:
                     to_IR(current_AST_node.sub_nodes[0], null, sb, ref let_decl_counter, true);
-                    sb.add_instruction($"{stack_size} ; {current_AST_node.token.id.ToUpper()}");
+                    sb.add_instruction($"{stack_size} ; SCAN");
                     break;
 
                 case Token.Type.ARGV:
@@ -441,7 +439,6 @@ public static class Compiler{
 
                 case "PRINT":    bytecode.Add((byte)Op_code.PRINT);    break;
                 case "SCAN":     bytecode.Add((byte)Op_code.SCAN);     break;
-                case "SCAN_STR": bytecode.Add((byte)Op_code.SCAN_STR); break;
                 case "GET_ARGV": bytecode.Add((byte)Op_code.GET_ARGV); break;
                 case "TO_BOOL":  bytecode.Add((byte)Op_code.TO_BOOL);  break;
                 case "TO_CHAR":  bytecode.Add((byte)Op_code.TO_CHAR);  break;

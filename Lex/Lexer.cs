@@ -55,7 +55,6 @@ public readonly record struct Token{
 
         PRINT,
         SCAN,
-        SCAN_STR,
 
         ARGV,
 
@@ -120,7 +119,7 @@ public static class Lexer{
                     @"/\*/(?:\r\n|\r|\n|.)*?/\*/|(?://.*)?(?:\r\n|\r|\n)|""(?:[^""\\]|\\.)*?""|'(?:[^'\\]|\\.)*?'|" +
                     @"\.\.|\*\*|[:;(){}+*/%&|^~-]|<<|>>|!=|[<>=]=?|" +
                     @"\bargc\b|\bfalse\b|\btrue\b|\band\b|\bor\b|\bnot\b|\blet\b|" +
-                    @"\bbool\b|\bchar\b|\bint\b|\bfloat\b|\bstr\b|\bprint\b|\bscan\b|\bscan_str\b|\bargv\b|\bif\b|\belse\b|\bwhile\b|\bfor\b|\breturn\b" +
+                    @"\bbool\b|\bchar\b|\bint\b|\bfloat\b|\bstr\b|\bprint\b|\bscan\b|\bargv\b|\bif\b|\belse\b|\bwhile\b|\bfor\b|\breturn\b" +
                 ")"
             ).Select((s) => s.Trim(' ')).Where((s) => s.Length > 0).ToArray()
         ){
@@ -129,62 +128,61 @@ public static class Lexer{
                 string token_id = line;
 
                 Token.Type token_type = line switch{
-                    "argc"     => Token.Type.ARGC,
-                    "false"    => Token.Type.FALSE,
-                    "true"     => Token.Type.TRUE,
+                    "argc"   => Token.Type.ARGC,
+                    "false"  => Token.Type.FALSE,
+                    "true"   => Token.Type.TRUE,
 
-                    ":"        => Token.Type.COLON,
-                    ";"        => Token.Type.SEMICOLON,
-                    ".."       => Token.Type.DOT2,
-                    "("        => Token.Type.LPAREN,
-                    ")"        => Token.Type.RPAREN,
-                    "{"        => Token.Type.LBRACE,
-                    "}"        => Token.Type.RBRACE,
+                    ":"      => Token.Type.COLON,
+                    ";"      => Token.Type.SEMICOLON,
+                    ".."     => Token.Type.DOT2,
+                    "("      => Token.Type.LPAREN,
+                    ")"      => Token.Type.RPAREN,
+                    "{"      => Token.Type.LBRACE,
+                    "}"      => Token.Type.RBRACE,
 
-                    "=="       => Token.Type.EQUALS,
-                    "!="       => Token.Type.NOT_EQUALS,
-                    "<"        => Token.Type.LESS_THAN,
-                    "<="       => Token.Type.LESS_THAN_EQ,
-                    ">"        => Token.Type.GREATER_THAN,
-                    ">="       => Token.Type.GREATER_THAN_EQ,
-                    "+"        => Token.Type.PLUS,
-                    "-"        => Token.Type.MINUS,
-                    "*"        => Token.Type.ASTERISK1,
-                    "**"       => Token.Type.ASTERISK2,
-                    "/"        => Token.Type.SLASH,
-                    "%"        => Token.Type.PERCENT,
-                    "<<"       => Token.Type.SHIFT_LEFT,
-                    ">>"       => Token.Type.SHIFT_RIGHT,
-                    "&"        => Token.Type.AMPERSAND,
-                    "|"        => Token.Type.PIPE,
-                    "^"        => Token.Type.CARET,
-                    "~"        => Token.Type.TILDE,
-                    "and"      => Token.Type.AND,
-                    "or"       => Token.Type.OR,
-                    "not"      => Token.Type.NOT,
-                    "="        => Token.Type.EQ,
+                    "=="     => Token.Type.EQUALS,
+                    "!="     => Token.Type.NOT_EQUALS,
+                    "<"      => Token.Type.LESS_THAN,
+                    "<="     => Token.Type.LESS_THAN_EQ,
+                    ">"      => Token.Type.GREATER_THAN,
+                    ">="     => Token.Type.GREATER_THAN_EQ,
+                    "+"      => Token.Type.PLUS,
+                    "-"      => Token.Type.MINUS,
+                    "*"      => Token.Type.ASTERISK1,
+                    "**"     => Token.Type.ASTERISK2,
+                    "/"      => Token.Type.SLASH,
+                    "%"      => Token.Type.PERCENT,
+                    "<<"     => Token.Type.SHIFT_LEFT,
+                    ">>"     => Token.Type.SHIFT_RIGHT,
+                    "&"      => Token.Type.AMPERSAND,
+                    "|"      => Token.Type.PIPE,
+                    "^"      => Token.Type.CARET,
+                    "~"      => Token.Type.TILDE,
+                    "and"    => Token.Type.AND,
+                    "or"     => Token.Type.OR,
+                    "not"    => Token.Type.NOT,
+                    "="      => Token.Type.EQ,
 
-                    "let"      => Token.Type.LET_DECL,
+                    "let"    => Token.Type.LET_DECL,
 
-                    "bool"     => Token.Type.BOOL,
-                    "char"     => Token.Type.CHAR,
-                    "int"      => Token.Type.INT,
-                    "float"    => Token.Type.FLOAT,
-                    "str"      => Token.Type.STR,
+                    "bool"   => Token.Type.BOOL,
+                    "char"   => Token.Type.CHAR,
+                    "int"    => Token.Type.INT,
+                    "float"  => Token.Type.FLOAT,
+                    "str"    => Token.Type.STR,
 
-                    "print"    => Token.Type.PRINT,
-                    "scan"     => Token.Type.SCAN,
-                    "scan_str" => Token.Type.SCAN_STR,
+                    "print"  => Token.Type.PRINT,
+                    "scan"   => Token.Type.SCAN,
 
-                    "argv"     => Token.Type.ARGV,
+                    "argv"   => Token.Type.ARGV,
 
-                    "if"       => Token.Type.IF,
-                    "else"     => Token.Type.ELSE,
+                    "if"     => Token.Type.IF,
+                    "else"   => Token.Type.ELSE,
 
-                    "while"    => Token.Type.WHILE,
-                    "for"      => Token.Type.FOR,
+                    "while"  => Token.Type.WHILE,
+                    "for"    => Token.Type.FOR,
 
-                    "return"   => Token.Type.RETURN,
+                    "return" => Token.Type.RETURN,
 
                     _ => ((Func<Token.Type>)(() => {
                         if (line.All((c) => char.IsDigit(c)))
