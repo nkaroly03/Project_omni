@@ -22,14 +22,55 @@
     }
 /*/
 
-let s: str = "";
+// let s: str = "Hello";
+// 1 ; PUSH "Hello"
+// 1 ; TO_STR
 
-let int_cast: int = 0;
-for ('\x20'..(int_cast = "128")) |i|{
-    let char_cast: char = i;
-    s = s + char_cast;
-}
+// let c: char = s[0 + 2];
+// 2 ; PUSH SP[-1]
+// 3 ; PUSH 0
+// 4 ; PUSH 2
+// 3 ; ADD
+// 2 ; DEREF
+// 2 ; TO_CHAR
 
-print(s + '\n');
+// c = s[3];
+// 3 ; PUSH SP[-2]
+// 4 ; PUSH 3
+// 3 ; DEREF
+// 2 ; MOV SP[-2]
 
-print("\n---test success---\n");
+// s[3] = c;
+// 3 ; PUSH 3
+// 4 ; PUSH SP[-2]
+// 2 ; DEREF_TO SP[-4]
+
+// c = c = s[3];
+// 3 ; PUSH SP[-2]
+// 4 ; PUSH 3
+// 3 ; DEREF
+// 2 ; MOV SP[-2]
+// 3 ; PUSH SP[-1]
+// 2 ; MOV SP[-2]
+
+// s[3] = s[4] = c;
+// 3 ; PUSH 3
+// 4 ; PUSH 4
+// 5 ; PUSH SP[-3]
+// 3 ; DEREF_TO SP[-5]
+// 4 ; PUSH SP[-3]
+// 5 ; PUSH 4
+// 4 ; DEREF
+// 2 ; DEREF_TO SP[-4]
+
+// c = (s + "Test")[2];
+// 3 ; PUSH SP[-2]
+// 4 ; PUSH "Test"
+// 3 ; ADD
+// 4 ; PUSH 2
+// 3 ; DEREF
+// 2 ; MOV SP[-2]
+
+// print("c: " + c + '\n');
+
+// print("\n---test success---\n");

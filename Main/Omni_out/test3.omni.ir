@@ -1,38 +1,18 @@
 src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\test3.omni
 
-    1 ; PUSH ""
+    1 ; PUSH "Test"
     1 ; TO_STR
-    2 ; PUSH 0
-    2 ; TO_INT
-    3 ; PUSH '\x20'
-    3 ; TO_INT
-    4 ; PUSH SP[-1]
-    5 ; PUSH "128"
-    4 ; MOV SP[-4]
-    5 ; PUSH SP[-3]
-    4 ; CMP_LE
-    3 ; JMPZ 13
-    4 ; PUSH SP[-1]
-    4 ; TO_CHAR
-    5 ; PUSH SP[-4]
-    6 ; PUSH SP[-2]
-    5 ; ADD
-    4 ; MOV SP[-5]
-    3 ; POP
-    4 ; PUSH SP[-1]
-    5 ; PUSH 1
-    4 ; ADD
-    3 ; MOV SP[-2]
-    3 ; JMP -17
-    2 ; POP
+    2 ; PUSH "\n"
+    3 ; PUSH 10
+    2 ; MOV SP[-3]
     3 ; PUSH SP[-2]
-    4 ; PUSH '\n'
-    3 ; ADD
-    2 ; PRINT
-    3 ; PUSH "\n---test success---\n"
-    2 ; PRINT
-    3 ; PUSH 0
-    2 ; RET
-    1 ; POP
+    4 ; PUSH 0
+    3 ; DEREF
+    2 ; ADD
+    3 ; PUSH '\n'
+    2 ; ADD
+    1 ; PRINT
+    2 ; PUSH 0
+    1 ; RET
     0 ; POP
 

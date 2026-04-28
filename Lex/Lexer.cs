@@ -19,6 +19,8 @@ public readonly record struct Token{
         DOT2,
         LPAREN,
         RPAREN,
+        LBRACKET,
+        RBRACKET,
         LBRACE,
         RBRACE,
 
@@ -117,7 +119,7 @@ public static class Lexer{
                 file_lines,
                 "(" +
                     @"/\*/(?:\r\n|\r|\n|.)*?/\*/|(?://.*)?(?:\r\n|\r|\n)|""(?:[^""\\]|\\.)*?""|'(?:[^'\\]|\\.)*?'|" +
-                    @"\.\.|\*\*|[:;(){}+*/%&|^~-]|<<|>>|!=|[<>=]=?|" +
+                    @"\.\.|\*\*|[:;()\[\]{}+*/%&|^~-]|<<|>>|!=|[<>=]=?|" +
                     @"\bargc\b|\bfalse\b|\btrue\b|\band\b|\bor\b|\bnot\b|\blet\b|" +
                     @"\bbool\b|\bchar\b|\bint\b|\bfloat\b|\bstr\b|\bprint\b|\bscan\b|\bargv\b|\bif\b|\belse\b|\bwhile\b|\bfor\b|\breturn\b" +
                 ")"
@@ -137,6 +139,8 @@ public static class Lexer{
                     ".."     => Token.Type.DOT2,
                     "("      => Token.Type.LPAREN,
                     ")"      => Token.Type.RPAREN,
+                    "["      => Token.Type.LBRACKET,
+                    "]"      => Token.Type.RBRACKET,
                     "{"      => Token.Type.LBRACE,
                     "}"      => Token.Type.RBRACE,
 
@@ -198,15 +202,12 @@ public static class Lexer{
                         else if (line.Count((c) => c == '.') == 1 && line[0] != '.' && line.All((c) => char.IsDigit(c) || c == '.'))
                             return Token.Type.FLOAT_LIT;
                         else if (line[0] == '\''){
-                            token_id = line[1..^1];
-                            if (Regex.Unescape(token_id).Length != 1)
+                            if (Regex.Unescape(line[1..^1]).Length != 1)
                                 throw new Syntax_error_exception($"On line <{line_idx + 1}> found invalid char literal");
                             return Token.Type.CHAR_LIT;
                         }
-                        else if (line[0] == '"'){
-                            token_id = line[1..^1];
+                        else if (line[0] == '"')
                             return Token.Type.STR_LIT;
-                        }
                         else if (!char.IsDigit(line[0]) && line.All((c) => char.IsAsciiLetter(c) || char.IsDigit(c) || c == '_'))
                             return Token.Type.ID;
                         else

@@ -91,8 +91,15 @@ public static class Parser{
                 if (self.Count == 0)
                     throw new Syntax_error_exception($"On line <{tok.line_number}> no tokens are available");
                 Token op = self.Peek();
-                if (op.type == Token.Type.RPAREN || op.type == Token.Type.DOT2 || op.type == Token.Type.SEMICOLON || op.type == Token.Type.LBRACE)
+                if (op.type == Token.Type.SEMICOLON || op.type == Token.Type.DOT2 || op.type == Token.Type.RPAREN || op.type == Token.Type.RBRACKET || op.type == Token.Type.LBRACE)
                     break;
+                else if (op.type == Token.Type.LBRACKET){
+                    self.Pop();
+                    lhs = new(){token = op, m_sub_nodes = [lhs, self.parse_arithm_expr(0.0f)]};
+                    if ((op = self.Pop()).type != Token.Type.RBRACKET)
+                        throw new Syntax_error_exception($"On line <{op.line_number}> <[> must be closed by <]>");
+                    continue;
+                }
                 else if (!op.type.is_operation())
                     throw new Syntax_error_exception($"On line <{op.line_number}> found invalid token <{op.id}>");
 
@@ -116,7 +123,7 @@ public static class Parser{
 
             switch (tok.type){
                 case Token.Type.ID:
-                    if (self.Count == 0 || self.Peek().type != Token.Type.EQ)
+                    if (self.Count == 0 || (self.Peek().type != Token.Type.EQ && self.Peek().type != Token.Type.LBRACKET))
                         throw new Syntax_error_exception($"On line <{tok.line_number}> <{tok.id}> must be followed by <=>");
 
                     self.Push(tok);

@@ -74,7 +74,7 @@ public sealed class Value : IEquatable<Value>, IComparable<Value>{
     public static Value operator& (Value v1, Value v2) => barithm_op(new(v1), new(v2), (_v1, _v2) => _v1.band_eq(_v2));
     public static Value operator| (Value v1, Value v2) => barithm_op(new(v1), new(v2), (_v1, _v2) => _v1. bor_eq(_v2));
     public static Value operator^ (Value v1, Value v2) => barithm_op(new(v1), new(v2), (_v1, _v2) => _v1. xor_eq(_v2));
-    public static Value operator~ (Value v) => new((v.data is int) ? ~v.to_int() : throw new InvalidOperationException("Trying to use bitwise operations on non integer types"));
+    public static Value operator~ (Value v) => new((v.data is int) ? ~v.to_int() : throw new InvalidOperationException("Trying to use bitwise operations on non-integer types"));
 
     public static bool operator==(Value v1, Value v2) =>  v1.Equals(v2);
     public static bool operator!=(Value v1, Value v2) => !v1.Equals(v2);
@@ -98,6 +98,23 @@ public sealed class Value : IEquatable<Value>, IComparable<Value>{
         _ => throw new UnreachableException(),
     };
 
+    public Value this[int i]{
+        get => data switch{
+            StringBuilder sb => new(sb[i]),
+
+            _ => throw new ArgumentOutOfRangeException("Trying to use indexer on non-string"),
+        };
+        set{
+            switch (data){
+                case StringBuilder sb:
+                    sb[i] = value.to_char();
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException("Trying to use indexer on non-string");
+            }
+        }
+    }
+
     public override bool Equals(object? obj) => Equals(obj as Value);
     public override int GetHashCode() => data.GetHashCode();
     public override string ToString() => data.ToString()!;
@@ -109,7 +126,7 @@ public sealed class Value : IEquatable<Value>, IComparable<Value>{
         if (data is StringBuilder || other.data is StringBuilder){
             if (data is StringBuilder sb1 && other.data is StringBuilder sb2)
                 return sb1.ToString().Equals(sb2.ToString());
-            throw new ArgumentOutOfRangeException("Trying to compare a string to a non string");
+            throw new ArgumentOutOfRangeException("Trying to compare a string to a non-string");
         }
 
         return (data is float || other.data is float) ? to_float().Equals(other.to_float()) : to_int().Equals(other.to_int());
@@ -121,7 +138,7 @@ public sealed class Value : IEquatable<Value>, IComparable<Value>{
         if (data is StringBuilder || other.data is StringBuilder){
             if (data is StringBuilder sb1 && other.data is StringBuilder sb2)
                 return sb1.ToString().CompareTo(sb2.ToString());
-            throw new ArgumentOutOfRangeException("Trying to compare a string to a non string");
+            throw new ArgumentOutOfRangeException("Trying to compare a string to a non-string");
         }
 
         return (data is float || other.data is float) ? to_float().CompareTo(other.to_float()) : to_int().CompareTo(other.to_int());
@@ -175,7 +192,7 @@ public sealed class Value : IEquatable<Value>, IComparable<Value>{
 
     public void add_eq(Value other){
         if (data is not StringBuilder && other.data is StringBuilder)
-            throw new ArgumentOutOfRangeException("Trying to do addition on a non string with a string");
+            throw new ArgumentOutOfRangeException("Trying to do addition on a non-string with a string");
 
         data = data switch{
             bool           b => b || other.to_bool(),
@@ -241,31 +258,31 @@ public sealed class Value : IEquatable<Value>, IComparable<Value>{
 
     public void shl_eq(Value other){
         if (data is not int || other.data is not int)
-            throw new InvalidOperationException("Trying to use bitwise operations on non integer types");
+            throw new InvalidOperationException("Trying to use bitwise operations on non-integer types");
 
         data = to_int() << other.to_int();
     }
     public void shr_eq(Value other){
         if (data is not int || other.data is not int)
-            throw new InvalidOperationException("Trying to use bitwise operations on non integer types");
+            throw new InvalidOperationException("Trying to use bitwise operations on non-integer types");
 
         data = to_int() >> other.to_int();
     }
     public void band_eq(Value other){
         if (data is not int || other.data is not int)
-            throw new InvalidOperationException("Trying to use bitwise operations on non integer types");
+            throw new InvalidOperationException("Trying to use bitwise operations on non-integer types");
 
         data = to_int() & other.to_int();
     }
     public void bor_eq(Value other){
         if (data is not int || other.data is not int)
-            throw new InvalidOperationException("Trying to use bitwise operations on non integer types");
+            throw new InvalidOperationException("Trying to use bitwise operations on non-integer types");
 
         data = to_int() | other.to_int();
     }
     public void xor_eq(Value other){
         if (data is not int || other.data is not int)
-            throw new InvalidOperationException("Trying to use bitwise operations on non integer types");
+            throw new InvalidOperationException("Trying to use bitwise operations on non-integer types");
 
         data = to_int() ^ other.to_int();
     }

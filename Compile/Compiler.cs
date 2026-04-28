@@ -29,6 +29,7 @@ public static class Compiler{
         RET,
 
         MOV,
+        DEREF_MOV,
 
         JMP,
         JMPZ,
@@ -65,6 +66,8 @@ public static class Compiler{
         XOR,
         BNEG,
 
+        DEREF,
+
         // AND,
         // OR,
         NEG,
@@ -92,14 +95,14 @@ public static class Compiler{
                     sb.add_instruction($"{++stack_size} ; PUSH {current_AST_node.token.id.ToUpper()}");
                     break;
                 case Token.Type.CHAR_LIT:
-                    sb.add_instruction($"{++stack_size} ; PUSH '{current_AST_node.token.id}'");
+                    sb.add_instruction($"{++stack_size} ; PUSH {current_AST_node.token.id}");
                     break;
                 case Token.Type.INT_LIT:
                 case Token.Type.FLOAT_LIT:
                     sb.add_instruction($"{++stack_size} ; PUSH {current_AST_node.token.id}");
                     break;
                 case Token.Type.STR_LIT:
-                    sb.add_instruction($"{++stack_size} ; PUSH \"{current_AST_node.token.id}\"");
+                    sb.add_instruction($"{++stack_size} ; PUSH {current_AST_node.token.id}");
                     break;
 
                 case Token.Type.LBRACE:
@@ -132,6 +135,7 @@ public static class Compiler{
                 case Token.Type.AMPERSAND:
                 case Token.Type.PIPE:
                 case Token.Type.CARET:
+                case Token.Type.LBRACKET:
                 // case Token.Type.AND:
                 // case Token.Type.OR:
                     to_IR(current_AST_node.sub_nodes[0], null, sb, ref let_decl_counter, true);
@@ -152,6 +156,7 @@ public static class Compiler{
                         Token.Type.AMPERSAND       => "BAND",
                         Token.Type.PIPE            => "BOR",
                         Token.Type.CARET           => "XOR",
+                        Token.Type.LBRACKET        => "DEREF",
                         // Token.Type.AND             => "AND",
                         // Token.Type.OR              => "OR",
                         
@@ -211,16 +216,34 @@ public static class Compiler{
 
                 case Token.Type.EQ:
                     Token eq_tok = current_AST_node.sub_nodes[0].token;
-                    if (eq_tok.type != Token.Type.ID)
-                        throw new Syntax_error_exception($"On line <{eq_tok.line_number}> trying to assign to rvalue");
-                    if (!m_id_positions.ContainsKey(eq_tok.id))
-                        throw new Syntax_error_exception($"On line <{eq_tok.line_number}> use of undeclared identifier <{eq_tok.id}>");
-                    to_IR(current_AST_node.sub_nodes[1], null, sb, ref let_decl_counter, true);
-                    sb.add_instruction($"{stack_size - 1} ; MOV SP[-{stack_size - m_id_positions[eq_tok.id]}]");
-                    --stack_size;
-                    if (push_back_after_assignment){
-                        sb.add_instruction($"{stack_size + 1} ; PUSH SP[-{stack_size - m_id_positions[eq_tok.id]}]");
-                        ++stack_size;
+                    if (eq_tok.type != Token.Type.LBRACKET){
+                        if (eq_tok.type != Token.Type.ID)
+                            throw new Syntax_error_exception($"On line <{eq_tok.line_number}> trying to assign to rvalue");
+                        if (!m_id_positions.ContainsKey(eq_tok.id))
+                            throw new Syntax_error_exception($"On line <{eq_tok.line_number}> use of undeclared identifier <{eq_tok.id}>");
+                        to_IR(current_AST_node.sub_nodes[1], null, sb, ref let_decl_counter, true);
+                        sb.add_instruction($"{stack_size - 1} ; MOV SP[-{stack_size - m_id_positions[eq_tok.id]}]");
+                        --stack_size;
+                        if (push_back_after_assignment){
+                            to_IR(current_AST_node.sub_nodes[0], null, sb, ref let_decl_counter, true);
+                            // sb.add_instruction($"{stack_size + 1} ; PUSH SP[-{stack_size - m_id_positions[eq_tok.id]}]");
+                            // ++stack_size;
+                        }
+                    }
+                    else{
+                        eq_tok = current_AST_node.sub_nodes[0].sub_nodes[0].token;
+                        if (eq_tok.type != Token.Type.LBRACKET){
+                            to_IR(current_AST_node.sub_nodes[0].sub_nodes[1], null, sb, ref let_decl_counter, true);
+                            to_IR(current_AST_node.sub_nodes[1], null, sb, ref let_decl_counter, true);
+                            sb.add_instruction($"{stack_size - 2} ; DEREF_MOV SP[-{stack_size - m_id_positions[eq_tok.id]}]");
+                            stack_size -= 2;
+                            if (push_back_after_assignment)
+                                to_IR(current_AST_node.sub_nodes[0], null, sb, ref let_decl_counter, true);
+                        }
+                        else{
+                            // 2d array support for []str
+                            throw new NotImplementedException();
+                        }
                     }
                     break;
 
@@ -421,10 +444,16 @@ public static class Compiler{
                 case "RET": bytecode.Add((byte)Op_code.RET); break;
 
                 case "MOV":
-                    as_bytes = BitConverter.GetBytes(int.Parse(rhs[3..(rhs.Length - 1)]));
+                    as_bytes = BitConverter.GetBytes(int.Parse(rhs[3..^1]));
                     bytecode.Add((byte)Op_code.MOV);
                     bytecode.AddRange(as_bytes);
                     break;
+                case "DEREF_MOV":
+                    as_bytes = BitConverter.GetBytes(int.Parse(rhs[3..(rhs.Length - 1)]));
+                    bytecode.Add((byte)Op_code.DEREF_MOV);
+                    bytecode.AddRange(as_bytes);
+                    break;
+
                 case "JMP":
                 case "JMPZ":
                     int jmp_count = int.Parse(rhs);
@@ -463,6 +492,7 @@ public static class Compiler{
                 case "BOR":      bytecode.Add((byte)Op_code.BOR);      break;
                 case "XOR":      bytecode.Add((byte)Op_code.XOR);      break;
                 case "BNEG":     bytecode.Add((byte)Op_code.BNEG);     break;
+                case "DEREF":    bytecode.Add((byte)Op_code.DEREF);    break;
                 // case "AND":      bytecode.Add((byte)Op_code.AND);      break;
                 // case "OR":       bytecode.Add((byte)Op_code.OR);       break;
                 case "NEG":      bytecode.Add((byte)Op_code.NEG);      break;

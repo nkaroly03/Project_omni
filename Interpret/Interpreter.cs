@@ -61,8 +61,8 @@ public static class Interpreter{
                     break;
 
                 case Compiler.Op_code.MOV:
-                    int value_idx = stack.Count + BitConverter.ToInt32(bytecode[pc..][..sizeof(int)]);
-                    stack[value_idx] = stack[value_idx].data switch{
+                    int mov_value_idx = stack.Count + BitConverter.ToInt32(bytecode[pc..][..sizeof(int)]);
+                    stack[mov_value_idx] = stack[mov_value_idx].data switch{
                         bool          => new(stack[^1].to_bool()),
                         char          => new(stack[^1].to_char()),
                         int           => new(stack[^1].to_int()),
@@ -72,6 +72,14 @@ public static class Interpreter{
                         _ => throw new UnreachableException(),
                     };
                     pc += sizeof(int);
+                    stack.pop();
+                    break;
+                case Compiler.Op_code.DEREF_MOV:
+                    Value value_ref = stack[stack.Count + BitConverter.ToInt32(bytecode[pc..][..sizeof(int)])];
+                    pc += sizeof(int);
+                    // TODO: forced type cast
+                    value_ref[stack[^2].to_int()] = stack[^1];
+                    stack.pop();
                     stack.pop();
                     break;
 
@@ -112,16 +120,20 @@ public static class Interpreter{
                 case Compiler.Op_code.CMP_GE:  stack[^2] = new(stack[^2] >  stack.pop()); break;
                 case Compiler.Op_code.CMP_GEQ: stack[^2] = new(stack[^2] >= stack.pop()); break;
 
-                case Compiler.Op_code.ADD:  stack[^2]  += stack.pop(); break;
-                case Compiler.Op_code.SUB:  stack[^2]  -= stack.pop(); break;
-                case Compiler.Op_code.MUL:  stack[^2]  *= stack.pop(); break;
-                case Compiler.Op_code.DIV:  stack[^2]  /= stack.pop(); break;
-                case Compiler.Op_code.MOD:  stack[^2]  %= stack.pop(); break;
-                case Compiler.Op_code.SHL:  stack[^2] <<= stack.pop(); break;
-                case Compiler.Op_code.SHR:  stack[^2] >>= stack.pop(); break;
-                case Compiler.Op_code.BAND: stack[^2]  &= stack.pop(); break;
-                case Compiler.Op_code.BOR:  stack[^2]  |= stack.pop(); break;
-                case Compiler.Op_code.XOR:  stack[^2]  ^= stack.pop(); break;
+                case Compiler.Op_code.ADD:   stack[^2]  += stack.pop(); break;
+                case Compiler.Op_code.SUB:   stack[^2]  -= stack.pop(); break;
+                case Compiler.Op_code.MUL:   stack[^2]  *= stack.pop(); break;
+                case Compiler.Op_code.DIV:   stack[^2]  /= stack.pop(); break;
+                case Compiler.Op_code.MOD:   stack[^2]  %= stack.pop(); break;
+                case Compiler.Op_code.SHL:   stack[^2] <<= stack.pop(); break;
+                case Compiler.Op_code.SHR:   stack[^2] >>= stack.pop(); break;
+                case Compiler.Op_code.BAND:  stack[^2]  &= stack.pop(); break;
+                case Compiler.Op_code.BOR:   stack[^2]  |= stack.pop(); break;
+                case Compiler.Op_code.XOR:   stack[^2]  ^= stack.pop(); break;
+
+                case Compiler.Op_code.DEREF:
+                    stack[^2] = stack[^2][stack.pop().to_int()];
+                    break;
                                             
                 case Compiler.Op_code.POW:
                     stack[^2] = Value.pow(stack[^2], stack.pop());
