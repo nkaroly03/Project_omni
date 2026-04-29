@@ -15,7 +15,10 @@ public static class Interpreter{
         }
     }
 
-    public static Value run(ReadOnlySpan<byte> bytecode, ReadOnlySpan<Value> argv){
+    public static Value run(ReadOnlySpan<byte> bytecode, Value argv){
+        if (argv.data is not StringBuilder[])
+            throw new ArgumentOutOfRangeException("argv must contain an array of StringBuilders");
+
         List<Value> stack = new();
         
         for (int pc = 0; pc < bytecode.Length;){
@@ -25,7 +28,10 @@ public static class Interpreter{
                     pc += sizeof(int);
                     break;
                 case Compiler.Op_code.PUSH_ARGC:
-                    stack.Add(new(argv.Length));
+                    stack.Add(new(((StringBuilder[])argv.data).Length));
+                    break;
+                case Compiler.Op_code.PUSH_ARGV:
+                    stack.Add(new(argv));
                     break;
                 case Compiler.Op_code.PUSH_FALSE:
                     stack.Add(new(false));
@@ -69,6 +75,8 @@ public static class Interpreter{
                         float         => new(stack[^1].to_float()),
                         StringBuilder => new(stack[^1].to_string()),
 
+                        bool[] or char[] or int[] or float[] or StringBuilder[] => throw new ArgumentOutOfRangeException("Trying to reassign an array"),
+
                         _ => throw new UnreachableException(),
                     };
                     pc += sizeof(int);
@@ -77,9 +85,7 @@ public static class Interpreter{
                 case Compiler.Op_code.DEREF_MOV:
                     Value value_ref = stack[stack.Count + BitConverter.ToInt32(bytecode[pc..][..sizeof(int)])];
                     pc += sizeof(int);
-                    // TODO: forced type cast
-                    value_ref[stack[^2].to_int()] = stack[^1];
-                    stack.pop();
+                    value_ref[stack[^2]] = stack.pop();
                     stack.pop();
                     break;
 
@@ -102,16 +108,32 @@ public static class Interpreter{
                     Console.Write(stack[^1]);
                     stack[^1] = new(new StringBuilder(Console.ReadLine()!));
                     break;
-                
-                case Compiler.Op_code.GET_ARGV:
-                    stack[^1] = argv[(stack[^1].data is int) ? stack[^1].to_int() : throw new ArgumentOutOfRangeException("<argv> must be indexed with a Value that holds an int")];
-                    break;
 
                 case Compiler.Op_code.TO_BOOL:  stack[^1] = new(stack[^1].to_bool());   break;
                 case Compiler.Op_code.TO_CHAR:  stack[^1] = new(stack[^1].to_char());   break;
                 case Compiler.Op_code.TO_INT:   stack[^1] = new(stack[^1].to_int());    break;
                 case Compiler.Op_code.TO_FLOAT: stack[^1] = new(stack[^1].to_float());  break;
                 case Compiler.Op_code.TO_STR:   stack[^1] = new(stack[^1].to_string()); break;
+
+                case Compiler.Op_code.ALLOC_ARRAY:
+                    if (stack[^1].data is not (bool or char or int))
+                        throw new ArgumentOutOfRangeException("Trying to allocate an array of non-integer size");
+                    int alloc_size = stack[^1].to_int();
+                    stack[^1] = (Compiler.Op_code)bytecode[pc++] switch{
+                        Compiler.Op_code.TO_BOOL  => new(new bool          [alloc_size]),
+                        Compiler.Op_code.TO_CHAR  => new(new char          [alloc_size]),
+                        Compiler.Op_code.TO_INT   => new(new int           [alloc_size]),
+                        Compiler.Op_code.TO_FLOAT => new(new float         [alloc_size]),
+                        Compiler.Op_code.TO_STR   => new(((Func<StringBuilder[]>)(() => {
+                            StringBuilder[] sb_arr = new StringBuilder[alloc_size];
+                            for (int i = 0; i < sb_arr.Length; ++i)
+                                sb_arr[i] = new();
+                            return sb_arr;
+                        }))()),
+
+                        _ => throw new UnreachableException(),
+                    };
+                    break;
 
                 case Compiler.Op_code.CMP_EQ:  stack[^2] = new(stack[^2] == stack.pop()); break;
                 case Compiler.Op_code.CMP_NEQ: stack[^2] = new(stack[^2] != stack.pop()); break;
@@ -132,7 +154,7 @@ public static class Interpreter{
                 case Compiler.Op_code.XOR:   stack[^2]  ^= stack.pop(); break;
 
                 case Compiler.Op_code.DEREF:
-                    stack[^2] = stack[^2][stack.pop().to_int()];
+                    stack[^2] = stack[^2][stack.pop()];
                     break;
                                             
                 case Compiler.Op_code.POW:
@@ -159,5 +181,5 @@ public static class Interpreter{
 
         return stack[^1];
     }
-    public static Value run(ReadOnlySpan<byte> bytecode) => run(bytecode, new());
+    public static Value run(ReadOnlySpan<byte> bytecode) => run(bytecode, new(new StringBuilder[0]));
 }

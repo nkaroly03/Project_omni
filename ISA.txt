@@ -5,44 +5,49 @@ Symbols:
     ARGV: argument vector
 
 Instructions:
-    PUSH [arg]: pushes <arg> on the stack, where <arg> is either ARGC, FALSE, TRUE, a char literal an int literal, a float literal, a str literal, or a value on the stack
-    POP:        pops the last value from the stack
+    PUSH [arg]:      pushes <arg> on the stack, where <arg> is either ARGC, FALSE, TRUE, a char literal an int literal, a float literal, a str literal, or a value on the stack
+    POP:             pops the last value from the stack
 
-    RET:        returns SP[-1], then pops the stack (for completeness, but is unnecessary)
+    RET:             returns SP[-1], then pops the stack (for completeness, but is unnecessary)
 
-    MOV [arg]:  calculates <arg> = SP[-1], where <arg> is an element on the stack, then pops the stack
+    MOV [arg]:       calculates <arg> = SP[-1], where <arg> is an element on the stack, then pops the stack
+    DEREF_MOV [arg]: calculates SP[<arg>] = SP[-2][SP[-1]], then pops the stack 2 times, where arg is an int literal
 
-    JMP  [arg]: jumps unconditionally <arg> number of instructions
-    JMPZ [arg]: jumps <arg> number of instructions if SP[-1] is 0, then pops the stack in either case
+    JMP  [arg]:      jumps unconditionally <arg> number of instructions
+    JMPZ [arg]:      jumps <arg> number of instructions if SP[-1] is 0, then pops the stack in either case
 
-    PRINT:      prints SP[-1], then pops the stack
-    SCAN:       sets SP[-1] to user input interpreted as str
-    GET_ARGV:   sets SP[-1] to ARGV[SP[-1]], SP[-1] must contain an integer
+    PRINT:           prints SP[-1], then pops the stack
+    SCAN:            sets SP[-1] to user input interpreted as str
 
-    TO_BOOL:    converts SP[-1] to bool
-    TO_CHAR:    converts SP[-1] to char
-    TO_INT:     converts SP[-1] to int
-    TO_FLOAT:   converts SP[-1] to float
-    TO_STR:     converts SP[-1] to str
+    TO_BOOL:         converts SP[-1] to bool
+    TO_CHAR:         converts SP[-1] to char
+    TO_INT:          converts SP[-1] to int
+    TO_FLOAT:        converts SP[-1] to float
+    TO_STR:          converts SP[-1] to str
 
-    ADD:        calculates SP[-2]  +=  SP[-1],                    then pops the stack
-    SUB:        calculates SP[-2]  -=  SP[-1],                    then pops the stack
-    MUL:        calculates SP[-2]  *=  SP[-1],                    then pops the stack
-    DIV:        calculates SP[-2]  /=  SP[-1],                    then pops the stack
-    MOD:        calculates SP[-2]  %=  SP[-1],                    then pops the stack
-    POW:        calculates SP[-2]   =  MathF.Pow(SP[-2], SP[-1]), then pops the stack
-    SHL:        calculates SP[-2] <<=  SP[-1],                    then pops the stack
-    SHR:        calculates SP[-2] >>=  SP[-1],                    then pops the stack
-    BAND:       calculates SP[-2]  &=  SP[-1],                    then pops the stack
-    BOR:        calculates SP[-2]  |=  SP[-1],                    then pops the stack
-    XOR:        calculates SP[-2]  ^=  SP[-1],                    then pops the stack
-    BNEG:       calculates SP[-1]   = ~SP[-1]
-    AND:        calculates SP[-2]   =  SP[-2] && SP[-1],          then pops the stack (not used anymore due to short-circuiting)
-    OR:         calculates SP[-2]   =  SP[-2] || SP[-1],          then pops the stack (not used anymore due to short-circuiting)
-    NEG:        calculates SP[-1]   = -SP[-1]
-    CMP_EQ:     calculates SP[-2]   =  SP[-2] == SP[-1],          then pops the stack
-    CMP_NEQ:    calculates SP[-2]   =  SP[-2] != SP[-1],          then pops the stack
-    CMP_LE:     calculates SP[-2]   =  SP[-2] <  SP[-1],          then pops the stack
-    CMP_LEQ:    calculates SP[-2]   =  SP[-2] <= SP[-1],          then pops the stack
-    CMP_GE:     calculates SP[-2]   =  SP[-2] >  SP[-1],          then pops the stack
-    CMP_GEQ:    calculates SP[-2]   =  SP[-2] >= SP[-1],          then pops the stack
+    ALLOC_ARRAY:     converts SP[-1] to an array of SP[-1] size, then fills it with default values accoring to the next instruction,
+                     which is either TO_BOOL, TO_CHAR, TO_INT, TO_FLOAT or TO_STR
+
+    CMP_EQ:          calculates SP[-2]   =  SP[-2] == SP[-1],          then pops the stack
+    CMP_NEQ:         calculates SP[-2]   =  SP[-2] != SP[-1],          then pops the stack
+    CMP_LE:          calculates SP[-2]   =  SP[-2] <  SP[-1],          then pops the stack
+    CMP_LEQ:         calculates SP[-2]   =  SP[-2] <= SP[-1],          then pops the stack
+    CMP_GE:          calculates SP[-2]   =  SP[-2] >  SP[-1],          then pops the stack
+    CMP_GEQ:         calculates SP[-2]   =  SP[-2] >= SP[-1],          then pops the stack
+
+    ADD:             calculates SP[-2]  +=  SP[-1],                    then pops the stack
+    SUB:             calculates SP[-2]  -=  SP[-1],                    then pops the stack
+    MUL:             calculates SP[-2]  *=  SP[-1],                    then pops the stack
+    DIV:             calculates SP[-2]  /=  SP[-1],                    then pops the stack
+    MOD:             calculates SP[-2]  %=  SP[-1],                    then pops the stack
+    POW:             calculates SP[-2]   =  MathF.Pow(SP[-2], SP[-1]), then pops the stack
+    SHL:             calculates SP[-2] <<=  SP[-1],                    then pops the stack
+    SHR:             calculates SP[-2] >>=  SP[-1],                    then pops the stack
+    BAND:            calculates SP[-2]  &=  SP[-1],                    then pops the stack
+    BOR:             calculates SP[-2]  |=  SP[-1],                    then pops the stack
+    XOR:             calculates SP[-2]  ^=  SP[-1],                    then pops the stack
+    BNEG:            calculates SP[-1]   = ~SP[-1]
+    DEREF:           calculates SP[-2]   =  SP[-2][SP[-1]],            then pops the stack
+    AND:             calculates SP[-2]   =  SP[-2] && SP[-1],          then pops the stack (not used anymore due to short-circuiting)
+    OR:              calculates SP[-2]   =  SP[-2] || SP[-1],          then pops the stack (not used anymore due to short-circuiting)
+    NEG:             calculates SP[-1]   = -SP[-1]

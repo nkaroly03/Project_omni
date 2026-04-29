@@ -5,6 +5,9 @@ using System.Text;
 
 public sealed class Value : IEquatable<Value>, IComparable<Value>{
     static Value arithm_op(Value v1, Value v2, Action<Value, Value> op){
+        if (v1.data.GetType().IsArray || v2.data.GetType().IsArray)
+            throw new ArgumentOutOfRangeException("Trying to use arithmetic operation on array(s)");
+
         v1.data = v1.data switch{
             bool b => v2.data switch{
                 bool  => v1.data,
@@ -46,20 +49,39 @@ public sealed class Value : IEquatable<Value>, IComparable<Value>{
 
         return v1;
     }
-    static Value barithm_op(Value v1, Value v2, Action<Value, Value> op){
-        op(v1, v2);
 
-        return v1;
-    }
+    public static Value operator+(Value v) => v.data switch{
+        bool          b => new(b),
+        char          c => new(c),
+        int           i => new(i),
+        float         f => new(f),
+        StringBuilder   => throw new ArgumentOutOfRangeException("Trying to use unary + on string"),
 
-    public static Value operator+(Value v) => (v.data is not StringBuilder) ? new(v) : throw new ArgumentOutOfRangeException("Trying to use unary + on string");
+        bool[] or char[] or int[] or float[] or StringBuilder[] => throw new ArgumentOutOfRangeException("Trying to use unary + on array"),
+
+        _ => throw new UnreachableException(),
+    };
     public static Value operator-(Value v) => v.data switch{
-        bool  b => new(!b),
-        char  c => new(-c),
-        int   i => new(-i),
-        float f => new(-f),
+        bool          b => new(!b), // TODO: correct logic?
+        char          c => new((char)-c),
+        int           i => new(-i),
+        float         f => new(-f),
+        StringBuilder   => throw new ArgumentOutOfRangeException("Trying to use unary - on string"),
 
-        _ => throw new ArgumentOutOfRangeException("Trying to use unary - on string"),
+        bool[] or char[] or int[] or float[] or StringBuilder[] => throw new ArgumentOutOfRangeException("Trying to use unary - on array"),
+
+        _ => throw new UnreachableException(),
+    };
+    public static Value operator~(Value v) => v.data switch{
+        bool          b => new(!b),
+        char          c => new((char)~c),
+        int           i => new(~i),
+        float           => throw new ArgumentOutOfRangeException("Trying to use bitwise negation on float"),
+        StringBuilder   => throw new ArgumentOutOfRangeException("Trying to use bitwise negation on string"),
+
+        bool[] or char[] or int[] or float[] or StringBuilder[] => throw new ArgumentOutOfRangeException("Trying to use bitwise negation on array"),
+
+        _ => throw new UnreachableException(),
     };
 
     public static Value operator+(Value v1, Value v2) => arithm_op(new(v1), new(v2), (_v1, _v2) => _v1.add_eq(_v2));
@@ -69,12 +91,11 @@ public sealed class Value : IEquatable<Value>, IComparable<Value>{
     public static Value operator%(Value v1, Value v2) => arithm_op(new(v1), new(v2), (_v1, _v2) => _v1.mod_eq(_v2));
     public static Value       pow(Value v1, Value v2) => arithm_op(new(v1), new(v2), (_v1, _v2) => _v1.pow_eq(_v2));
 
-    public static Value operator<<(Value v1, Value v2) => barithm_op(new(v1), new(v2), (_v1, _v2) => _v1. shl_eq(_v2));
-    public static Value operator>>(Value v1, Value v2) => barithm_op(new(v1), new(v2), (_v1, _v2) => _v1. shr_eq(_v2));
-    public static Value operator& (Value v1, Value v2) => barithm_op(new(v1), new(v2), (_v1, _v2) => _v1.band_eq(_v2));
-    public static Value operator| (Value v1, Value v2) => barithm_op(new(v1), new(v2), (_v1, _v2) => _v1. bor_eq(_v2));
-    public static Value operator^ (Value v1, Value v2) => barithm_op(new(v1), new(v2), (_v1, _v2) => _v1. xor_eq(_v2));
-    public static Value operator~ (Value v) => new((v.data is int) ? ~v.to_int() : throw new InvalidOperationException("Trying to use bitwise operations on non-integer types"));
+    public static Value operator<<(Value v1, Value v2) => arithm_op(new(v1), new(v2), (_v1, _v2) => _v1. shl_eq(_v2));
+    public static Value operator>>(Value v1, Value v2) => arithm_op(new(v1), new(v2), (_v1, _v2) => _v1. shr_eq(_v2));
+    public static Value operator& (Value v1, Value v2) => arithm_op(new(v1), new(v2), (_v1, _v2) => _v1.band_eq(_v2));
+    public static Value operator| (Value v1, Value v2) => arithm_op(new(v1), new(v2), (_v1, _v2) => _v1. bor_eq(_v2));
+    public static Value operator^ (Value v1, Value v2) => arithm_op(new(v1), new(v2), (_v1, _v2) => _v1. xor_eq(_v2));
 
     public static bool operator==(Value v1, Value v2) =>  v1.Equals(v2);
     public static bool operator!=(Value v1, Value v2) => !v1.Equals(v2);
@@ -85,43 +106,78 @@ public sealed class Value : IEquatable<Value>, IComparable<Value>{
 
     public object data{ get; private set; }
 
-    public Value(bool data)          => this.data = data;
-    public Value(char data)          => this.data = data;
-    public Value(int data)           => this.data = data;
-    public Value(float data)         => this.data = data;
-    public Value(StringBuilder data) => this.data = data;
+    public Value(bool data)            => this.data = data;
+    public Value(char data)            => this.data = data;
+    public Value(int data)             => this.data = data;
+    public Value(float data)           => this.data = data;
+    public Value(StringBuilder data)   => this.data = data;
+
+    public Value(bool[] data)          => this.data = data;
+    public Value(char[] data)          => this.data = data;
+    public Value(int[] data)           => this.data = data;
+    public Value(float[] data)         => this.data = data;
+    public Value(StringBuilder[] data) => this.data = data;
 
     public Value(Value other) => data = other.data switch{
-        bool or char or int or float    => other.data,
-        StringBuilder                sb => new StringBuilder(sb.ToString()),
+        bool   or char   or int   or float   or
+        bool[] or char[] or int[] or float[] or StringBuilder[] => other.data,
+        StringBuilder sb => new StringBuilder(sb.ToString()),
 
         _ => throw new UnreachableException(),
     };
 
-    public Value this[int i]{
-        get => data switch{
-            StringBuilder sb => new(sb[i]),
+    public Value this[Value val]{
+        get{
+            if (val.data.GetType().IsArray)
+                throw new ArgumentOutOfRangeException("Trying to use indexer with an array as an index");
+            if (val.data is StringBuilder)
+                throw new ArgumentOutOfRangeException("Trying to use indexer with a string as an index");
+            if (val.data is float)
+                throw new ArgumentOutOfRangeException("Trying to use indexer with a float as an index");
+            int i = val.to_int();
+            return data switch{
+                StringBuilder sb => new(sb[i]),
 
-            _ => throw new ArgumentOutOfRangeException("Trying to use indexer on non-string"),
-        };
+                bool[]           b_arr => new( b_arr[i]),
+                char[]           c_arr => new( c_arr[i]),
+                int[]            i_arr => new( i_arr[i]),
+                float[]          f_arr => new( f_arr[i]),
+                StringBuilder[] sb_arr => new(sb_arr[i]),
+
+                _ => throw new ArgumentOutOfRangeException("Trying to use indexer on non array-like type"),
+            };
+        }
         set{
+            if (val.data.GetType().IsArray)
+                throw new ArgumentOutOfRangeException("Trying to use indexer with an array as an index");
+            if (val.data is StringBuilder)
+                throw new ArgumentOutOfRangeException("Trying to use indexer with a string as an index");
+            if (val.data is float)
+                throw new ArgumentOutOfRangeException("Trying to use indexer with a float as an index");
+            int i = val.to_int();
             switch (data){
-                case StringBuilder sb:
-                    sb[i] = value.to_char();
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException("Trying to use indexer on non-string");
+                case StringBuilder       sb:     sb[i] = value.to_char();   break;
+                case bool[]           b_arr:  b_arr[i] = value.to_bool();   break;
+                case char[]           c_arr:  c_arr[i] = value.to_char();   break;
+                case int[]            i_arr:  i_arr[i] = value.to_int();    break;
+                case float[]          f_arr:  f_arr[i] = value.to_float();  break;
+                case StringBuilder[] sb_arr: sb_arr[i] = value.to_string(); break;
+
+                default: throw new ArgumentOutOfRangeException("Trying to use indexer on non array-like type");
             }
         }
     }
 
     public override bool Equals(object? obj) => Equals(obj as Value);
     public override int GetHashCode() => data.GetHashCode();
-    public override string ToString() => data.ToString()!;
+    public override string ToString() => data.ToString()!; // TODO: modifiy for array printing?
 
     public bool Equals(Value? other){
         if (other is null)
             return false;
+
+        if (data.GetType().IsArray || other.data.GetType().IsArray)
+            throw new ArgumentOutOfRangeException("Trying to compare an array to an array");
 
         if (data is StringBuilder || other.data is StringBuilder){
             if (data is StringBuilder sb1 && other.data is StringBuilder sb2)
@@ -134,6 +190,9 @@ public sealed class Value : IEquatable<Value>, IComparable<Value>{
     public int CompareTo(Value? other){
         if (other is null)
             return 1;
+
+        if (data.GetType().IsArray || other.data.GetType().IsArray)
+            throw new ArgumentOutOfRangeException("Trying to compare an array to an array");
 
         if (data is StringBuilder || other.data is StringBuilder){
             if (data is StringBuilder sb1 && other.data is StringBuilder sb2)
@@ -151,6 +210,8 @@ public sealed class Value : IEquatable<Value>, IComparable<Value>{
         float          f => Convert.ToBoolean(f),
         StringBuilder sb => bool.Parse(sb.ToString()),
 
+        bool[] or char[] or int[] or float[] or StringBuilder[] => throw new ArgumentOutOfRangeException("Trying to convert an array to bool"),
+
         _ => throw new UnreachableException(),
     };
     public char to_char() => data switch{
@@ -159,6 +220,8 @@ public sealed class Value : IEquatable<Value>, IComparable<Value>{
         int            i => (char)i,
         float          f => (char)f,
         StringBuilder sb => char.Parse(sb.ToString()),
+
+        bool[] or char[] or int[] or float[] or StringBuilder[] => throw new ArgumentOutOfRangeException("Trying to convert an array to char"),
 
         _ => throw new UnreachableException(),
     };
@@ -169,6 +232,8 @@ public sealed class Value : IEquatable<Value>, IComparable<Value>{
         float          f => (int)f,
         StringBuilder sb => int.Parse(sb.ToString()),
 
+        bool[] or char[] or int[] or float[] or StringBuilder[] => throw new ArgumentOutOfRangeException("Trying to convert an array to int"),
+
         _ => throw new UnreachableException(),
     };
     public float to_float() => data switch{
@@ -177,6 +242,8 @@ public sealed class Value : IEquatable<Value>, IComparable<Value>{
         int            i => (float)i,
         float          f => f,
         StringBuilder sb => float.Parse(sb.ToString()),
+
+        bool[] or char[] or int[] or float[] or StringBuilder[] => throw new ArgumentOutOfRangeException("Trying to convert an array to float"),
 
         _ => throw new UnreachableException(),
     };
@@ -187,15 +254,20 @@ public sealed class Value : IEquatable<Value>, IComparable<Value>{
         float          f => new( f.ToString()),
         StringBuilder sb => new(sb.ToString()),
 
+        bool[] or char[] or int[] or float[] or StringBuilder[] => throw new ArgumentOutOfRangeException("Trying to convert an array to string"),
+
         _ => throw new UnreachableException(),
     };
 
     public void add_eq(Value other){
+        if (data.GetType().IsArray || other.data.GetType().IsArray)
+            throw new ArgumentOutOfRangeException("Trying to do addition with array(s)");
+
         if (data is not StringBuilder && other.data is StringBuilder)
             throw new ArgumentOutOfRangeException("Trying to do addition on a non-string with a string");
 
         data = data switch{
-            bool           b => b || other.to_bool(),
+            bool           b => Convert.ToBoolean((Convert.ToInt32(b) + Convert.ToInt32(other.to_bool())) & 1),
             char           c => (char)(c + other.to_char()),
             int            i => i + other.to_int(),
             float          f => f + other.to_float(),
@@ -210,40 +282,55 @@ public sealed class Value : IEquatable<Value>, IComparable<Value>{
         };
     }
     public void sub_eq(Value other) => data = data switch{
-        bool  b => Convert.ToBoolean(Convert.ToInt32(b) - other.to_int()),
-        char  c => (char)(c - other.to_char()),
-        int   i => i - other.to_int(),
-        float f => f - other.to_float(),
+        bool          b => Convert.ToBoolean(Convert.ToInt32(b) - Convert.ToInt32(other.to_bool())),
+        char          c => (char)(c - other.to_char()),
+        int           i => i - other.to_int(),
+        float         f => f - other.to_float(),
+        StringBuilder   => throw new ArgumentOutOfRangeException("Trying to do subtraction with string(s)"),
 
-        _ => throw new ArgumentOutOfRangeException("Trying to do subtraction with strings"),
+        bool[] or char[] or int[] or float[] or StringBuilder[] => throw new ArgumentOutOfRangeException("Trying to do subtraction with array(s)"),
+
+        _ => throw new UnreachableException(),
     };
     public void mul_eq(Value other) => data = data switch{
-        bool  b => b && other.to_bool(),
-        char  c => (char)(c * other.to_char()),
-        int   i => i * other.to_int(),
-        float f => f * other.to_float(),
+        bool          b => Convert.ToBoolean(Convert.ToInt32(b) * Convert.ToInt32(other.to_bool())),
+        char          c => (char)(c * other.to_char()),
+        int           i => i * other.to_int(),
+        float         f => f * other.to_float(),
+        StringBuilder   => throw new ArgumentOutOfRangeException("Trying to do multiplication with string(s)"),
 
-        _ => throw new ArgumentOutOfRangeException("Trying to do multiplication with strings"),
+        bool[] or char[] or int[] or float[] or StringBuilder[] => throw new ArgumentOutOfRangeException("Trying to do multiplication with array(s)"),
+
+        _ => throw new UnreachableException(),
     };
     public void div_eq(Value other) => data = data switch{
-        bool  b => Convert.ToBoolean(Convert.ToInt32(b) / other.to_int()),
-        char  c => (char)(c / other.to_char()),
-        int   i => i / other.to_int(),
-        float f => f / other.to_float(),
+        bool          b => Convert.ToBoolean(Convert.ToInt32(b) / Convert.ToInt32(other.to_bool())),
+        char          c => (char)(c / other.to_char()),
+        int           i => i / other.to_int(),
+        float         f => f / other.to_float(),
+        StringBuilder   => throw new ArgumentOutOfRangeException("Trying to do division with string(s)"),
 
-        _ => throw new ArgumentOutOfRangeException("Trying to do division with strings"),
+        bool[] or char[] or int[] or float[] or StringBuilder[] => throw new ArgumentOutOfRangeException("Trying to do division with array(s)"),
+
+        _ => throw new UnreachableException(),
     };
     public void mod_eq(Value other) => data = data switch{
-        bool  b => Convert.ToBoolean(Convert.ToInt32(b) % other.to_int()),
-        char  c => (char)(c % other.to_char()),
-        int   i => i % other.to_int(),
-        float f => f % other.to_float(),
+        bool          b => Convert.ToBoolean(Convert.ToInt32(b) % Convert.ToInt32(other.to_bool())),
+        char          c => (char)(c % other.to_char()),
+        int           i => i % other.to_int(),
+        float         f => f % other.to_float(),
+        StringBuilder   => throw new ArgumentOutOfRangeException("Trying to do modulo with string(s)"),
 
-        _ => throw new ArgumentOutOfRangeException("Trying to do modulo with strings"),
+        bool[] or char[] or int[] or float[] or StringBuilder[] => throw new ArgumentOutOfRangeException("Trying to do modulo with array(s)"),
+
+        _ => throw new UnreachableException(),
     };
     public void pow_eq(Value other){
+        if (data.GetType().IsArray || other.data.GetType().IsArray)
+            throw new ArgumentOutOfRangeException("Trying to do exponentiation with array(s)");
+
         if (data is StringBuilder || other.data is StringBuilder)
-            throw new ArgumentOutOfRangeException("Trying to do exponentiation strings");
+            throw new ArgumentOutOfRangeException("Trying to do exponentiation string(s)");
 
         float result = MathF.Pow(to_float(), other.to_float());
         data = data switch{
@@ -257,33 +344,83 @@ public sealed class Value : IEquatable<Value>, IComparable<Value>{
     }
 
     public void shl_eq(Value other){
-        if (data is not int || other.data is not int)
-            throw new InvalidOperationException("Trying to use bitwise operations on non-integer types");
+        if (data.GetType().IsArray || other.data.GetType().IsArray)
+            throw new ArgumentOutOfRangeException("Trying to do bitwise left-shift with array(s)");
+        if (data is StringBuilder || other.data is StringBuilder)
+            throw new ArgumentOutOfRangeException("Trying to do bitwise left-shift with string(s)");
+        if (data is float || other.data is float)
+            throw new ArgumentOutOfRangeException("Trying to do bitwise left-shift with float(s)");
 
-        data = to_int() << other.to_int();
+        data = data switch{
+            bool b => b,
+            char c => (char)(c << other.to_char()),
+            int  i => i << other.to_int(),
+
+            _ => throw new UnreachableException(),
+        };
     }
     public void shr_eq(Value other){
-        if (data is not int || other.data is not int)
-            throw new InvalidOperationException("Trying to use bitwise operations on non-integer types");
+        if (data.GetType().IsArray || other.data.GetType().IsArray)
+            throw new ArgumentOutOfRangeException("Trying to do bitwise right-shift with array(s)");
+        if (data is StringBuilder || other.data is StringBuilder)
+            throw new ArgumentOutOfRangeException("Trying to do bitwise right-shift with string(s)");
+        if (data is float || other.data is float)
+            throw new ArgumentOutOfRangeException("Trying to do bitwise right-shift with float(s)");
 
-        data = to_int() >> other.to_int();
+        data = data switch{
+            bool b => b,
+            char c => (char)(c >> other.to_char()),
+            int  i => i >> other.to_int(),
+
+            _ => throw new UnreachableException(),
+        };
     }
     public void band_eq(Value other){
-        if (data is not int || other.data is not int)
-            throw new InvalidOperationException("Trying to use bitwise operations on non-integer types");
+        if (data.GetType().IsArray || other.data.GetType().IsArray)
+            throw new ArgumentOutOfRangeException("Trying to do bitwise and with array(s)");
+        if (data is StringBuilder || other.data is StringBuilder)
+            throw new ArgumentOutOfRangeException("Trying to do bitwise and with string(s)");
+        if (data is float || other.data is float)
+            throw new ArgumentOutOfRangeException("Trying to do bitwise and with float(s)");
 
-        data = to_int() & other.to_int();
+        data = data switch{
+            bool b => b && other.to_bool(),
+            char c => (char)(c & other.to_char()),
+            int  i => i & other.to_int(),
+
+            _ => throw new UnreachableException(),
+        };
     }
     public void bor_eq(Value other){
-        if (data is not int || other.data is not int)
-            throw new InvalidOperationException("Trying to use bitwise operations on non-integer types");
+        if (data.GetType().IsArray || other.data.GetType().IsArray)
+            throw new ArgumentOutOfRangeException("Trying to do bitwise or with array(s)");
+        if (data is StringBuilder || other.data is StringBuilder)
+            throw new ArgumentOutOfRangeException("Trying to do bitwise or with string(s)");
+        if (data is float || other.data is float)
+            throw new ArgumentOutOfRangeException("Trying to do bitwise or with float(s)");
 
-        data = to_int() | other.to_int();
+        data = data switch{
+            bool b => b || other.to_bool(),
+            char c => (char)(c | other.to_char()),
+            int  i => i | other.to_int(),
+
+            _ => throw new UnreachableException(),
+        };
     }
     public void xor_eq(Value other){
-        if (data is not int || other.data is not int)
-            throw new InvalidOperationException("Trying to use bitwise operations on non-integer types");
+        if (data.GetType().IsArray || other.data.GetType().IsArray)
+            throw new ArgumentOutOfRangeException("Trying to do xor with array(s)");
+        if (data is StringBuilder || other.data is StringBuilder)
+            throw new ArgumentOutOfRangeException("Trying to do xor with string(s)");
+        if (data is float || other.data is float)
+            throw new ArgumentOutOfRangeException("Trying to do xor with float(s)");
 
-        data = to_int() ^ other.to_int();
+        data = data switch{
+            bool b => b != other.to_bool(),
+            char c => (char)(c ^ other.to_char()),
+            int  i => i ^ other.to_int(),
+
+            _ => throw new UnreachableException(),
+        };
     }
 }

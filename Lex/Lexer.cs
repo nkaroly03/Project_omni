@@ -7,6 +7,7 @@ public readonly record struct Token{
     public enum Type{
         ID,
         ARGC,
+        ARGV,
         FALSE,
         TRUE,
         CHAR_LIT,
@@ -57,8 +58,6 @@ public readonly record struct Token{
 
         PRINT,
         SCAN,
-
-        ARGV,
 
         IF,
         ELSE,
@@ -131,6 +130,7 @@ public static class Lexer{
 
                 Token.Type token_type = line switch{
                     "argc"   => Token.Type.ARGC,
+                    "argv"   => Token.Type.ARGV,
                     "false"  => Token.Type.FALSE,
                     "true"   => Token.Type.TRUE,
 
@@ -177,8 +177,6 @@ public static class Lexer{
 
                     "print"  => Token.Type.PRINT,
                     "scan"   => Token.Type.SCAN,
-
-                    "argv"   => Token.Type.ARGV,
 
                     "if"     => Token.Type.IF,
                     "else"   => Token.Type.ELSE,

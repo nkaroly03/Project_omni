@@ -60,7 +60,7 @@ public static class Parser{
             Token tok = self.Pop();
             if (tok.type.is_atom())
                 lhs.token = tok;
-            else if (tok.type == Token.Type.SCAN || tok.type == Token.Type.ARGV){
+            else if (tok.type == Token.Type.SCAN){
                 lhs.token = tok;
 
                 if (self.Count == 0 || (tok = self.Pop()).type != Token.Type.LPAREN)
@@ -129,6 +129,8 @@ public static class Parser{
                     self.Push(tok);
 
                     node1 = self.parse_arithm_expr(0.0f);
+                    if (node1.token.type == Token.Type.LBRACKET)
+                        throw new Syntax_error_exception($"On line <{tok.line_number}> discarding the result of array dereference");
 
                     if (self.Count == 0 || (tok = self.Pop()).type != Token.Type.SEMICOLON)
                         throw new Syntax_error_exception($"On line <{tok.line_number}> expression must be closed by <;>");
@@ -147,10 +149,10 @@ public static class Parser{
                     break;
 
                 case Token.Type.LET_DECL:
-                    if (self.Count == 0 || (tok = self.Peek()).type != Token.Type.ID)
+                    if (self.Count == 0 || (tok = self.Pop()).type != Token.Type.ID)
                         throw new Syntax_error_exception($"On line <{tok.line_number}> <let> must be followed by an identifier");
 
-                    node1.m_sub_nodes.Add(new(){token = self.Pop()});
+                    node1.m_sub_nodes.Add(new(){token = tok});
 
                     if (self.Count == 0 || self.Peek().type != Token.Type.COLON)
                         throw new Syntax_error_exception($"On line <{tok.line_number}> <{tok.id}> must be followed by <:>");
@@ -159,20 +161,43 @@ public static class Parser{
                     if (
                         self.Count == 0 ||
                         (
-                            (tok = self.Peek()).type != Token.Type.BOOL && tok.type != Token.Type.CHAR &&
+                            (tok = self.Pop()).type != Token.Type.LBRACKET && tok.type != Token.Type.BOOL && tok.type != Token.Type.CHAR &&
                             tok.type != Token.Type.INT && tok.type != Token.Type.FLOAT && tok.type != Token.Type.STR
                         )
                     )
-                        throw new Syntax_error_exception($"On line <{tok.line_number}> <:> must be followed by a valid type");
+                        throw new Syntax_error_exception($"On line <{tok.line_number}> <:> must be followed by a valid type or <[>");
 
-                    node1.m_sub_nodes.Add(new(){token = self.Pop()});
+                    node1.m_sub_nodes.Add(new(){token = tok});
 
-                    if (self.Count == 0 || (tok = self.Peek()).type != Token.Type.EQ)
-                        throw new Syntax_error_exception($"On line <{tok.line_number}> type must be followed by <=>");
-                    self.Pop();
+                    if (tok.type != Token.Type.LBRACKET){
+                        if (self.Count == 0 || (tok = self.Pop()).type != Token.Type.EQ)
+                            throw new Syntax_error_exception($"On line <{tok.line_number}> type must be followed by <=>");
 
-                    node1.m_sub_nodes[1].m_sub_nodes.Add(self.parse_arithm_expr(0.0f));
-                    
+                        node1.m_sub_nodes[1].m_sub_nodes.Add(self.parse_arithm_expr(0.0f));
+                    }
+                    else{
+                        node1.m_sub_nodes[1].m_sub_nodes.Add(self.parse_arithm_expr(0.0f));
+                        if ((tok = self.Pop()).type != Token.Type.RBRACKET)
+                            throw new Syntax_error_exception($"On line <{tok.line_number}> <[> must be closed by <]>");
+
+                        if (
+                            self.Count == 0 ||
+                            (
+                                (tok = self.Pop()).type != Token.Type.BOOL && tok.type != Token.Type.CHAR &&
+                                tok.type != Token.Type.INT && tok.type != Token.Type.FLOAT && tok.type != Token.Type.STR
+                            )
+                        )
+                            throw new Syntax_error_exception($"On line <{tok.line_number}> <]> must be followed by a valid type");
+
+                        node1.m_sub_nodes[1].m_sub_nodes.Add(new(){token = tok});
+
+                        if (self.Count == 0 || (tok = self.Pop()).type != Token.Type.EQ)
+                            throw new Syntax_error_exception($"On line <{tok.line_number}> type must be followed by <=>");
+                        if (self.Count == 0 || (tok = self.Pop()).type != Token.Type.LBRACE)
+                            throw new Syntax_error_exception($"On line <{tok.line_number}> <=> must be followed by <{{>");
+                        if (self.Count == 0 || (tok = self.Pop()).type != Token.Type.RBRACE)
+                            throw new Syntax_error_exception($"On line <{tok.line_number}> <{{> must be followed by <}}>");
+                    }
                     if (self.Count == 0 || (tok = self.Pop()).type != Token.Type.SEMICOLON)
                         throw new Syntax_error_exception(($"On line <{tok.line_number}> let declaration must be closed by <;>"));
                     break;
@@ -191,7 +216,7 @@ public static class Parser{
                     break;
                 case Token.Type.SCAN:
                 case Token.Type.ARGV:
-                    throw new Syntax_error_exception($"On line <{tok.line_number}> discarding the result of <{tok.id}> is a bug");
+                    throw new Syntax_error_exception($"On line <{tok.line_number}> discarding the result of <{tok.id}> or trying to assign to it is a bug");
 
                 case Token.Type.IF:
                 case Token.Type.WHILE:
@@ -322,6 +347,8 @@ public static class Parser{
 
         if (token_array.Count((t) => t.type == Token.Type.LPAREN) != token_array.Count((t) => t.type == Token.Type.RPAREN))
             throw new Syntax_error_exception("The number of opening and closing parentheses must match");
+        if (token_array.Count((t) => t.type == Token.Type.LBRACKET) != token_array.Count((t) => t.type == Token.Type.RBRACKET))
+            throw new Syntax_error_exception("The number of opening and closing brackets must match");
         if (token_array.Count((t) => t.type == Token.Type.LBRACE) != token_array.Count((t) => t.type == Token.Type.RBRACE))
             throw new Syntax_error_exception("The number of opening and closing braces must match");
 

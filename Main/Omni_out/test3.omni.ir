@@ -1,18 +1,9 @@
 src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\test3.omni
 
-    1 ; PUSH "Test"
-    1 ; TO_STR
-    2 ; PUSH "\n"
-    3 ; PUSH 10
-    2 ; MOV SP[-3]
-    3 ; PUSH SP[-2]
-    4 ; PUSH 0
-    3 ; DEREF
-    2 ; ADD
-    3 ; PUSH '\n'
-    2 ; ADD
-    1 ; PRINT
+    1 ; PUSH ARGV
     2 ; PUSH 0
-    1 ; RET
-    0 ; POP
+    1 ; DEREF
+    0 ; PRINT
+    1 ; PUSH 0
+    0 ; RET
 
