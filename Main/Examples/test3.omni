@@ -32,6 +32,10 @@
 // 
 // print("s[0]: " + s[0] + '\n');
 
-print((argv[0] = "Hello"));
+// print((argv[0] = "Hello"));
+// 
+// print(argv[0]);
 
-print(argv[0]);
+let c: char = poll_char();
+
+print("c: " + c + '\n');

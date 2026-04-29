@@ -60,7 +60,7 @@ public static class Parser{
             Token tok = self.Pop();
             if (tok.type.is_atom())
                 lhs.token = tok;
-            else if (tok.type == Token.Type.SCAN){
+            else if (tok.type == Token.Type.SCAN || tok.type == Token.Type.ARRAY_SIZE){
                 lhs.token = tok;
 
                 if (self.Count == 0 || (tok = self.Pop()).type != Token.Type.LPAREN)
@@ -68,6 +68,14 @@ public static class Parser{
 
                 lhs.m_sub_nodes.Add(self.parse_arithm_expr(0.0f));
 
+                if (self.Count == 0 || (tok = self.Pop()).type != Token.Type.RPAREN)
+                    throw new Syntax_error_exception($"On line <{tok.line_number}> <{lhs.token.id}> must be closed by <)>");
+            }
+            else if (tok.type == Token.Type.RAND || tok.type == Token.Type.POLL_CHAR){
+                lhs.token = tok;
+
+                if (self.Count == 0 || (tok = self.Pop()).type != Token.Type.LPAREN)
+                    throw new Syntax_error_exception($"On line <{tok.line_number}> <{lhs.token.id}> must be followed by <(>");
                 if (self.Count == 0 || (tok = self.Pop()).type != Token.Type.RPAREN)
                     throw new Syntax_error_exception($"On line <{tok.line_number}> <{lhs.token.id}> must be closed by <)>");
             }
@@ -214,8 +222,12 @@ public static class Parser{
                     if (self.Count == 0 || (tok = self.Pop()).type != Token.Type.SEMICOLON)
                         throw new Syntax_error_exception($"On line <{tok.line_number}> <print> statement must be close by <;>");
                     break;
+
                 case Token.Type.SCAN:
                 case Token.Type.ARGV:
+                case Token.Type.ARRAY_SIZE:
+                case Token.Type.RAND:
+                case Token.Type.POLL_CHAR:
                     throw new Syntax_error_exception($"On line <{tok.line_number}> discarding the result of <{tok.id}> or trying to assign to it is a bug");
 
                 case Token.Type.IF:
@@ -373,6 +385,7 @@ public static class Parser{
     }
 
     /*
+        the following ascii arts are not up to date
     -----------------------------------------------------------------------
                                     let
                                     / \

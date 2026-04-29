@@ -20,6 +20,7 @@ public static class Interpreter{
             throw new ArgumentOutOfRangeException("argv must contain an array of StringBuilders");
 
         List<Value> stack = new();
+        Random rd = new();
         
         for (int pc = 0; pc < bytecode.Length;){
             switch ((Compiler.Op_code)bytecode[pc++]){
@@ -109,6 +110,31 @@ public static class Interpreter{
                     stack[^1] = new(new StringBuilder(Console.ReadLine()!));
                     break;
 
+                case Compiler.Op_code.ARRAY_SIZE:
+                    stack[^1] = stack[^1].data switch{
+                        StringBuilder       sb => new(    sb.Length),
+                        bool[]           b_arr => new( b_arr.Length),
+                        char[]           c_arr => new( c_arr.Length),
+                        int[]            i_arr => new( i_arr.Length),
+                        float[]          f_arr => new( f_arr.Length),
+                        StringBuilder[] sb_arr => new(sb_arr.Length),
+
+                        _ => throw new ArgumentOutOfRangeException("Trying to get the size of a non-array type"),
+                    };
+                    break;
+                case Compiler.Op_code.RAND:
+                    stack.Add(new(rd.Next()));
+                    break;
+                case Compiler.Op_code.POLL_CHAR:
+                    char polled_char = '\0';
+                    if (Console.KeyAvailable){
+                        polled_char = Console.ReadKey(true).KeyChar;
+                        while (Console.KeyAvailable)
+                            _ = Console.ReadKey(true);
+                    }
+                    stack.Add(new(polled_char));
+                    break;
+
                 case Compiler.Op_code.TO_BOOL:  stack[^1] = new(stack[^1].to_bool());   break;
                 case Compiler.Op_code.TO_CHAR:  stack[^1] = new(stack[^1].to_char());   break;
                 case Compiler.Op_code.TO_INT:   stack[^1] = new(stack[^1].to_int());    break;
@@ -120,10 +146,10 @@ public static class Interpreter{
                         throw new ArgumentOutOfRangeException("Trying to allocate an array of non-integer size");
                     int alloc_size = stack[^1].to_int();
                     stack[^1] = (Compiler.Op_code)bytecode[pc++] switch{
-                        Compiler.Op_code.TO_BOOL  => new(new bool          [alloc_size]),
-                        Compiler.Op_code.TO_CHAR  => new(new char          [alloc_size]),
-                        Compiler.Op_code.TO_INT   => new(new int           [alloc_size]),
-                        Compiler.Op_code.TO_FLOAT => new(new float         [alloc_size]),
+                        Compiler.Op_code.TO_BOOL  => new(new bool [alloc_size]),
+                        Compiler.Op_code.TO_CHAR  => new(new char [alloc_size]),
+                        Compiler.Op_code.TO_INT   => new(new int  [alloc_size]),
+                        Compiler.Op_code.TO_FLOAT => new(new float[alloc_size]),
                         Compiler.Op_code.TO_STR   => new(((Func<StringBuilder[]>)(() => {
                             StringBuilder[] sb_arr = new StringBuilder[alloc_size];
                             for (int i = 0; i < sb_arr.Length; ++i)

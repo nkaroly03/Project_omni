@@ -5,19 +5,23 @@ Symbols:
     ARGV: argument vector
 
 Instructions:
-    PUSH [arg]:      pushes <arg> on the stack, where <arg> is either ARGC, FALSE, TRUE, a char literal an int literal, a float literal, a str literal, or a value on the stack
+    PUSH [arg]:      pushes <arg> on the stack, where <arg> is either ARGC, ARGV, FALSE, TRUE, a char literal an int literal, a float literal, a str literal, a value on the stack
     POP:             pops the last value from the stack
 
     RET:             returns SP[-1], then pops the stack (for completeness, but is unnecessary)
 
     MOV [arg]:       calculates <arg> = SP[-1], where <arg> is an element on the stack, then pops the stack
-    DEREF_MOV [arg]: calculates SP[<arg>] = SP[-2][SP[-1]], then pops the stack 2 times, where arg is an int literal
+    DEREF_MOV [arg]: calculates SP[<arg>] = SP[-2][SP[-1]], where arg is an int literal, then pops the stack twice,
 
     JMP  [arg]:      jumps unconditionally <arg> number of instructions
     JMPZ [arg]:      jumps <arg> number of instructions if SP[-1] is 0, then pops the stack in either case
 
     PRINT:           prints SP[-1], then pops the stack
-    SCAN:            sets SP[-1] to user input interpreted as str
+    SCAN:            prints SP[-1], then sets SP[-1] to user input interpreted as str
+
+    ARRAY_SIZE:      sets SP[-1] to SP[-1]'s array size
+    RAND:            pushes a random int on the stack
+    POLL_CHAR:       pushes a char on the stack from non-canonical, raw input, if no characters were available pushes '\0'
 
     TO_BOOL:         converts SP[-1] to bool
     TO_CHAR:         converts SP[-1] to char

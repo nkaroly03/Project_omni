@@ -38,6 +38,10 @@ public static class Compiler{
         PRINT,
         SCAN,
 
+        ARRAY_SIZE,
+        RAND,
+        POLL_CHAR,
+
         TO_BOOL,
         TO_CHAR,
         TO_INT,
@@ -291,6 +295,16 @@ public static class Compiler{
                     sb.add_instruction($"{stack_size} ; SCAN");
                     break;
 
+                case Token.Type.ARRAY_SIZE:
+                    to_IR(current_AST_node.sub_nodes[0], null, sb, ref let_decl_counter, true);
+                    sb.add_instruction($"{stack_size} ; ARRAY_SIZE");
+                    break;
+                case Token.Type.RAND:
+                    sb.add_instruction($"{++stack_size} ; RAND");
+                    break;
+                case Token.Type.POLL_CHAR:
+                    sb.add_instruction($"{++stack_size} ; POLL_CHAR");
+                    break;
 
                 case Token.Type.IF:
                     StringBuilder if_else_sb = new();
@@ -487,6 +501,9 @@ public static class Compiler{
 
                 case "PRINT":       bytecode.Add((byte)Op_code.PRINT);       break;
                 case "SCAN":        bytecode.Add((byte)Op_code.SCAN);        break;
+                case "ARRAY_SIZE":  bytecode.Add((byte)Op_code.ARRAY_SIZE);  break;
+                case "RAND":        bytecode.Add((byte)Op_code.RAND);        break;
+                case "POLL_CHAR":   bytecode.Add((byte)Op_code.POLL_CHAR);   break;
                 case "TO_BOOL":     bytecode.Add((byte)Op_code.TO_BOOL);     break;
                 case "TO_CHAR":     bytecode.Add((byte)Op_code.TO_CHAR);     break;
                 case "TO_INT":      bytecode.Add((byte)Op_code.TO_INT);      break;

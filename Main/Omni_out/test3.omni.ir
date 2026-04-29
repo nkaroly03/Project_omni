@@ -1,9 +1,14 @@
 src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\test3.omni
 
-    1 ; PUSH ARGV
+    1 ; POLL_CHAR
+    1 ; TO_CHAR
+    2 ; PUSH "c: "
+    3 ; PUSH SP[-2]
+    2 ; ADD
+    3 ; PUSH '\n'
+    2 ; ADD
+    1 ; PRINT
     2 ; PUSH 0
-    1 ; DEREF
-    0 ; PRINT
-    1 ; PUSH 0
-    0 ; RET
+    1 ; RET
+    0 ; POP
 
