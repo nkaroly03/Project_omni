@@ -9,7 +9,7 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\test2.omni
     4 ; PUSH SP[-3]
     5 ; PUSH 0
     4 ; CMP_GEQ
-    3 ; JMPZ 34
+    3 ; JMPZ 37
     4 ; PUSH SP[-1]
     5 ; PUSH 1
     4 ; ADD
@@ -18,13 +18,16 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\test2.omni
     5 ; PUSH SP[-3]
     4 ; ADD
     4 ; TO_INT
-    4 ; PRINT "fib #"
+    5 ; PUSH "fib #"
+    4 ; PRINT
     5 ; PUSH SP[-2]
     4 ; PRINT
-    4 ; PRINT ": "
+    5 ; PUSH ": "
+    4 ; PRINT
     5 ; PUSH SP[-4]
     4 ; PRINT
-    4 ; PRINT "\n"
+    5 ; PUSH "\n"
+    4 ; PRINT
     5 ; PUSH 0
     5 ; TO_INT
     6 ; PUSH SP[-1]
@@ -42,11 +45,13 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\test2.omni
     5 ; MOV SP[-5]
     4 ; POP
     3 ; POP
-    3 ; JMP -36
-    3 ; PRINT "Reached #"
+    3 ; JMP -39
+    4 ; PUSH "Reached #"
+    3 ; PRINT
     4 ; PUSH SP[-1]
     3 ; PRINT
-    3 ; PRINT " before overflow\n"
+    4 ; PUSH " before overflow\n"
+    3 ; PRINT
     4 ; PUSH SP[-3]
     3 ; RET
     2 ; POP

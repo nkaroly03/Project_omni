@@ -115,6 +115,8 @@ public static class Lexer{
         }))())
             throw new Syntax_error_exception($"Unclosed string literal");
 
+        int lparen_count = 0, rparen_count = 0, lbracket_count = 0, rbracket_count = 0, lbrace_count = 0, rbrace_count = 0;
+
         int line_idx = 0;
         foreach (
             string line in
@@ -130,6 +132,13 @@ public static class Lexer{
         ){
             // Console.WriteLine($"tok: {System.Text.RegularExpressions.Regex.Escape(line)} | tok.Length: {line.Length}");
             if (line != Environment.NewLine && !line.StartsWith("//") && !line.StartsWith("/*/")){
+                lparen_count   += Convert.ToInt32(line == "(");
+                rparen_count   += Convert.ToInt32(line == ")");
+                lbracket_count += Convert.ToInt32(line == "[");
+                rbracket_count += Convert.ToInt32(line == "]");
+                lbrace_count   += Convert.ToInt32(line == "{");
+                rbrace_count   += Convert.ToInt32(line == "}");
+
                 string token_id = line;
 
                 Token.Type token_type = line switch{
@@ -228,6 +237,13 @@ public static class Lexer{
             else
                 line_idx += Regex.Count(line, @"\r\n|\r|\n");
         }
+
+        if (lparen_count != rparen_count)
+            throw new Syntax_error_exception("The number of opening and closing parentheses must match");
+        if (lbracket_count != rbracket_count)
+            throw new Syntax_error_exception("The number of opening and closing brackets must match");
+        if (lbrace_count != rbrace_count)
+            throw new Syntax_error_exception("The number of opening and closing braces must match");
 
         return System.Runtime.InteropServices.CollectionsMarshal.AsSpan(tokens);
     }

@@ -33,90 +33,114 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\tetris.omni
     16 ; PUSH 8
     16 ; ALLOC_ARRAY
     16 ; TO_INT
-    17 ; PUSH SP[-13]
-    18 ; PUSH 2
-    16 ; DEREF_MOV SP[-3]
-    17 ; PUSH SP[-12]
-    18 ; PUSH 3
-    16 ; DEREF_MOV SP[-3]
-    17 ; PUSH SP[-11]
-    18 ; PUSH 3
-    16 ; DEREF_MOV SP[-3]
-    17 ; PUSH SP[-10]
-    18 ; PUSH 3
-    16 ; DEREF_MOV SP[-3]
-    17 ; PUSH SP[-9]
-    18 ; PUSH 3
-    16 ; DEREF_MOV SP[-3]
-    17 ; PUSH SP[-8]
-    18 ; PUSH 3
-    16 ; DEREF_MOV SP[-3]
-    17 ; PUSH SP[-7]
-    18 ; PUSH 4
-    16 ; DEREF_MOV SP[-3]
-    17 ; PUSH SP[-6]
-    18 ; PUSH 0
-    16 ; DEREF_MOV SP[-3]
+    17 ; PUSH SP[-1]
+    18 ; PUSH SP[-14]
+    19 ; PUSH 2
+    16 ; DEREF_MOV
+    17 ; PUSH SP[-1]
+    18 ; PUSH SP[-13]
+    19 ; PUSH 3
+    16 ; DEREF_MOV
+    17 ; PUSH SP[-1]
+    18 ; PUSH SP[-12]
+    19 ; PUSH 3
+    16 ; DEREF_MOV
+    17 ; PUSH SP[-1]
+    18 ; PUSH SP[-11]
+    19 ; PUSH 3
+    16 ; DEREF_MOV
+    17 ; PUSH SP[-1]
+    18 ; PUSH SP[-10]
+    19 ; PUSH 3
+    16 ; DEREF_MOV
+    17 ; PUSH SP[-1]
+    18 ; PUSH SP[-9]
+    19 ; PUSH 3
+    16 ; DEREF_MOV
+    17 ; PUSH SP[-1]
+    18 ; PUSH SP[-8]
+    19 ; PUSH 4
+    16 ; DEREF_MOV
+    17 ; PUSH SP[-1]
+    18 ; PUSH SP[-7]
+    19 ; PUSH 0
+    16 ; DEREF_MOV
     17 ; PUSH 8
     17 ; ALLOC_ARRAY
     17 ; TO_STR
-    18 ; PUSH SP[-14]
-    19 ; PUSH "XXXX"
-    17 ; DEREF_MOV SP[-3]
-    18 ; PUSH SP[-13]
-    19 ; PUSH ".XXXX...."
-    17 ; DEREF_MOV SP[-3]
-    18 ; PUSH SP[-12]
-    19 ; PUSH "XX..XX..."
-    17 ; DEREF_MOV SP[-3]
-    18 ; PUSH SP[-11]
-    19 ; PUSH "..XXXX..."
-    17 ; DEREF_MOV SP[-3]
-    18 ; PUSH SP[-10]
-    19 ; PUSH "X..XXX..."
-    17 ; DEREF_MOV SP[-3]
-    18 ; PUSH SP[-9]
-    19 ; PUSH ".X.XXX..."
-    17 ; DEREF_MOV SP[-3]
-    18 ; PUSH SP[-8]
-    19 ; PUSH "....XXXX........"
-    17 ; DEREF_MOV SP[-3]
-    18 ; PUSH SP[-7]
-    19 ; PUSH ""
-    17 ; DEREF_MOV SP[-3]
+    18 ; PUSH SP[-1]
+    19 ; PUSH SP[-15]
+    20 ; PUSH "XXXX"
+    17 ; DEREF_MOV
+    18 ; PUSH SP[-1]
+    19 ; PUSH SP[-14]
+    20 ; PUSH ".XXXX...."
+    17 ; DEREF_MOV
+    18 ; PUSH SP[-1]
+    19 ; PUSH SP[-13]
+    20 ; PUSH "XX..XX..."
+    17 ; DEREF_MOV
+    18 ; PUSH SP[-1]
+    19 ; PUSH SP[-12]
+    20 ; PUSH "..XXXX..."
+    17 ; DEREF_MOV
+    18 ; PUSH SP[-1]
+    19 ; PUSH SP[-11]
+    20 ; PUSH "X..XXX..."
+    17 ; DEREF_MOV
+    18 ; PUSH SP[-1]
+    19 ; PUSH SP[-10]
+    20 ; PUSH ".X.XXX..."
+    17 ; DEREF_MOV
+    18 ; PUSH SP[-1]
+    19 ; PUSH SP[-9]
+    20 ; PUSH "....XXXX........"
+    17 ; DEREF_MOV
+    18 ; PUSH SP[-1]
+    19 ; PUSH SP[-8]
+    20 ; PUSH ""
+    17 ; DEREF_MOV
     18 ; PUSH 8
     18 ; ALLOC_ARRAY
     18 ; TO_STR
-    19 ; PUSH SP[-15]
-    20 ; PUSH "\x1b[38;2;255;255;0m#"
-    18 ; DEREF_MOV SP[-3]
-    19 ; PUSH SP[-14]
-    20 ; PUSH "\x1b[38;2;0;255;0m#"
-    18 ; DEREF_MOV SP[-3]
-    19 ; PUSH SP[-13]
-    20 ; PUSH "\x1b[38;2;255;0;0m#"
-    18 ; DEREF_MOV SP[-3]
-    19 ; PUSH SP[-12]
-    20 ; PUSH "\x1b[38;2;255;127;0m#"
-    18 ; DEREF_MOV SP[-3]
-    19 ; PUSH SP[-11]
-    20 ; PUSH "\x1b[38;2;255;255;255m#"
-    18 ; DEREF_MOV SP[-3]
-    19 ; PUSH SP[-10]
-    20 ; PUSH "\x1b[38;2;255;0;255m#"
-    18 ; DEREF_MOV SP[-3]
-    19 ; PUSH SP[-9]
-    20 ; PUSH "\x1b[38;2;0;255;255m#"
-    18 ; DEREF_MOV SP[-3]
-    19 ; PUSH SP[-8]
-    20 ; PUSH " "
-    18 ; DEREF_MOV SP[-3]
+    19 ; PUSH SP[-1]
+    20 ; PUSH SP[-16]
+    21 ; PUSH "\x1b[38;2;255;255;0m#"
+    18 ; DEREF_MOV
+    19 ; PUSH SP[-1]
+    20 ; PUSH SP[-15]
+    21 ; PUSH "\x1b[38;2;0;255;0m#"
+    18 ; DEREF_MOV
+    19 ; PUSH SP[-1]
+    20 ; PUSH SP[-14]
+    21 ; PUSH "\x1b[38;2;255;0;0m#"
+    18 ; DEREF_MOV
+    19 ; PUSH SP[-1]
+    20 ; PUSH SP[-13]
+    21 ; PUSH "\x1b[38;2;255;127;0m#"
+    18 ; DEREF_MOV
+    19 ; PUSH SP[-1]
+    20 ; PUSH SP[-12]
+    21 ; PUSH "\x1b[38;2;255;255;255m#"
+    18 ; DEREF_MOV
+    19 ; PUSH SP[-1]
+    20 ; PUSH SP[-11]
+    21 ; PUSH "\x1b[38;2;255;0;255m#"
+    18 ; DEREF_MOV
+    19 ; PUSH SP[-1]
+    20 ; PUSH SP[-10]
+    21 ; PUSH "\x1b[38;2;0;255;255m#"
+    18 ; DEREF_MOV
+    19 ; PUSH SP[-1]
+    20 ; PUSH SP[-9]
+    21 ; PUSH " "
+    18 ; DEREF_MOV
     19 ; PUSH FALSE
     19 ; TO_BOOL
     20 ; PUSH SP[-1]
     20 ; TO_BOOL
     20 ; NEG
-    19 ; JMPZ 1706
+    19 ; JMPZ 1711
     20 ; PUSH SP[-19]
     21 ; PUSH SP[-19]
     20 ; MUL
@@ -128,15 +152,16 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\tetris.omni
     23 ; PUSH SP[-3]
     23 ; ARRAY_SIZE
     22 ; CMP_LE
-    21 ; JMPZ 9
-    22 ; PUSH SP[-1]
-    23 ; PUSH SP[-12]
-    21 ; DEREF_MOV SP[-4]
+    21 ; JMPZ 10
+    22 ; PUSH SP[-2]
+    23 ; PUSH SP[-2]
+    24 ; PUSH SP[-13]
+    21 ; DEREF_MOV
     22 ; PUSH SP[-1]
     23 ; PUSH 1
     22 ; ADD
     21 ; MOV SP[-2]
-    21 ; JMP -12
+    21 ; JMP -13
     20 ; POP
     21 ; RAND
     22 ; PUSH SP[-11]
@@ -271,7 +296,7 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\tetris.omni
     31 ; PUSH TRUE
     31 ; TO_BOOL
     32 ; PUSH SP[-1]
-    31 ; JMPZ 1485
+    31 ; JMPZ 1489
     32 ; POLL_CHAR
     32 ; TO_CHAR
     33 ; PUSH SP[-1]
@@ -956,13 +981,13 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\tetris.omni
     37 ; PUSH SP[-1]
     38 ; PUSH SP[-5]
     37 ; CMP_LE
-    36 ; JMPZ 103
+    36 ; JMPZ 104
     37 ; PUSH 0
     37 ; TO_INT
     38 ; PUSH SP[-1]
     39 ; PUSH SP[-6]
     38 ; CMP_LE
-    37 ; JMPZ 91
+    37 ; JMPZ 92
     38 ; PUSH 0
     38 ; TO_INT
     39 ; PUSH SP[-17]
@@ -1029,7 +1054,7 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\tetris.omni
     39 ; DEREF
     40 ; PUSH 'X'
     39 ; CMP_EQ
-    38 ; JMPZ 18
+    38 ; JMPZ 19
     39 ; PUSH SP[-2]
     40 ; PUSH SP[-17]
     39 ; ADD
@@ -1038,13 +1063,14 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\tetris.omni
     41 ; PUSH SP[-17]
     40 ; ADD
     40 ; TO_INT
-    41 ; PUSH SP[-1]
-    42 ; PUSH SP[-41]
-    41 ; MUL
-    42 ; PUSH SP[-3]
-    41 ; ADD
-    42 ; PUSH SP[-21]
-    40 ; DEREF_MOV SP[-23]
+    41 ; PUSH SP[-21]
+    42 ; PUSH SP[-2]
+    43 ; PUSH SP[-42]
+    42 ; MUL
+    43 ; PUSH SP[-4]
+    42 ; ADD
+    43 ; PUSH SP[-22]
+    40 ; DEREF_MOV
     39 ; POP
     38 ; POP
     37 ; POP
@@ -1052,23 +1078,23 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\tetris.omni
     39 ; PUSH 1
     38 ; ADD
     37 ; MOV SP[-2]
-    37 ; JMP -93
+    37 ; JMP -94
     36 ; POP
     37 ; PUSH SP[-1]
     38 ; PUSH 1
     37 ; ADD
     36 ; MOV SP[-2]
-    36 ; JMP -105
+    36 ; JMP -106
     35 ; POP
     34 ; POP
     33 ; POP
     32 ; POP
     33 ; PUSH SP[-1]
-    32 ; JMPZ 187
+    32 ; JMPZ 189
     33 ; PUSH TRUE
     33 ; TO_BOOL
     34 ; PUSH SP[-1]
-    33 ; JMPZ 182
+    33 ; JMPZ 184
     34 ; PUSH FALSE
     33 ; MOV SP[-2]
     34 ; PUSH 0
@@ -1126,7 +1152,7 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\tetris.omni
     34 ; POP
     34 ; JMP -51
     35 ; PUSH SP[-2]
-    34 ; JMPZ 122
+    34 ; JMPZ 124
     35 ; PUSH SP[-1]
     36 ; PUSH 1
     35 ; SUB
@@ -1193,7 +1219,7 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\tetris.omni
     38 ; PUSH SP[-4]
     39 ; PUSH 0
     38 ; CMP_GE
-    37 ; JMPZ 37
+    37 ; JMPZ 38
     38 ; PUSH SP[-4]
     39 ; PUSH 1
     38 ; SUB
@@ -1207,49 +1233,51 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\tetris.omni
     39 ; PUSH SP[-1]
     40 ; PUSH SP[-39]
     39 ; CMP_LE
-    38 ; JMPZ 21
-    39 ; PUSH SP[-4]
-    40 ; PUSH SP[-39]
-    39 ; MUL
-    40 ; PUSH SP[-2]
-    39 ; ADD
-    40 ; PUSH SP[-20]
-    41 ; PUSH SP[-6]
-    42 ; PUSH 1
-    41 ; SUB
-    42 ; PUSH SP[-41]
-    41 ; MUL
-    42 ; PUSH SP[-4]
-    41 ; ADD
-    40 ; DEREF
-    38 ; DEREF_MOV SP[-21]
+    38 ; JMPZ 22
+    39 ; PUSH SP[-19]
+    40 ; PUSH SP[-5]
+    41 ; PUSH SP[-40]
+    40 ; MUL
+    41 ; PUSH SP[-3]
+    40 ; ADD
+    41 ; PUSH SP[-21]
+    42 ; PUSH SP[-7]
+    43 ; PUSH 1
+    42 ; SUB
+    43 ; PUSH SP[-42]
+    42 ; MUL
+    43 ; PUSH SP[-5]
+    42 ; ADD
+    41 ; DEREF
+    38 ; DEREF_MOV
     39 ; PUSH SP[-1]
     40 ; PUSH 1
     39 ; ADD
     38 ; MOV SP[-2]
-    38 ; JMP -23
+    38 ; JMP -24
     37 ; POP
-    37 ; JMP -39
+    37 ; JMP -40
     38 ; PUSH 0
     38 ; TO_INT
     39 ; PUSH SP[-1]
     40 ; PUSH SP[-3]
     39 ; CMP_LE
-    38 ; JMPZ 9
-    39 ; PUSH SP[-1]
-    40 ; PUSH SP[-29]
-    38 ; DEREF_MOV SP[-21]
+    38 ; JMPZ 10
+    39 ; PUSH SP[-19]
+    40 ; PUSH SP[-2]
+    41 ; PUSH SP[-30]
+    38 ; DEREF_MOV
     39 ; PUSH SP[-1]
     40 ; PUSH 1
     39 ; ADD
     38 ; MOV SP[-2]
-    38 ; JMP -11
+    38 ; JMP -12
     37 ; POP
     36 ; POP
     35 ; POP
     34 ; POP
     33 ; POP
-    33 ; JMP -182
+    33 ; JMP -184
     32 ; POP
     33 ; PUSH ""
     33 ; TO_STR
@@ -1612,7 +1640,7 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\tetris.omni
     35 ; POP
     34 ; POP
     33 ; POP
-    33 ; JMP 125
+    33 ; JMP 126
     34 ; PUSH SP[-18]
     35 ; PUSH SP[-14]
     34 ; DEREF
@@ -1630,13 +1658,13 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\tetris.omni
     38 ; PUSH SP[-1]
     39 ; PUSH SP[-5]
     38 ; CMP_LE
-    37 ; JMPZ 103
+    37 ; JMPZ 104
     38 ; PUSH 0
     38 ; TO_INT
     39 ; PUSH SP[-1]
     40 ; PUSH SP[-6]
     39 ; CMP_LE
-    38 ; JMPZ 91
+    38 ; JMPZ 92
     39 ; PUSH 0
     39 ; TO_INT
     40 ; PUSH SP[-18]
@@ -1703,7 +1731,7 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\tetris.omni
     40 ; DEREF
     41 ; PUSH 'X'
     40 ; CMP_EQ
-    39 ; JMPZ 18
+    39 ; JMPZ 19
     40 ; PUSH SP[-2]
     41 ; PUSH SP[-18]
     40 ; ADD
@@ -1712,13 +1740,14 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\tetris.omni
     42 ; PUSH SP[-18]
     41 ; ADD
     41 ; TO_INT
-    42 ; PUSH SP[-1]
-    43 ; PUSH SP[-42]
-    42 ; MUL
-    43 ; PUSH SP[-3]
-    42 ; ADD
-    43 ; PUSH SP[-32]
-    41 ; DEREF_MOV SP[-24]
+    42 ; PUSH SP[-22]
+    43 ; PUSH SP[-2]
+    44 ; PUSH SP[-43]
+    43 ; MUL
+    44 ; PUSH SP[-4]
+    43 ; ADD
+    44 ; PUSH SP[-33]
+    41 ; DEREF_MOV
     40 ; POP
     39 ; POP
     38 ; POP
@@ -1726,13 +1755,13 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\tetris.omni
     40 ; PUSH 1
     39 ; ADD
     38 ; MOV SP[-2]
-    38 ; JMP -93
+    38 ; JMP -94
     37 ; POP
     38 ; PUSH SP[-1]
     39 ; PUSH 1
     38 ; ADD
     37 ; MOV SP[-2]
-    37 ; JMP -105
+    37 ; JMP -106
     36 ; POP
     35 ; POP
     34 ; POP
@@ -1755,7 +1784,7 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\tetris.omni
     33 ; MOV SP[-5]
     32 ; POP
     31 ; POP
-    31 ; JMP -1485
+    31 ; JMP -1489
     32 ; PUSH "\x1b[?25h\x1b[0m"
     31 ; PRINT
     32 ; PUSH "\x1b[2JDo you wish to restart? (y/n):"
@@ -1821,7 +1850,7 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\tetris.omni
     21 ; POP
     20 ; POP
     19 ; POP
-    19 ; JMP -1708
+    19 ; JMP -1713
     20 ; PUSH 0
     19 ; RET
     18 ; POP

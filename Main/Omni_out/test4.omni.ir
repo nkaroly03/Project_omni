@@ -15,17 +15,19 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\test4.omni
     5 ; NEG
     4 ; JMPZ 3
     5 ; PUSH FALSE
-    5 ; JMP 8
-    5 ; PUSH 0
-    5 ; GET_ARGV
+    5 ; JMP 9
+    5 ; PUSH ARGV
+    6 ; PUSH 0
+    5 ; DEREF
     4 ; MOV SP[-3]
     5 ; PUSH SP[-2]
     6 ; PUSH 0
     5 ; CMP_GE
     5 ; TO_BOOL
-    4 ; JMPZ 4
-    5 ; PUSH 0
-    5 ; GET_ARGV
+    4 ; JMPZ 5
+    5 ; PUSH ARGV
+    6 ; PUSH 0
+    5 ; DEREF
     4 ; MOV SP[-2]
     5 ; PUSH 3.14159265
     5 ; TO_FLOAT

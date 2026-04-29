@@ -2,8 +2,9 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\sin.omni
 
     1 ; PUSH 3.14159265
     1 ; TO_FLOAT
-    2 ; PUSH 0
-    2 ; GET_ARGV
+    2 ; PUSH ARGV
+    3 ; PUSH 0
+    2 ; DEREF
     2 ; TO_FLOAT
     3 ; PUSH SP[-1]
     4 ; PUSH 2

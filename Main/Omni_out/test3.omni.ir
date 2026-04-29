@@ -1,12 +1,32 @@
 src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\test3.omni
 
-    1 ; POLL_CHAR
-    1 ; TO_CHAR
-    2 ; PUSH "c: "
-    3 ; PUSH SP[-2]
-    2 ; ADD
-    3 ; PUSH '\n'
-    2 ; ADD
+    1 ; PUSH 1
+    1 ; NEG
+    1 ; TO_INT
+    2 ; PUSH "i: "
+    1 ; PRINT
+    2 ; PUSH SP[-1]
+    1 ; PRINT
+    2 ; PUSH '\n'
+    1 ; PRINT
+    2 ; PUSH "i: "
+    1 ; PRINT
+    2 ; PUSH SP[-1]
+    2 ; TO_BOOL
+    2 ; NEG
+    1 ; JMPZ 3
+    2 ; PUSH FALSE
+    2 ; JMP 3
+    2 ; PUSH 1
+    2 ; TO_BOOL
+    1 ; PRINT
+    2 ; PUSH '\n'
+    1 ; PRINT
+    2 ; PUSH "i: "
+    1 ; PRINT
+    2 ; PUSH SP[-1]
+    1 ; PRINT
+    2 ; PUSH '\n'
     1 ; PRINT
     2 ; PUSH 0
     1 ; RET

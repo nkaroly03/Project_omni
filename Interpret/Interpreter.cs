@@ -25,7 +25,7 @@ public static class Interpreter{
         for (int pc = 0; pc < bytecode.Length;){
             switch ((Compiler.Op_code)bytecode[pc++]){
                 case Compiler.Op_code.PUSH_FROM_SP:
-                    stack.Add(new(stack[stack.Count + BitConverter.ToInt32(bytecode[pc..][..sizeof(int)])]));
+                    stack.Add(stack[stack.Count + BitConverter.ToInt32(bytecode[pc..][..sizeof(int)])]);
                     pc += sizeof(int);
                     break;
                 case Compiler.Op_code.PUSH_ARGC:
@@ -84,9 +84,8 @@ public static class Interpreter{
                     stack.pop();
                     break;
                 case Compiler.Op_code.DEREF_MOV:
-                    Value value_ref = stack[stack.Count + BitConverter.ToInt32(bytecode[pc..][..sizeof(int)])];
-                    pc += sizeof(int);
-                    value_ref[stack[^2]] = stack.pop();
+                    stack[^3][stack[^2]] = stack.pop();
+                    stack.pop();
                     stack.pop();
                     break;
 

@@ -4,8 +4,8 @@ let HEIGHT: int = 32;
 let int_cast: int = 0;
 
 let frequency: float = 1;
-if (argc > 0 and (int_cast = argv(0)) > 0)
-    frequency = argv(0);
+if (argc > 0 and (int_cast = argv[0]) > 0)
+    frequency = argv[0];
 
 let PI: float = 3.14159265;
 

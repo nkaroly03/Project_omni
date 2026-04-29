@@ -36,6 +36,16 @@
 // 
 // print(argv[0]);
 
-let c: char = poll_char();
+let i: int = -1;
 
-print("c: " + c + '\n');
+print("i: ");
+print(i);
+print('\n');
+
+print("i: ");
+print(i and 1);
+print('\n');
+
+print("i: ");
+print(i);
+print('\n');

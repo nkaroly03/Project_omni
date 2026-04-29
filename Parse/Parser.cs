@@ -357,13 +357,6 @@ public static class Parser{
         Token[] token_array = tokens.ToArray();
         Array.Reverse(token_array);
 
-        if (token_array.Count((t) => t.type == Token.Type.LPAREN) != token_array.Count((t) => t.type == Token.Type.RPAREN))
-            throw new Syntax_error_exception("The number of opening and closing parentheses must match");
-        if (token_array.Count((t) => t.type == Token.Type.LBRACKET) != token_array.Count((t) => t.type == Token.Type.RBRACKET))
-            throw new Syntax_error_exception("The number of opening and closing brackets must match");
-        if (token_array.Count((t) => t.type == Token.Type.LBRACE) != token_array.Count((t) => t.type == Token.Type.RBRACE))
-            throw new Syntax_error_exception("The number of opening and closing braces must match");
-
         Stack<Token> token_stack = new(token_array);
         List<Node> nodes = new(); 
 

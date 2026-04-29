@@ -1,6 +1,6 @@
 let PI: float = 3.14159265;
 
-let val: float = argv(0);
+let val: float = argv[0];
 
 let k: int = val * 2 / PI;
 val = val - k * PI / 2;

@@ -234,33 +234,14 @@ public static class Compiler{
                         to_IR(current_AST_node.sub_nodes[1], null, sb, ref let_decl_counter, true);
                         sb.add_instruction($"{stack_size - 1} ; MOV SP[-{stack_size - m_id_positions[eq_tok.id]}]");
                         --stack_size;
-                        // if (push_back_after_assignment){
-                            // to_IR(current_AST_node.sub_nodes[0], null, sb, ref let_decl_counter, true);
-                            // // sb.add_instruction($"{stack_size + 1} ; PUSH SP[-{stack_size - m_id_positions[eq_tok.id]}]");
-                            // // ++stack_size;
-                        // }
                     }
                     else{
-                        eq_tok = current_AST_node.sub_nodes[0].sub_nodes[0].token;
-                        if (eq_tok.type != Token.Type.LBRACKET){
-                            if (eq_tok.type == Token.Type.ARGV)
-                                throw new Syntax_error_exception($"On line <{eq_tok.line_number}> <argv> is immutable");
-                            else if (eq_tok.type != Token.Type.ID)
-                                throw new Syntax_error_exception($"On line <{eq_tok.line_number}> trying to assign to rvalue");
-                            to_IR(current_AST_node.sub_nodes[0].sub_nodes[1], null, sb, ref let_decl_counter, true);
-                            to_IR(current_AST_node.sub_nodes[1], null, sb, ref let_decl_counter, true);
-                            sb.add_instruction($"{stack_size - 2} ; DEREF_MOV SP[-{stack_size - m_id_positions[eq_tok.id]}]");
-                            stack_size -= 2;
-                        }
-                        else{
-                            // TODO: rvalue check
-                            to_IR(current_AST_node.sub_nodes[0].sub_nodes[0], null, sb, ref let_decl_counter, true);
-                            to_IR(current_AST_node.sub_nodes[0].sub_nodes[1], null, sb, ref let_decl_counter, true);
-                            to_IR(current_AST_node.sub_nodes[1], null, sb, ref let_decl_counter, true);
-                            sb.add_instruction($"{stack_size - 2} ; DEREF_MOV SP[-3]");
-                            stack_size -= 2;
-                            sb.add_instruction($"{--stack_size} ; POP");
-                        }
+                        // TODO: rvalue check
+                        to_IR(current_AST_node.sub_nodes[0].sub_nodes[0], null, sb, ref let_decl_counter, true);
+                        to_IR(current_AST_node.sub_nodes[0].sub_nodes[1], null, sb, ref let_decl_counter, true);
+                        to_IR(current_AST_node.sub_nodes[1], null, sb, ref let_decl_counter, true);
+                        sb.add_instruction($"{stack_size - 3} ; DEREF_MOV");
+                        stack_size -= 3;
                     }
                     if (push_back_after_assignment)
                         to_IR(current_AST_node.sub_nodes[0], null, sb, ref let_decl_counter, true);
@@ -417,7 +398,6 @@ public static class Compiler{
                     }
                     break;
                 case "MOV":
-                case "DEREF_MOV":
                 case "JMP":
                 case "JMPZ":
                     instruction_byte_count += sizeof(int);
@@ -482,9 +462,7 @@ public static class Compiler{
                     bytecode.AddRange(as_bytes);
                     break;
                 case "DEREF_MOV":
-                    as_bytes = BitConverter.GetBytes(int.Parse(rhs[3..^1]));
                     bytecode.Add((byte)Op_code.DEREF_MOV);
-                    bytecode.AddRange(as_bytes);
                     break;
 
                 case "JMP":
