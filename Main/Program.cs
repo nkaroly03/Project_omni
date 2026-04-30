@@ -10,10 +10,10 @@ ReadOnlySpan<Token> tokens = Lexer.tokenize(argv[1]);
 // foreach (Token tok in tokens)
     // Console.WriteLine(tok);
 ReadOnlySpan<Node> AST = Parser.build_AST(tokens);
-// foreach (Node node in AST){
-    // Console.Write(node);
-    // Console.WriteLine(new string('-', 40));
-// }
+foreach (Node node in AST){
+    Console.Write(node);
+    Console.WriteLine(new string('-', 40));
+}
 
 string IR = Compiler.to_IR(AST);
 // Console.WriteLine(IR);
@@ -32,4 +32,4 @@ Directory.CreateDirectory(out_dir_name);
 File.WriteAllLines($"{out_dir_name}/{file_name}.ir", [$"src: {Path.GetFullPath(argv[1])}{Environment.NewLine}", IR]);
 File.WriteAllBytes($"{out_dir_name}/{file_name}.bc", bytecode);
 
-Console.WriteLine($"return value: {Interpreter.run(bytecode, new Value(argv[2..].Select((s) => new StringBuilder(s)).ToArray()))}");
+Console.WriteLine($"\nreturn value: {Interpreter.run(bytecode, Value.get_argv(argv[2..]))}");

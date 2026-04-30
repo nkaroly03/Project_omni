@@ -17,7 +17,7 @@ public static class Interpreter{
 
     public static Value run(ReadOnlySpan<byte> bytecode, Value argv){
         if (argv.data is not StringBuilder[])
-            throw new ArgumentOutOfRangeException("argv must contain an array of StringBuilders");
+            throw new ArgumentOutOfRangeException("<argv> must contain an array of StringBuilders");
 
         List<Value> stack = new();
         Random rd = new();
@@ -28,11 +28,8 @@ public static class Interpreter{
                     stack.Add(stack[stack.Count + BitConverter.ToInt32(bytecode[pc..][..sizeof(int)])]);
                     pc += sizeof(int);
                     break;
-                case Compiler.Op_code.PUSH_ARGC:
-                    stack.Add(new(((StringBuilder[])argv.data).Length));
-                    break;
                 case Compiler.Op_code.PUSH_ARGV:
-                    stack.Add(new(argv));
+                    stack.Add(argv);
                     break;
                 case Compiler.Op_code.PUSH_FALSE:
                     stack.Add(new(false));
@@ -84,6 +81,14 @@ public static class Interpreter{
                     stack.pop();
                     break;
                 case Compiler.Op_code.DEREF_MOV:
+                    // TODO: throw this in Compile.to_IR
+                    // if (object.ReferenceEquals(stack[^3], argv) || ((Func<bool>)(() => {
+                        // foreach (StringBuilder sb in ((StringBuilder[])argv.data))
+                            // if (object.ReferenceEquals(stack[^3].data, sb))
+                                // return true;
+                        // return false;
+                    // }))())
+                        // throw new ArgumentOutOfRangeException("<argv> and it's elements are immutable");
                     stack[^3][stack[^2]] = stack.pop();
                     stack.pop();
                     stack.pop();
@@ -202,6 +207,9 @@ public static class Interpreter{
                     stack[^1] = -stack[^1];
                     break;
             }
+            // foreach (Value v in stack)
+                // Console.WriteLine($"stack_size: {stack.Count} | {v}");
+            // Console.WriteLine();
         }
 
         return stack[^1];

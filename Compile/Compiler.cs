@@ -16,7 +16,6 @@ public static class Compiler{
 
     public enum Op_code : byte{
         PUSH_FROM_SP,
-        PUSH_ARGC,
         PUSH_ARGV,
         PUSH_FALSE,
         PUSH_TRUE,
@@ -91,9 +90,6 @@ public static class Compiler{
                     sb.add_instruction($"{stack_size} ; PUSH SP[-{stack_size - m_id_positions[current_AST_node.token.id] - 1}]");
                     break;
 
-                case Token.Type.ARGC:
-                    sb.add_instruction($"{++stack_size} ; PUSH ARGC");
-                    break;
                 case Token.Type.ARGV:
                     sb.add_instruction($"{++stack_size} ; PUSH ARGV");
                     break;
@@ -383,7 +379,7 @@ public static class Compiler{
             (string lhs, string rhs) = (space_idx >= 0) ? (instruction[..space_idx], instruction[(space_idx + 1)..]) : (instruction, "");
             switch (lhs){
                 case "PUSH":
-                    if (rhs != "ARGC" && rhs != "ARGV" && rhs != "FALSE" && rhs != "TRUE"){
+                    if (rhs != "ARGV" && rhs != "FALSE" && rhs != "TRUE"){
                         if (rhs.StartsWith("\""))
                             instruction_byte_count += (sizeof(int) + Encoding.UTF8.GetBytes(rhs.get_string_literal()).Length);
                         else{
@@ -422,8 +418,6 @@ public static class Compiler{
                         bytecode.Add((byte)Op_code.PUSH_FROM_SP);
                         bytecode.AddRange(as_bytes);
                     }
-                    else if (rhs == "ARGC")
-                        bytecode.Add((byte)Op_code.PUSH_ARGC);
                     else if (rhs == "ARGV")
                         bytecode.Add((byte)Op_code.PUSH_ARGV);
                     else if (rhs == "FALSE")

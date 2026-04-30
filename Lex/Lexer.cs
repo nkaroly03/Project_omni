@@ -6,7 +6,6 @@ using System.Text.RegularExpressions;
 public readonly record struct Token{
     public enum Type{
         ID,
-        ARGC,
         ARGV,
         FALSE,
         TRUE,
@@ -125,8 +124,10 @@ public static class Lexer{
                 "(" +
                     @"/\*/(?:\r\n|\r|\n|.)*?/\*/|(?://.*)?(?:\r\n|\r|\n)|""(?:[^""\\]|\\.)*?""|'(?:[^'\\]|\\.)*?'|" +
                     @"\.\.|\*\*|[:;()\[\]{}+*/%&|^~-]|<<|>>|!=|[<>=]=?|" +
-                    @"\bargc\b|\bfalse\b|\btrue\b|\band\b|\bor\b|\bnot\b|\blet\b|" +
-                    @"\bbool\b|\bchar\b|\bint\b|\bfloat\b|\bstr\b|\bprint\b|\bscan\b|\barray_size\b|\brand\b|\bpoll_char\b|\bargv\b|\bif\b|\belse\b|\bwhile\b|\bfor\b|\breturn\b" +
+                    @"\bargv\b|\bfalse\b|\btrue\b|\band\b|\bor\b|\bnot\b|\blet\b|" +
+                    @"\bbool\b|\bchar\b|\bint\b|\bfloat\b|\bstr\b|" +
+                    @"\bprint\b|\bscan\b|\barray_size\b|\brand\b|\bpoll_char\b|" +
+                    @"\bif\b|\belse\b|\bwhile\b|\bfor\b|\breturn\b" +
                 ")"
             ).Select((s) => s.Trim(' ')).Where((s) => s.Length > 0).ToArray()
         ){
@@ -142,7 +143,6 @@ public static class Lexer{
                 string token_id = line;
 
                 Token.Type token_type = line switch{
-                    "argc"       => Token.Type.ARGC,
                     "argv"       => Token.Type.ARGV,
                     "false"      => Token.Type.FALSE,
                     "true"       => Token.Type.TRUE,

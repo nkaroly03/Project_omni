@@ -8,9 +8,8 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\test4.omni
     3 ; TO_INT
     4 ; PUSH 1
     4 ; TO_FLOAT
-    5 ; PUSH ARGC
-    6 ; PUSH 0
-    5 ; CMP_GE
+    5 ; PUSH ARGV
+    5 ; ARRAY_SIZE
     5 ; TO_BOOL
     5 ; NEG
     4 ; JMPZ 3

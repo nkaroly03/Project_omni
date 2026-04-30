@@ -1769,7 +1769,7 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\tetris.omni
     34 ; PUSH 0
     34 ; TO_INT
     35 ; PUSH SP[-1]
-    36 ; PUSH 20000
+    36 ; PUSH 50000
     35 ; CMP_LE
     34 ; JMPZ 6
     35 ; PUSH SP[-1]

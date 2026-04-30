@@ -36,16 +36,10 @@
 // 
 // print(argv[0]);
 
-let i: int = -1;
+// let s: str = "Hello";
+// 
+// print("s: " + s + '\n');
+// s[0] = (s = "Test")[2];
+// print("s: " + s + '\n');
 
-print("i: ");
-print(i);
-print('\n');
-
-print("i: ");
-print(i and 1);
-print('\n');
-
-print("i: ");
-print(i);
-print('\n');
+print("Hello"[2 + 1]);

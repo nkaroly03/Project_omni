@@ -104,7 +104,9 @@ public sealed class Value : IEquatable<Value>, IComparable<Value>{
     public static bool operator> (Value v1, Value v2) =>  v1.CompareTo(v2) >  0;
     public static bool operator>=(Value v1, Value v2) =>  v1.CompareTo(v2) >= 0;
 
-    public object data{ get; private set; }
+    public static Value get_argv(string[] argv) => new(argv.Select((s) => new StringBuilder(s)).ToArray());
+
+    public object data{ get; private set; } // TODO: make into internal/modifiy Interpret.Interpreter's MOV case? (s[0] = (s = "Test")[2])
 
     public Value(bool data)            => this.data = data;
     public Value(char data)            => this.data = data;
