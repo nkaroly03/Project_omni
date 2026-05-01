@@ -225,22 +225,44 @@ public static class Compiler{
                             throw new Syntax_error_exception($"On line <{eq_tok.line_number}> <argv> is immutable");
                         else if (eq_tok.type != Token.Type.ID)
                             throw new Syntax_error_exception($"On line <{eq_tok.line_number}> trying to assign to rvalue");
-                        if (!m_id_positions.ContainsKey(eq_tok.id))
+                        else if (!m_id_positions.ContainsKey(eq_tok.id))
                             throw new Syntax_error_exception($"On line <{eq_tok.line_number}> use of undeclared identifier <{eq_tok.id}>");
+
                         to_IR(current_AST_node.sub_nodes[1], null, sb, ref let_decl_counter, true);
                         sb.add_instruction($"{stack_size - 1} ; MOV SP[-{stack_size - m_id_positions[eq_tok.id]}]");
                         --stack_size;
+
+                        if (push_back_after_assignment)
+                            to_IR(current_AST_node.sub_nodes[0], null, sb, ref let_decl_counter, true);
                     }
                     else{
-                        // TODO: rvalue check
+                        for (Node lhs = current_AST_node.sub_nodes[0].sub_nodes[0]; lhs.token.type != Token.Type.ID; lhs = lhs.sub_nodes[0]){
+                            if (lhs.token.type == Token.Type.ARGV)
+                                throw new Syntax_error_exception($"On line <{lhs.token.line_number}> <argv> is immutable");
+                            else if (lhs.token.type != Token.Type.ID && lhs.token.type != Token.Type.LBRACKET && lhs.token.type != Token.Type.EQ)
+                                throw new Syntax_error_exception($"On line <{lhs.token.line_number}> trying to assign to rvalue");
+                        }
                         to_IR(current_AST_node.sub_nodes[0].sub_nodes[0], null, sb, ref let_decl_counter, true);
                         to_IR(current_AST_node.sub_nodes[0].sub_nodes[1], null, sb, ref let_decl_counter, true);
                         to_IR(current_AST_node.sub_nodes[1], null, sb, ref let_decl_counter, true);
                         sb.add_instruction($"{stack_size - 3} ; DEREF_MOV");
                         stack_size -= 3;
+
+                        if (push_back_after_assignment){
+                            Stack<Node> deref_idxs = new();
+                            Node push_back = current_AST_node.sub_nodes[0];
+                            while (push_back.token.type != Token.Type.ID){
+                                if (push_back.token.type == Token.Type.LBRACKET)
+                                    deref_idxs.Push(push_back.sub_nodes[1]);
+                                push_back = push_back.sub_nodes[0];
+                            }
+                            to_IR(push_back, null, sb, ref let_decl_counter, true);
+                            while (deref_idxs.Count > 0){
+                                to_IR(deref_idxs.Pop(), null, sb, ref let_decl_counter, true);
+                                sb.add_instruction($"{--stack_size} ; DEREF");
+                            }
+                        }
                     }
-                    if (push_back_after_assignment)
-                        to_IR(current_AST_node.sub_nodes[0], null, sb, ref let_decl_counter, true);
                     break;
 
                 case Token.Type.LET_DECL:
@@ -357,6 +379,7 @@ public static class Compiler{
         StringBuilder sb = new();
         int let_decl_counter = 0;
 
+        // TODO: check discarded expressions (example: (a[0] + 1);)
         for (int i = 0; i < AST.Length - 1; ++i)
             if (AST[i].token.type != Token.Type.ELSE)
                 state.to_IR(AST[i], AST[i + 1], sb, ref let_decl_counter, false);

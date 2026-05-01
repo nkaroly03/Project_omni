@@ -131,15 +131,12 @@ public static class Parser{
 
             switch (tok.type){
                 case Token.Type.ID:
-                    if (self.Count == 0 || (self.Peek().type != Token.Type.EQ && self.Peek().type != Token.Type.LBRACKET))
-                        throw new Syntax_error_exception($"On line <{tok.line_number}> <{tok.id}> must be followed by <=>");
-
+                case Token.Type.LPAREN:
                     self.Push(tok);
-
                     node1 = self.parse_arithm_expr(0.0f);
-                    if (node1.token.type == Token.Type.LBRACKET)
-                        throw new Syntax_error_exception($"On line <{tok.line_number}> discarding the result of array dereference");
 
+                    if (node1.token.type != Token.Type.EQ)
+                        throw new Syntax_error_exception($"On line <{tok.line_number}> discarding the result of expression");
                     if (self.Count == 0 || (tok = self.Pop()).type != Token.Type.SEMICOLON)
                         throw new Syntax_error_exception($"On line <{tok.line_number}> expression must be closed by <;>");
                     break;

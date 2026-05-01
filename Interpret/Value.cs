@@ -8,6 +8,9 @@ public sealed class Value : IEquatable<Value>, IComparable<Value>{
         if (v1.data.GetType().IsArray || v2.data.GetType().IsArray)
             throw new ArgumentOutOfRangeException("Trying to use arithmetic operation on array(s)");
 
+        v1 = new(v1);
+        v2 = new(v2);
+
         v1.data = v1.data switch{
             bool b => v2.data switch{
                 bool  => v1.data,
@@ -84,18 +87,18 @@ public sealed class Value : IEquatable<Value>, IComparable<Value>{
         _ => throw new UnreachableException(),
     };
 
-    public static Value operator+(Value v1, Value v2) => arithm_op(new(v1), new(v2), (_v1, _v2) => _v1.add_eq(_v2));
-    public static Value operator-(Value v1, Value v2) => arithm_op(new(v1), new(v2), (_v1, _v2) => _v1.sub_eq(_v2));
-    public static Value operator*(Value v1, Value v2) => arithm_op(new(v1), new(v2), (_v1, _v2) => _v1.mul_eq(_v2));
-    public static Value operator/(Value v1, Value v2) => arithm_op(new(v1), new(v2), (_v1, _v2) => _v1.div_eq(_v2));
-    public static Value operator%(Value v1, Value v2) => arithm_op(new(v1), new(v2), (_v1, _v2) => _v1.mod_eq(_v2));
-    public static Value       pow(Value v1, Value v2) => arithm_op(new(v1), new(v2), (_v1, _v2) => _v1.pow_eq(_v2));
+    public static Value operator+(Value v1, Value v2) => arithm_op(v1, v2, (_v1, _v2) => _v1.add_eq(_v2));
+    public static Value operator-(Value v1, Value v2) => arithm_op(v1, v2, (_v1, _v2) => _v1.sub_eq(_v2));
+    public static Value operator*(Value v1, Value v2) => arithm_op(v1, v2, (_v1, _v2) => _v1.mul_eq(_v2));
+    public static Value operator/(Value v1, Value v2) => arithm_op(v1, v2, (_v1, _v2) => _v1.div_eq(_v2));
+    public static Value operator%(Value v1, Value v2) => arithm_op(v1, v2, (_v1, _v2) => _v1.mod_eq(_v2));
+    public static Value       pow(Value v1, Value v2) => arithm_op(v1, v2, (_v1, _v2) => _v1.pow_eq(_v2));
 
-    public static Value operator<<(Value v1, Value v2) => arithm_op(new(v1), new(v2), (_v1, _v2) => _v1. shl_eq(_v2));
-    public static Value operator>>(Value v1, Value v2) => arithm_op(new(v1), new(v2), (_v1, _v2) => _v1. shr_eq(_v2));
-    public static Value operator& (Value v1, Value v2) => arithm_op(new(v1), new(v2), (_v1, _v2) => _v1.band_eq(_v2));
-    public static Value operator| (Value v1, Value v2) => arithm_op(new(v1), new(v2), (_v1, _v2) => _v1. bor_eq(_v2));
-    public static Value operator^ (Value v1, Value v2) => arithm_op(new(v1), new(v2), (_v1, _v2) => _v1. xor_eq(_v2));
+    public static Value operator<<(Value v1, Value v2) => arithm_op(v1, v2, (_v1, _v2) => _v1. shl_eq(_v2));
+    public static Value operator>>(Value v1, Value v2) => arithm_op(v1, v2, (_v1, _v2) => _v1. shr_eq(_v2));
+    public static Value operator& (Value v1, Value v2) => arithm_op(v1, v2, (_v1, _v2) => _v1.band_eq(_v2));
+    public static Value operator| (Value v1, Value v2) => arithm_op(v1, v2, (_v1, _v2) => _v1. bor_eq(_v2));
+    public static Value operator^ (Value v1, Value v2) => arithm_op(v1, v2, (_v1, _v2) => _v1. xor_eq(_v2));
 
     public static bool operator==(Value v1, Value v2) =>  v1.Equals(v2);
     public static bool operator!=(Value v1, Value v2) => !v1.Equals(v2);
@@ -106,7 +109,7 @@ public sealed class Value : IEquatable<Value>, IComparable<Value>{
 
     public static Value get_argv(string[] argv) => new(argv.Select((s) => new StringBuilder(s)).ToArray());
 
-    public object data{ get; private set; } // TODO: make into internal/modifiy Interpret.Interpreter's MOV case? (s[0] = (s = "Test")[2])
+    public object data{ get; private set; } // TODO: make into internal/modifiy Interpret.Interpreter's MOV case? reason: (s[0] = (s = "Test")[2])
 
     public Value(bool data)            => this.data = data;
     public Value(char data)            => this.data = data;
@@ -274,8 +277,8 @@ public sealed class Value : IEquatable<Value>, IComparable<Value>{
             int            i => i + other.to_int(),
             float          f => f + other.to_float(),
             StringBuilder sb => other.data switch{
-                char           other_c => sb.Append(other_c),
-                StringBuilder other_sb => sb.Append(other_sb.ToString()),
+                char           c_other => sb.Append( c_other),
+                StringBuilder sb_other => sb.Append(sb_other.ToString()),
 
                 _ => throw new ArgumentOutOfRangeException("Trying to do addition on a string with bool, int or float"),
             },
@@ -330,7 +333,6 @@ public sealed class Value : IEquatable<Value>, IComparable<Value>{
     public void pow_eq(Value other){
         if (data.GetType().IsArray || other.data.GetType().IsArray)
             throw new ArgumentOutOfRangeException("Trying to do exponentiation with array(s)");
-
         if (data is StringBuilder || other.data is StringBuilder)
             throw new ArgumentOutOfRangeException("Trying to do exponentiation string(s)");
 

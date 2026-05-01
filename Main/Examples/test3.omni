@@ -23,23 +23,35 @@
     }
 /*/
 
-// let s: [1]str = {};
+let s1: str = "Hello\n";
+let s2: str = "Ok\n";
 // 
-// s[0] = "Hello, World!";
-// // print("s[0]: " + s[0] + '\n');
+s2[0] = s1[0] = 'T';
 // 
-// s[0] = s[0] = "Hello";
+// print(s1);
+// print(s2);
 // 
-// print("s[0]: " + s[0] + '\n');
+// print(((s2 = "Ok")[0] = 'A'));
+// print("\ns1: " + s1 + '\n');
+// print("\ns2: " + s2 + '\n');
 
-// print((argv[0] = "Hello"));
-// 
-// print(argv[0]);
 
-// let s: str = "Hello";
+// let s1: [2]str = {};
+// s1[0] = "Hello";
+// s1[1] = "Ok";
 // 
-// print("s: " + s + '\n');
-// s[0] = (s = "Test")[2];
-// print("s: " + s + '\n');
+// print(((s1[0] = s1[1] = "Test")[0] = 'A'));
+// print('\n');
+// 
+// for (0..array_size(s1)) |i|
+    // print(s1[i] + '\n');
 
-print("Hello"[2 + 1]);
+
+let arr: [2]int = {};
+
+arr[0] = arr[(arr[1] = 1)] = 20;
+
+// for (0..array_size(arr)) |i|{
+    // let cast: str = "";
+    // print("arr[" + (cast = i) + "]: " + (cast = arr[i]) + '\n');
+// }

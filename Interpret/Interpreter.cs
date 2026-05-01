@@ -81,14 +81,6 @@ public static class Interpreter{
                     stack.pop();
                     break;
                 case Compiler.Op_code.DEREF_MOV:
-                    // TODO: throw this in Compile.to_IR
-                    // if (object.ReferenceEquals(stack[^3], argv) || ((Func<bool>)(() => {
-                        // foreach (StringBuilder sb in ((StringBuilder[])argv.data))
-                            // if (object.ReferenceEquals(stack[^3].data, sb))
-                                // return true;
-                        // return false;
-                    // }))())
-                        // throw new ArgumentOutOfRangeException("<argv> and it's elements are immutable");
                     stack[^3][stack[^2]] = stack.pop();
                     stack.pop();
                     stack.pop();

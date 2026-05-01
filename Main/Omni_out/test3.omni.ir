@@ -1,11 +1,47 @@
 src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\test3.omni
 
-    1 ; PUSH "Hello"
-    2 ; PUSH 2
-    3 ; PUSH 1
-    2 ; ADD
-    1 ; DEREF
-    0 ; PRINT
-    1 ; PUSH 0
-    0 ; RET
+    1 ; PUSH "Hello\n"
+    1 ; TO_STR
+    2 ; PUSH "Ok\n"
+    2 ; TO_STR
+    3 ; PUSH SP[-1]
+    4 ; PUSH 0
+    5 ; PUSH SP[-4]
+    6 ; PUSH 0
+    7 ; PUSH 'T'
+    4 ; DEREF_MOV
+    5 ; PUSH SP[-4]
+    6 ; PUSH 0
+    5 ; DEREF
+    2 ; DEREF_MOV
+    3 ; PUSH 2
+    3 ; ALLOC_ARRAY
+    3 ; TO_INT
+    4 ; PUSH SP[-1]
+    5 ; PUSH 0
+    6 ; PUSH SP[-3]
+    7 ; PUSH SP[-4]
+    8 ; PUSH 1
+    9 ; PUSH 1
+    6 ; DEREF_MOV
+    7 ; PUSH SP[-4]
+    8 ; PUSH 1
+    7 ; DEREF
+    8 ; PUSH 20
+    5 ; DEREF_MOV
+    6 ; PUSH SP[-3]
+    7 ; PUSH SP[-4]
+    8 ; PUSH 1
+    9 ; PUSH 1
+    6 ; DEREF_MOV
+    7 ; PUSH SP[-4]
+    8 ; PUSH 1
+    7 ; DEREF
+    6 ; DEREF
+    3 ; DEREF_MOV
+    4 ; PUSH 0
+    3 ; RET
+    2 ; POP
+    1 ; POP
+    0 ; POP
 

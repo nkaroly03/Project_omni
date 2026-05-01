@@ -77,18 +77,15 @@ public readonly record struct Token{
 }
 
 public class Syntax_error_exception : Exception{
-    public Syntax_error_exception(string msg) : base(msg.colour_str()){}
-    public Syntax_error_exception(string msg, Exception inner_exception) : base(msg.colour_str(), inner_exception){}
+    static string colour_str(string str) => $"\x1b[38;2;255;0;0m{str}\x1b[0m";
+
+    public Syntax_error_exception(string msg) : base(colour_str(msg)){}
+    public Syntax_error_exception(string msg, Exception inner_exception) : base(colour_str(msg), inner_exception){}
 
     public Syntax_error_exception(){}
 }
 
 public static class Lexer{
-    extension(string self){
-        public string colour_str(byte r, byte g, byte b) => $"\x1b[38;2;{r};{g};{b}m{self}\x1b[0m";
-        public string colour_str() => self.colour_str(255, 0, 0);
-    }
-
     public static ReadOnlySpan<Token> tokenize(string path){
         List<Token> tokens = new();
 
