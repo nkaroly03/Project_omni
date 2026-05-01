@@ -1,0 +1,884 @@
+src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\Snake.omni
+
+    1 ; PUSH 30
+    1 ; TO_INT
+    2 ; PUSH 30
+    2 ; TO_INT
+    3 ; PUSH 0
+    3 ; TO_INT
+    4 ; PUSH 1
+    4 ; TO_INT
+    5 ; PUSH 2
+    5 ; TO_INT
+    6 ; PUSH 3
+    6 ; TO_INT
+    7 ; PUSH 4
+    7 ; TO_INT
+    8 ; PUSH 5
+    8 ; ALLOC_ARRAY
+    8 ; TO_STR
+    9 ; PUSH SP[-1]
+    10 ; PUSH SP[-7]
+    11 ; PUSH " "
+    8 ; DEREF_MOV
+    9 ; PUSH SP[-1]
+    10 ; PUSH SP[-6]
+    11 ; PUSH "\x1b[0mX"
+    8 ; DEREF_MOV
+    9 ; PUSH SP[-1]
+    10 ; PUSH SP[-5]
+    11 ; PUSH "\x1b[31m$"
+    8 ; DEREF_MOV
+    9 ; PUSH SP[-1]
+    10 ; PUSH SP[-4]
+    11 ; PUSH "\x1b[32m*"
+    8 ; DEREF_MOV
+    9 ; PUSH SP[-1]
+    10 ; PUSH SP[-3]
+    11 ; PUSH "\x1b[32m@"
+    8 ; DEREF_MOV
+    9 ; PUSH 0
+    9 ; TO_INT
+    10 ; PUSH 1
+    10 ; TO_INT
+    11 ; PUSH 2
+    11 ; TO_INT
+    12 ; PUSH 3
+    12 ; TO_INT
+    13 ; PUSH 30
+    13 ; TO_INT
+    14 ; PUSH 30
+    14 ; TO_INT
+    15 ; PUSH ARGV
+    15 ; ARRAY_SIZE
+    15 ; TO_INT
+    16 ; PUSH SP[-1]
+    17 ; PUSH 0
+    16 ; CMP_GE
+    15 ; JMPZ 25
+    16 ; PUSH ARGV
+    17 ; PUSH 0
+    16 ; DEREF
+    15 ; MOV SP[-4]
+    16 ; PUSH SP[-3]
+    17 ; PUSH SP[-16]
+    16 ; CMP_LE
+    15 ; JMPZ 3
+    16 ; PUSH SP[-15]
+    15 ; MOV SP[-4]
+    16 ; PUSH SP[-1]
+    17 ; PUSH 1
+    16 ; CMP_GE
+    15 ; JMPZ 11
+    16 ; PUSH ARGV
+    17 ; PUSH 1
+    16 ; DEREF
+    15 ; MOV SP[-3]
+    16 ; PUSH SP[-2]
+    17 ; PUSH SP[-15]
+    16 ; CMP_LE
+    15 ; JMPZ 3
+    16 ; PUSH SP[-14]
+    15 ; MOV SP[-3]
+    16 ; PUSH FALSE
+    16 ; TO_BOOL
+    17 ; PUSH SP[-1]
+    17 ; TO_BOOL
+    17 ; NEG
+    16 ; JMPZ 778
+    17 ; PUSH SP[-4]
+    18 ; PUSH SP[-4]
+    17 ; MUL
+    17 ; TO_INT
+    18 ; PUSH SP[-1]
+    18 ; ALLOC_ARRAY
+    18 ; TO_INT
+    19 ; PUSH SP[-2]
+    19 ; ALLOC_ARRAY
+    19 ; TO_INT
+    20 ; PUSH 0
+    20 ; TO_INT
+    21 ; PUSH SP[-1]
+    22 ; PUSH SP[-8]
+    21 ; CMP_LE
+    20 ; JMPZ 34
+    21 ; PUSH 0
+    21 ; TO_INT
+    22 ; PUSH SP[-1]
+    23 ; PUSH SP[-10]
+    22 ; CMP_LE
+    21 ; JMPZ 22
+    22 ; PUSH SP[-4]
+    23 ; PUSH SP[-3]
+    24 ; PUSH SP[-11]
+    23 ; MUL
+    24 ; PUSH SP[-3]
+    23 ; ADD
+    24 ; PUSH SP[-3]
+    21 ; DEREF_MOV
+    22 ; PUSH SP[-3]
+    23 ; PUSH SP[-3]
+    24 ; PUSH SP[-11]
+    23 ; MUL
+    24 ; PUSH SP[-3]
+    23 ; ADD
+    24 ; PUSH SP[-4]
+    21 ; DEREF_MOV
+    22 ; PUSH SP[-1]
+    23 ; PUSH 1
+    22 ; ADD
+    21 ; MOV SP[-2]
+    21 ; JMP -24
+    20 ; POP
+    21 ; PUSH SP[-1]
+    22 ; PUSH 1
+    21 ; ADD
+    20 ; MOV SP[-2]
+    20 ; JMP -36
+    19 ; POP
+    20 ; PUSH SP[-7]
+    21 ; PUSH SP[-7]
+    20 ; MUL
+    20 ; TO_INT
+    21 ; PUSH SP[-1]
+    22 ; PUSH 1
+    21 ; CMP_GE
+    20 ; JMPZ 41
+    21 ; RAND
+    22 ; PUSH SP[-2]
+    21 ; MOD
+    21 ; TO_INT
+    22 ; PUSH SP[-2]
+    23 ; PUSH 1
+    22 ; SUB
+    21 ; MOV SP[-3]
+    22 ; PUSH SP[-4]
+    23 ; PUSH SP[-3]
+    22 ; DEREF
+    22 ; TO_INT
+    23 ; PUSH SP[-4]
+    24 ; PUSH SP[-4]
+    23 ; DEREF
+    23 ; TO_INT
+    24 ; PUSH SP[-6]
+    25 ; PUSH SP[-5]
+    26 ; PUSH SP[-8]
+    27 ; PUSH SP[-6]
+    26 ; DEREF
+    23 ; DEREF_MOV
+    24 ; PUSH SP[-5]
+    25 ; PUSH SP[-5]
+    26 ; PUSH SP[-7]
+    27 ; PUSH SP[-6]
+    26 ; DEREF
+    23 ; DEREF_MOV
+    24 ; PUSH SP[-6]
+    25 ; PUSH SP[-4]
+    26 ; PUSH SP[-4]
+    23 ; DEREF_MOV
+    24 ; PUSH SP[-5]
+    25 ; PUSH SP[-4]
+    26 ; PUSH SP[-3]
+    23 ; DEREF_MOV
+    22 ; POP
+    21 ; POP
+    20 ; POP
+    20 ; JMP -43
+    19 ; POP
+    20 ; PUSH SP[-3]
+    21 ; PUSH 3
+    20 ; SUB
+    19 ; MOV SP[-4]
+    20 ; PUSH 0
+    20 ; TO_INT
+    21 ; PUSH SP[-8]
+    22 ; PUSH SP[-8]
+    21 ; MUL
+    21 ; ALLOC_ARRAY
+    21 ; TO_INT
+    22 ; PUSH SP[-9]
+    23 ; PUSH SP[-9]
+    22 ; MUL
+    22 ; ALLOC_ARRAY
+    22 ; TO_INT
+    23 ; PUSH SP[-10]
+    24 ; PUSH 2
+    23 ; DIV
+    23 ; TO_INT
+    24 ; PUSH SP[-10]
+    25 ; PUSH 2
+    24 ; DIV
+    24 ; TO_INT
+    25 ; PUSH SP[-4]
+    26 ; PUSH SP[-6]
+    27 ; PUSH SP[-4]
+    28 ; PUSH 1
+    27 ; ADD
+    24 ; DEREF_MOV
+    25 ; PUSH SP[-3]
+    26 ; PUSH SP[-6]
+    27 ; PUSH SP[-3]
+    24 ; DEREF_MOV
+    25 ; PUSH SP[-5]
+    26 ; PUSH 1
+    25 ; ADD
+    24 ; MOV SP[-6]
+    25 ; PUSH SP[-4]
+    26 ; PUSH SP[-6]
+    27 ; PUSH SP[-4]
+    24 ; DEREF_MOV
+    25 ; PUSH SP[-3]
+    26 ; PUSH SP[-6]
+    27 ; PUSH SP[-3]
+    24 ; DEREF_MOV
+    25 ; PUSH SP[-5]
+    26 ; PUSH 1
+    25 ; ADD
+    24 ; MOV SP[-6]
+    25 ; PUSH SP[-4]
+    26 ; PUSH SP[-6]
+    27 ; PUSH SP[-4]
+    28 ; PUSH 1
+    27 ; SUB
+    24 ; DEREF_MOV
+    25 ; PUSH SP[-3]
+    26 ; PUSH SP[-6]
+    27 ; PUSH SP[-3]
+    24 ; DEREF_MOV
+    25 ; PUSH SP[-5]
+    26 ; PUSH 1
+    25 ; ADD
+    24 ; MOV SP[-6]
+    23 ; POP
+    22 ; POP
+    23 ; PUSH 0
+    23 ; TO_INT
+    24 ; PUSH 0
+    24 ; TO_INT
+    25 ; RAND
+    26 ; PUSH SP[-9]
+    25 ; MOD
+    25 ; TO_INT
+    26 ; PUSH SP[-8]
+    27 ; PUSH SP[-2]
+    26 ; DEREF
+    25 ; MOV SP[-4]
+    26 ; PUSH SP[-7]
+    27 ; PUSH SP[-2]
+    26 ; DEREF
+    25 ; MOV SP[-3]
+    24 ; POP
+    25 ; PUSH SP[-13]
+    25 ; TO_INT
+    26 ; PUSH TRUE
+    26 ; TO_BOOL
+    27 ; PUSH "\x1b[?25l\x1b[2J\x1b[H"
+    26 ; PRINT
+    27 ; PUSH SP[-1]
+    26 ; JMPZ 524
+    27 ; POLL_CHAR
+    27 ; TO_CHAR
+    28 ; PUSH SP[-1]
+    29 ; PUSH '\x1b'
+    28 ; CMP_EQ
+    27 ; JMPZ 3
+    28 ; PUSH FALSE
+    27 ; MOV SP[-3]
+    28 ; PUSH SP[-1]
+    29 ; PUSH 'W'
+    28 ; CMP_EQ
+    28 ; TO_BOOL
+    27 ; JMPZ 3
+    28 ; PUSH TRUE
+    28 ; JMP 5
+    28 ; PUSH SP[-1]
+    29 ; PUSH 'w'
+    28 ; CMP_EQ
+    28 ; TO_BOOL
+    27 ; JMPZ 4
+    28 ; PUSH SP[-19]
+    27 ; MOV SP[-4]
+    27 ; JMP 45
+    28 ; PUSH SP[-1]
+    29 ; PUSH 'S'
+    28 ; CMP_EQ
+    28 ; TO_BOOL
+    27 ; JMPZ 3
+    28 ; PUSH TRUE
+    28 ; JMP 5
+    28 ; PUSH SP[-1]
+    29 ; PUSH 's'
+    28 ; CMP_EQ
+    28 ; TO_BOOL
+    27 ; JMPZ 4
+    28 ; PUSH SP[-18]
+    27 ; MOV SP[-4]
+    27 ; JMP 30
+    28 ; PUSH SP[-1]
+    29 ; PUSH 'A'
+    28 ; CMP_EQ
+    28 ; TO_BOOL
+    27 ; JMPZ 3
+    28 ; PUSH TRUE
+    28 ; JMP 5
+    28 ; PUSH SP[-1]
+    29 ; PUSH 'a'
+    28 ; CMP_EQ
+    28 ; TO_BOOL
+    27 ; JMPZ 4
+    28 ; PUSH SP[-17]
+    27 ; MOV SP[-4]
+    27 ; JMP 15
+    28 ; PUSH SP[-1]
+    29 ; PUSH 'D'
+    28 ; CMP_EQ
+    28 ; TO_BOOL
+    27 ; JMPZ 3
+    28 ; PUSH TRUE
+    28 ; JMP 5
+    28 ; PUSH SP[-1]
+    29 ; PUSH 'd'
+    28 ; CMP_EQ
+    28 ; TO_BOOL
+    27 ; JMPZ 3
+    28 ; PUSH SP[-16]
+    27 ; MOV SP[-4]
+    26 ; POP
+    27 ; PUSH SP[-1]
+    26 ; JMPZ 453
+    27 ; PUSH 1
+    27 ; TO_INT
+    28 ; PUSH SP[-1]
+    29 ; PUSH SP[-9]
+    28 ; CMP_LE
+    27 ; JMPZ 35
+    28 ; PUSH SP[-7]
+    29 ; PUSH SP[-2]
+    28 ; DEREF
+    29 ; PUSH SP[-8]
+    30 ; PUSH 0
+    29 ; DEREF
+    28 ; CMP_EQ
+    28 ; TO_BOOL
+    28 ; NEG
+    27 ; JMPZ 3
+    28 ; PUSH FALSE
+    28 ; JMP 9
+    28 ; PUSH SP[-6]
+    29 ; PUSH SP[-2]
+    28 ; DEREF
+    29 ; PUSH SP[-7]
+    30 ; PUSH 0
+    29 ; DEREF
+    28 ; CMP_EQ
+    28 ; TO_BOOL
+    28 ; TO_BOOL
+    28 ; NEG
+    27 ; MOV SP[-3]
+    28 ; PUSH SP[-2]
+    28 ; TO_BOOL
+    28 ; NEG
+    27 ; JMPZ 3
+    28 ; PUSH SP[-8]
+    27 ; MOV SP[-2]
+    28 ; PUSH SP[-1]
+    29 ; PUSH 1
+    28 ; ADD
+    27 ; MOV SP[-2]
+    27 ; JMP -37
+    26 ; POP
+    27 ; PUSH SP[-1]
+    26 ; JMPZ 46
+    27 ; PUSH SP[-10]
+    27 ; TO_INT
+    28 ; PUSH SP[-1]
+    29 ; PUSH SP[-16]
+    30 ; PUSH SP[-16]
+    29 ; MUL
+    28 ; CMP_LE
+    27 ; JMPZ 37
+    28 ; PUSH SP[-10]
+    29 ; PUSH SP[-2]
+    28 ; DEREF
+    29 ; PUSH SP[-8]
+    30 ; PUSH 0
+    29 ; DEREF
+    28 ; CMP_EQ
+    28 ; TO_BOOL
+    28 ; NEG
+    27 ; JMPZ 3
+    28 ; PUSH FALSE
+    28 ; JMP 9
+    28 ; PUSH SP[-9]
+    29 ; PUSH SP[-2]
+    28 ; DEREF
+    29 ; PUSH SP[-7]
+    30 ; PUSH 0
+    29 ; DEREF
+    28 ; CMP_EQ
+    28 ; TO_BOOL
+    28 ; TO_BOOL
+    28 ; NEG
+    27 ; MOV SP[-3]
+    28 ; PUSH SP[-2]
+    28 ; TO_BOOL
+    28 ; NEG
+    27 ; JMPZ 5
+    28 ; PUSH SP[-15]
+    29 ; PUSH SP[-15]
+    28 ; MUL
+    27 ; MOV SP[-2]
+    28 ; PUSH SP[-1]
+    29 ; PUSH 1
+    28 ; ADD
+    27 ; MOV SP[-2]
+    27 ; JMP -41
+    26 ; POP
+    27 ; PUSH SP[-1]
+    27 ; TO_BOOL
+    27 ; NEG
+    26 ; JMPZ 3
+    27 ; PUSH FALSE
+    27 ; JMP 7
+    27 ; PUSH SP[-4]
+    28 ; PUSH SP[-7]
+    29 ; PUSH 0
+    28 ; DEREF
+    27 ; CMP_EQ
+    27 ; TO_BOOL
+    27 ; NEG
+    26 ; JMPZ 3
+    27 ; PUSH FALSE
+    27 ; JMP 7
+    27 ; PUSH SP[-3]
+    28 ; PUSH SP[-6]
+    29 ; PUSH 0
+    28 ; DEREF
+    27 ; CMP_EQ
+    27 ; TO_BOOL
+    26 ; JMPZ 44
+    27 ; PUSH SP[-6]
+    28 ; PUSH SP[-8]
+    29 ; PUSH SP[-8]
+    30 ; PUSH SP[-10]
+    31 ; PUSH 1
+    30 ; SUB
+    29 ; DEREF
+    26 ; DEREF_MOV
+    27 ; PUSH SP[-5]
+    28 ; PUSH SP[-8]
+    29 ; PUSH SP[-7]
+    30 ; PUSH SP[-10]
+    31 ; PUSH 1
+    30 ; SUB
+    29 ; DEREF
+    26 ; DEREF_MOV
+    27 ; PUSH SP[-7]
+    28 ; PUSH 1
+    27 ; ADD
+    26 ; MOV SP[-8]
+    27 ; PUSH SP[-7]
+    28 ; PUSH 2
+    27 ; MOD
+    28 ; PUSH 0
+    27 ; CMP_EQ
+    26 ; JMPZ 5
+    27 ; PUSH SP[-10]
+    28 ; PUSH 1
+    27 ; SUB
+    26 ; MOV SP[-11]
+    27 ; RAND
+    28 ; PUSH SP[-11]
+    27 ; MOD
+    27 ; TO_INT
+    28 ; PUSH SP[-10]
+    29 ; PUSH SP[-2]
+    28 ; DEREF
+    27 ; MOV SP[-6]
+    28 ; PUSH SP[-9]
+    29 ; PUSH SP[-2]
+    28 ; DEREF
+    27 ; MOV SP[-5]
+    26 ; POP
+    27 ; PUSH SP[-14]
+    28 ; PUSH SP[-14]
+    27 ; MUL
+    27 ; ALLOC_ARRAY
+    27 ; TO_INT
+    28 ; PUSH 0
+    28 ; TO_INT
+    29 ; PUSH SP[-1]
+    30 ; PUSH SP[-17]
+    31 ; PUSH SP[-17]
+    30 ; MUL
+    29 ; CMP_LE
+    28 ; JMPZ 10
+    29 ; PUSH SP[-2]
+    30 ; PUSH SP[-2]
+    31 ; PUSH SP[-28]
+    28 ; DEREF_MOV
+    29 ; PUSH SP[-1]
+    30 ; PUSH 1
+    29 ; ADD
+    28 ; MOV SP[-2]
+    28 ; JMP -14
+    27 ; POP
+    28 ; PUSH SP[-11]
+    28 ; TO_INT
+    29 ; PUSH SP[-1]
+    30 ; PUSH SP[-17]
+    31 ; PUSH SP[-17]
+    30 ; MUL
+    29 ; CMP_LE
+    28 ; JMPZ 18
+    29 ; PUSH SP[-2]
+    30 ; PUSH SP[-11]
+    31 ; PUSH SP[-3]
+    30 ; DEREF
+    31 ; PUSH SP[-18]
+    30 ; MUL
+    31 ; PUSH SP[-13]
+    32 ; PUSH SP[-4]
+    31 ; DEREF
+    30 ; ADD
+    31 ; PUSH SP[-27]
+    28 ; DEREF_MOV
+    29 ; PUSH SP[-1]
+    30 ; PUSH 1
+    29 ; ADD
+    28 ; MOV SP[-2]
+    28 ; JMP -22
+    27 ; POP
+    28 ; PUSH SP[-1]
+    29 ; PUSH SP[-5]
+    30 ; PUSH SP[-17]
+    29 ; MUL
+    30 ; PUSH SP[-7]
+    29 ; ADD
+    30 ; PUSH SP[-25]
+    27 ; DEREF_MOV
+    28 ; PUSH 1
+    28 ; TO_INT
+    29 ; PUSH SP[-1]
+    30 ; PUSH SP[-10]
+    29 ; CMP_LE
+    28 ; JMPZ 18
+    29 ; PUSH SP[-2]
+    30 ; PUSH SP[-8]
+    31 ; PUSH SP[-3]
+    30 ; DEREF
+    31 ; PUSH SP[-18]
+    30 ; MUL
+    31 ; PUSH SP[-10]
+    32 ; PUSH SP[-4]
+    31 ; DEREF
+    30 ; ADD
+    31 ; PUSH SP[-25]
+    28 ; DEREF_MOV
+    29 ; PUSH SP[-1]
+    30 ; PUSH 1
+    29 ; ADD
+    28 ; MOV SP[-2]
+    28 ; JMP -20
+    27 ; POP
+    28 ; PUSH SP[-1]
+    29 ; PUSH SP[-7]
+    30 ; PUSH 0
+    29 ; DEREF
+    30 ; PUSH SP[-17]
+    29 ; MUL
+    30 ; PUSH SP[-9]
+    31 ; PUSH 0
+    30 ; DEREF
+    29 ; ADD
+    30 ; PUSH SP[-23]
+    27 ; DEREF_MOV
+    28 ; PUSH ""
+    28 ; TO_STR
+    29 ; PUSH 0
+    29 ; TO_INT
+    30 ; PUSH SP[-1]
+    31 ; PUSH SP[-18]
+    32 ; PUSH 2
+    31 ; ADD
+    30 ; CMP_LE
+    29 ; JMPZ 10
+    30 ; PUSH SP[-2]
+    31 ; PUSH '#'
+    30 ; ADD
+    29 ; MOV SP[-3]
+    30 ; PUSH SP[-1]
+    31 ; PUSH 1
+    30 ; ADD
+    29 ; MOV SP[-2]
+    29 ; JMP -14
+    28 ; POP
+    29 ; PUSH SP[-1]
+    30 ; PUSH '\n'
+    29 ; ADD
+    28 ; MOV SP[-2]
+    29 ; PUSH 0
+    29 ; TO_INT
+    30 ; PUSH SP[-1]
+    31 ; PUSH SP[-17]
+    30 ; CMP_LE
+    29 ; JMPZ 38
+    30 ; PUSH SP[-2]
+    31 ; PUSH '#'
+    30 ; ADD
+    29 ; MOV SP[-3]
+    30 ; PUSH 0
+    30 ; TO_INT
+    31 ; PUSH SP[-1]
+    32 ; PUSH SP[-19]
+    31 ; CMP_LE
+    30 ; JMPZ 18
+    31 ; PUSH SP[-3]
+    32 ; PUSH SP[-24]
+    33 ; PUSH SP[-6]
+    34 ; PUSH SP[-5]
+    35 ; PUSH SP[-22]
+    34 ; MUL
+    35 ; PUSH SP[-5]
+    34 ; ADD
+    33 ; DEREF
+    32 ; DEREF
+    31 ; ADD
+    30 ; MOV SP[-4]
+    31 ; PUSH SP[-1]
+    32 ; PUSH 1
+    31 ; ADD
+    30 ; MOV SP[-2]
+    30 ; JMP -20
+    29 ; POP
+    30 ; PUSH SP[-2]
+    31 ; PUSH "\x1b[0m#\n"
+    30 ; ADD
+    29 ; MOV SP[-3]
+    30 ; PUSH SP[-1]
+    31 ; PUSH 1
+    30 ; ADD
+    29 ; MOV SP[-2]
+    29 ; JMP -40
+    28 ; POP
+    29 ; PUSH 0
+    29 ; TO_INT
+    30 ; PUSH SP[-1]
+    31 ; PUSH SP[-18]
+    32 ; PUSH 2
+    31 ; ADD
+    30 ; CMP_LE
+    29 ; JMPZ 10
+    30 ; PUSH SP[-2]
+    31 ; PUSH '#'
+    30 ; ADD
+    29 ; MOV SP[-3]
+    30 ; PUSH SP[-1]
+    31 ; PUSH 1
+    30 ; ADD
+    29 ; MOV SP[-2]
+    29 ; JMP -14
+    28 ; POP
+    29 ; PUSH SP[-1]
+    28 ; PRINT
+    29 ; PUSH "\x1b[H"
+    28 ; PRINT
+    29 ; PUSH SP[-8]
+    30 ; PUSH 0
+    29 ; DEREF
+    29 ; TO_INT
+    30 ; PUSH SP[-8]
+    31 ; PUSH 0
+    30 ; DEREF
+    30 ; TO_INT
+    31 ; PUSH SP[-6]
+    32 ; PUSH SP[-23]
+    31 ; CMP_EQ
+    30 ; JMPZ 15
+    31 ; PUSH SP[-1]
+    32 ; PUSH 0
+    31 ; CMP_EQ
+    30 ; JMPZ 6
+    31 ; PUSH SP[-17]
+    32 ; PUSH 1
+    31 ; SUB
+    30 ; MOV SP[-2]
+    30 ; JMP 5
+    31 ; PUSH SP[-1]
+    32 ; PUSH 1
+    31 ; SUB
+    30 ; MOV SP[-2]
+    30 ; JMP 40
+    31 ; PUSH SP[-6]
+    32 ; PUSH SP[-22]
+    31 ; CMP_EQ
+    30 ; JMPZ 8
+    31 ; PUSH SP[-1]
+    32 ; PUSH 1
+    31 ; ADD
+    32 ; PUSH SP[-18]
+    31 ; MOD
+    30 ; MOV SP[-2]
+    30 ; JMP 29
+    31 ; PUSH SP[-6]
+    32 ; PUSH SP[-21]
+    31 ; CMP_EQ
+    30 ; JMPZ 15
+    31 ; PUSH SP[-2]
+    32 ; PUSH 0
+    31 ; CMP_EQ
+    30 ; JMPZ 6
+    31 ; PUSH SP[-18]
+    32 ; PUSH 1
+    31 ; SUB
+    30 ; MOV SP[-3]
+    30 ; JMP 5
+    31 ; PUSH SP[-2]
+    32 ; PUSH 1
+    31 ; SUB
+    30 ; MOV SP[-3]
+    30 ; JMP 11
+    31 ; PUSH SP[-6]
+    32 ; PUSH SP[-20]
+    31 ; CMP_EQ
+    30 ; JMPZ 7
+    31 ; PUSH SP[-2]
+    32 ; PUSH 1
+    31 ; ADD
+    32 ; PUSH SP[-19]
+    31 ; MOD
+    30 ; MOV SP[-3]
+    31 ; PUSH 0
+    31 ; TO_INT
+    32 ; PUSH SP[-1]
+    33 ; PUSH SP[-13]
+    32 ; CMP_LE
+    31 ; JMPZ 28
+    32 ; PUSH SP[-11]
+    33 ; PUSH SP[-2]
+    32 ; DEREF
+    32 ; TO_INT
+    33 ; PUSH SP[-11]
+    34 ; PUSH SP[-3]
+    33 ; DEREF
+    33 ; TO_INT
+    34 ; PUSH SP[-13]
+    35 ; PUSH SP[-4]
+    36 ; PUSH SP[-7]
+    33 ; DEREF_MOV
+    34 ; PUSH SP[-12]
+    35 ; PUSH SP[-4]
+    36 ; PUSH SP[-6]
+    33 ; DEREF_MOV
+    34 ; PUSH SP[-2]
+    33 ; MOV SP[-6]
+    34 ; PUSH SP[-1]
+    33 ; MOV SP[-5]
+    32 ; POP
+    31 ; POP
+    32 ; PUSH SP[-1]
+    33 ; PUSH 1
+    32 ; ADD
+    31 ; MOV SP[-2]
+    31 ; JMP -30
+    30 ; POP
+    29 ; POP
+    28 ; POP
+    29 ; PUSH 0
+    29 ; TO_INT
+    30 ; PUSH SP[-1]
+    31 ; PUSH 50000
+    30 ; CMP_LE
+    29 ; JMPZ 6
+    30 ; PUSH SP[-1]
+    31 ; PUSH 1
+    30 ; ADD
+    29 ; MOV SP[-2]
+    29 ; JMP -8
+    28 ; POP
+    27 ; POP
+    26 ; POP
+    26 ; JMP -524
+    27 ; PUSH "\x1b[0m\x1b[?25h"
+    26 ; PRINT
+    27 ; PUSH "\x1b[2JDo you wish to restart? (y/n): "
+    26 ; PRINT
+    27 ; PUSH FALSE
+    27 ; TO_BOOL
+    28 ; PUSH SP[-1]
+    28 ; TO_BOOL
+    28 ; NEG
+    27 ; JMPZ 43
+    28 ; POLL_CHAR
+    28 ; TO_CHAR
+    29 ; PUSH SP[-1]
+    30 ; PUSH 'Y'
+    29 ; CMP_EQ
+    29 ; TO_BOOL
+    28 ; JMPZ 3
+    29 ; PUSH TRUE
+    29 ; JMP 5
+    29 ; PUSH SP[-1]
+    30 ; PUSH 'y'
+    29 ; CMP_EQ
+    29 ; TO_BOOL
+    28 ; JMPZ 3
+    29 ; PUSH TRUE
+    29 ; JMP 5
+    29 ; PUSH SP[-1]
+    30 ; PUSH 'N'
+    29 ; CMP_EQ
+    29 ; TO_BOOL
+    28 ; JMPZ 3
+    29 ; PUSH TRUE
+    29 ; JMP 5
+    29 ; PUSH SP[-1]
+    30 ; PUSH 'n'
+    29 ; CMP_EQ
+    29 ; TO_BOOL
+    28 ; MOV SP[-3]
+    29 ; PUSH SP[-1]
+    30 ; PUSH 'N'
+    29 ; CMP_EQ
+    29 ; TO_BOOL
+    28 ; JMPZ 3
+    29 ; PUSH TRUE
+    29 ; JMP 5
+    29 ; PUSH SP[-1]
+    30 ; PUSH 'n'
+    29 ; CMP_EQ
+    29 ; TO_BOOL
+    28 ; MOV SP[-14]
+    27 ; POP
+    27 ; JMP -45
+    26 ; POP
+    25 ; POP
+    24 ; POP
+    23 ; POP
+    22 ; POP
+    21 ; POP
+    20 ; POP
+    19 ; POP
+    18 ; POP
+    17 ; POP
+    16 ; POP
+    16 ; JMP -780
+    17 ; PUSH 0
+    16 ; RET
+    15 ; POP
+    14 ; POP
+    13 ; POP
+    12 ; POP
+    11 ; POP
+    10 ; POP
+    9 ; POP
+    8 ; POP
+    7 ; POP
+    6 ; POP
+    5 ; POP
+    4 ; POP
+    3 ; POP
+    2 ; POP
+    1 ; POP
+    0 ; POP
+

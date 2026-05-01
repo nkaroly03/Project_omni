@@ -1,13 +1,21 @@
 /*/
+    for (start_expr..end_expr) |var|
+        expr;
+
+    {
+        let var: int = start_expr;
+        while (var < end_expr){
+            expr;
+            var = var + 1;
+        }
+    }
+
     // for loop
-    
     for (0..10) |i|{
         print("i: ");
         print(i);
         print("\n");
     }
-
-    print("------------------------------------------------\n");
 
     // for loop transformed into while loop
     {
@@ -47,9 +55,9 @@ s2[0] = s1[0] = 'T';
     // print(s1[i] + '\n');
 
 
-let arr: [2]int = {};
-
-arr[0] = arr[(arr[1] = 1)] = 20;
+// let arr: [2]int = {};
+// 
+// arr[0] = arr[(arr[1] = 1)] = 20;
 
 // for (0..array_size(arr)) |i|{
     // let cast: str = "";
