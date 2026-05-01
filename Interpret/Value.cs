@@ -246,7 +246,7 @@ public sealed class Value : IEquatable<Value>, IComparable<Value>{
         char           c => (float)c,
         int            i => (float)i,
         float          f => f,
-        StringBuilder sb => float.Parse(sb.ToString()),
+        StringBuilder sb => float.Parse(sb.ToString(), System.Globalization.CultureInfo.InvariantCulture),
 
         bool[] or char[] or int[] or float[] or StringBuilder[] => throw new ArgumentOutOfRangeException("Trying to convert an array to float"),
 

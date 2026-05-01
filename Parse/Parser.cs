@@ -200,6 +200,7 @@ public static class Parser{
                             throw new Syntax_error_exception($"On line <{tok.line_number}> type must be followed by <=>");
                         if (self.Count == 0 || (tok = self.Pop()).type != Token.Type.LBRACE)
                             throw new Syntax_error_exception($"On line <{tok.line_number}> <=> must be followed by <{{>");
+                        // TODO: implement init list?
                         if (self.Count == 0 || (tok = self.Pop()).type != Token.Type.RBRACE)
                             throw new Syntax_error_exception($"On line <{tok.line_number}> <{{> must be followed by <}}>");
                     }
@@ -294,9 +295,6 @@ public static class Parser{
                     if (self.Count == 0 || (tok = self.Pop()).type != Token.Type.PIPE)
                         throw new Syntax_error_exception($"On line <{for_idx_id.line_number}> <{for_idx_id.id}> must be followed by <|>");
 
-                    if (self.Count == 0)
-                        throw new Syntax_error_exception($"On line <{tok.line_number}> found missing token(s)");
-                    
                     Node for_let_decl = new(){
                         token = new(){type = Token.Type.LET_DECL, id = "let"},
                         m_sub_nodes = [new(){token = for_idx_id}, new(){token = new(){type = Token.Type.INT, id = "int"}, m_sub_nodes = [for_start_idx_node]}]
@@ -306,6 +304,8 @@ public static class Parser{
 
                     Node for_block = new(){token = new(){type = Token.Type.LBRACE, id = "{"}};
 
+                    if (self.Count == 0)
+                        throw new Syntax_error_exception($"On line <{tok.line_number}> found missing token(s)");
                     tok = self.Peek();
                     if (tok.type != Token.Type.SEMICOLON){
                         (Node n1, Node? n2) = self.parse_expr(true);

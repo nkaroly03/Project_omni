@@ -1,0 +1,26 @@
+src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\test3.omni
+
+    1 ; PUSH "Hello\n"
+    1 ; TO_STR
+    2 ; PUSH "Ok\n"
+    2 ; TO_STR
+    3 ; PUSH SP[-1]
+    4 ; PUSH 0
+    5 ; PUSH SP[-4]
+    6 ; PUSH 0
+    7 ; PUSH 'T'
+    4 ; DEREF_MOV
+    5 ; PUSH SP[-4]
+    6 ; PUSH 0
+    5 ; DEREF
+    2 ; DEREF_MOV
+    3 ; PUSH "Input: "
+    3 ; SCAN
+    4 ; PUSH 0
+    3 ; DEREF
+    2 ; PRINT
+    3 ; PUSH 0
+    2 ; RET
+    1 ; POP
+    0 ; POP
+
