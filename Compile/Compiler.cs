@@ -236,32 +236,18 @@ public static class Compiler{
                             to_IR(current_AST_node.sub_nodes[0], null, sb, ref let_decl_counter, true);
                     }
                     else{
-                        for (Node lhs = current_AST_node.sub_nodes[0].sub_nodes[0]; lhs.token.type != Token.Type.ID; lhs = lhs.sub_nodes[0]){
-                            if (lhs.token.type == Token.Type.ARGV)
-                                throw new Syntax_error_exception($"On line <{lhs.token.line_number}> <argv> is immutable");
-                            else if (lhs.token.type != Token.Type.ID && lhs.token.type != Token.Type.LBRACKET && lhs.token.type != Token.Type.EQ)
-                                throw new Syntax_error_exception($"On line <{lhs.token.line_number}> trying to assign to rvalue");
-                        }
+                        // TODO: rvalue check?
                         to_IR(current_AST_node.sub_nodes[0].sub_nodes[0], null, sb, ref let_decl_counter, true);
                         to_IR(current_AST_node.sub_nodes[0].sub_nodes[1], null, sb, ref let_decl_counter, true);
-                        to_IR(current_AST_node.sub_nodes[1], null, sb, ref let_decl_counter, true);
-                        sb.add_instruction($"{stack_size - 3} ; DEREF_MOV");
-                        stack_size -= 3;
-
                         if (push_back_after_assignment){
-                            Stack<Node> deref_idxs = new();
-                            Node push_back = current_AST_node.sub_nodes[0];
-                            while (push_back.token.type != Token.Type.ID){
-                                if (push_back.token.type == Token.Type.LBRACKET)
-                                    deref_idxs.Push(push_back.sub_nodes[1]);
-                                push_back = push_back.sub_nodes[0];
-                            }
-                            to_IR(push_back, null, sb, ref let_decl_counter, true);
-                            while (deref_idxs.Count > 0){
-                                to_IR(deref_idxs.Pop(), null, sb, ref let_decl_counter, true);
-                                sb.add_instruction($"{--stack_size} ; DEREF");
-                            }
+                            sb.add_instruction($"{++stack_size} ; PUSH SP[-2]");
+                            sb.add_instruction($"{++stack_size} ; PUSH SP[-2]");
                         }
+                        to_IR(current_AST_node.sub_nodes[1], null, sb, ref let_decl_counter, true);
+                        stack_size -= 3;
+                        sb.add_instruction($"{stack_size} ; DEREF_MOV");
+                        if (push_back_after_assignment)
+                            sb.add_instruction($"{--stack_size} ; DEREF");
                     }
                     break;
 
