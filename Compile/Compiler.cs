@@ -14,6 +14,12 @@ public static class Compiler{
         string get_string_literal() => System.Text.RegularExpressions.Regex.Unescape(self[1..^1]);
     }
 
+    const string SP_STR    = "SP";
+    const string PUSH_STR  = "PUSH";
+    const string FALSE_STR = nameof(Token.type.FALSE);
+    const string TRUE_STR  = nameof(Token.type.TRUE);
+    const string ARGV_STR  = nameof(Token.type.ARGV);
+
     public enum Op_code : byte{
         PUSH_FROM_SP,
         PUSH_ARGV,
@@ -87,26 +93,22 @@ public static class Compiler{
                     if (!m_id_positions.ContainsKey(current_AST_node.token.id))
                         throw new Syntax_error_exception($"On line <{current_AST_node.token.line_number}> use of undeclared identifier <{current_AST_node.token.id}>");
                     ++stack_size;
-                    sb.add_instruction($"{stack_size} ; PUSH SP[-{stack_size - m_id_positions[current_AST_node.token.id] - 1}]");
+                    sb.add_instruction($"{stack_size} ; {PUSH_STR} {SP_STR}[-{stack_size - m_id_positions[current_AST_node.token.id] - 1}]");
                     break;
-
                 case Token.Type.ARGV:
-                    sb.add_instruction($"{++stack_size} ; PUSH ARGV");
+                    sb.add_instruction($"{++stack_size} ; {PUSH_STR} {ARGV_STR}");
                     break;
-
                 case Token.Type.FALSE:
+                    sb.add_instruction($"{++stack_size} ; {PUSH_STR} {FALSE_STR}");
+                    break;
                 case Token.Type.TRUE:
-                    sb.add_instruction($"{++stack_size} ; PUSH {current_AST_node.token.id.ToUpper()}");
+                    sb.add_instruction($"{++stack_size} ; {PUSH_STR} {TRUE_STR}");
                     break;
                 case Token.Type.CHAR_LIT:
-                    sb.add_instruction($"{++stack_size} ; PUSH {current_AST_node.token.id}");
-                    break;
                 case Token.Type.INT_LIT:
                 case Token.Type.FLOAT_LIT:
-                    sb.add_instruction($"{++stack_size} ; PUSH {current_AST_node.token.id}");
-                    break;
                 case Token.Type.STR_LIT:
-                    sb.add_instruction($"{++stack_size} ; PUSH {current_AST_node.token.id}");
+                    sb.add_instruction($"{++stack_size} ; {PUSH_STR} {current_AST_node.token.id}");
                     break;
 
                 case Token.Type.LBRACE:
@@ -118,7 +120,7 @@ public static class Compiler{
                         to_IR(current_AST_node.sub_nodes[^1], null, block_sb, ref block_let_decl_counter, false);
                     }
                     while (block_let_decl_counter-- > 0){
-                        block_sb.add_instruction($"{--stack_size} ; POP");
+                        block_sb.add_instruction($"{--stack_size} ; {Op_code.POP}");
                         m_id_positions.RemoveAt(m_id_positions.Count - 1);
                     }
                     sb.Append(block_sb);
@@ -145,22 +147,22 @@ public static class Compiler{
                     to_IR(current_AST_node.sub_nodes[0], null, sb, ref let_decl_counter, true);
                     to_IR(current_AST_node.sub_nodes[1], null, sb, ref let_decl_counter, true);
                     sb.add_instruction($"{--stack_size} ; {current_AST_node.token.type switch{
-                        Token.Type.EQUALS          => "CMP_EQ",
-                        Token.Type.NOT_EQUALS      => "CMP_NEQ",
-                        Token.Type.LESS_THAN       => "CMP_LE",
-                        Token.Type.LESS_THAN_EQ    => "CMP_LEQ",
-                        Token.Type.GREATER_THAN    => "CMP_GE",
-                        Token.Type.GREATER_THAN_EQ => "CMP_GEQ",
-                        Token.Type.ASTERISK1       => "MUL",
-                        Token.Type.ASTERISK2       => "POW",
-                        Token.Type.SLASH           => "DIV",
-                        Token.Type.PERCENT         => "MOD",
-                        Token.Type.SHIFT_LEFT      => "SHL",
-                        Token.Type.SHIFT_RIGHT     => "SHR",
-                        Token.Type.AMPERSAND       => "BAND",
-                        Token.Type.PIPE            => "BOR",
-                        Token.Type.CARET           => "XOR",
-                        Token.Type.LBRACKET        => "DEREF",
+                        Token.Type.EQUALS          => Op_code.CMP_EQ,
+                        Token.Type.NOT_EQUALS      => Op_code.CMP_NEQ,
+                        Token.Type.LESS_THAN       => Op_code.CMP_LE,
+                        Token.Type.LESS_THAN_EQ    => Op_code.CMP_LEQ,
+                        Token.Type.GREATER_THAN    => Op_code.CMP_GE,
+                        Token.Type.GREATER_THAN_EQ => Op_code.CMP_GEQ,
+                        Token.Type.ASTERISK1       => Op_code.MUL,
+                        Token.Type.ASTERISK2       => Op_code.POW,
+                        Token.Type.SLASH           => Op_code.DIV,
+                        Token.Type.PERCENT         => Op_code.MOD,
+                        Token.Type.SHIFT_LEFT      => Op_code.SHL,
+                        Token.Type.SHIFT_RIGHT     => Op_code.SHR,
+                        Token.Type.AMPERSAND       => Op_code.BAND,
+                        Token.Type.PIPE            => Op_code.BOR,
+                        Token.Type.CARET           => Op_code.XOR,
+                        Token.Type.LBRACKET        => Op_code.DEREF,
                         // Token.Type.AND             => "AND",
                         // Token.Type.OR              => "OR",
                         
@@ -170,7 +172,7 @@ public static class Compiler{
 
                 case Token.Type.TILDE:
                     to_IR(current_AST_node.sub_nodes[0], null, sb, ref let_decl_counter, true);
-                    sb.add_instruction($"{stack_size} ; BNEG");
+                    sb.add_instruction($"{stack_size} ; {Op_code.BNEG}");
                     break;
 
                 case Token.Type.AND:
@@ -179,43 +181,43 @@ public static class Compiler{
                     to_IR(current_AST_node.sub_nodes[0], null, sb, ref let_decl_counter, true);
                     --stack_size;
                     to_IR(current_AST_node.sub_nodes[1], null, and_or_sb, ref let_decl_counter, true);
-                    if (sb.ToString()[(sb.ToString().LastIndexOf(';') + 1)..].Trim() != "TO_BOOL")
-                        sb.add_instruction($"{stack_size} ; TO_BOOL");
+                    if (sb.ToString()[(sb.ToString().LastIndexOf(';') + 1)..].Trim() != nameof(Op_code.TO_BOOL))
+                        sb.add_instruction($"{stack_size} ; {Op_code.TO_BOOL}");
                     if (current_AST_node.token.type == Token.Type.AND){
-                        sb.add_instruction($"{stack_size} ; NEG");
-                        sb.add_instruction($"{stack_size - 1} ; JMPZ 3");
-                        sb.add_instruction($"{stack_size} ; PUSH FALSE");
+                        sb.add_instruction($"{stack_size} ; {Op_code.NEG}");
+                        sb.add_instruction($"{stack_size - 1} ; {Op_code.JMPZ} 3");
+                        sb.add_instruction($"{stack_size} ; {PUSH_STR} {FALSE_STR}");
                     }
                     else{
-                        sb.add_instruction($"{stack_size - 1} ; JMPZ 3");
-                        sb.add_instruction($"{stack_size} ; PUSH TRUE");
+                        sb.add_instruction($"{stack_size - 1} ; {Op_code.JMPZ} 3");
+                        sb.add_instruction($"{stack_size} ; {PUSH_STR} {TRUE_STR}");
                     }
-                    sb.add_instruction($"{stack_size} ; JMP {and_or_sb.count_instructions() + 1}");
+                    sb.add_instruction($"{stack_size} ; {Op_code.JMP} {and_or_sb.count_instructions() + 1}");
                     sb.Append(and_or_sb);
-                    if (sb.ToString()[(sb.ToString().LastIndexOf(';') + 1)..].Trim() != "TO_BOOL")
-                        sb.add_instruction($"{stack_size} ; TO_BOOL");
+                    if (sb.ToString()[(sb.ToString().LastIndexOf(';') + 1)..].Trim() != nameof(Op_code.TO_BOOL))
+                        sb.add_instruction($"{stack_size} ; {Op_code.TO_BOOL}");
                     break;
                 case Token.Type.NOT:
                     to_IR(current_AST_node.sub_nodes[0], null, sb, ref let_decl_counter, true);
-                    sb.add_instruction($"{stack_size} ; TO_BOOL");
-                    sb.add_instruction($"{stack_size} ; NEG");
+                    sb.add_instruction($"{stack_size} ; {Op_code.TO_BOOL}");
+                    sb.add_instruction($"{stack_size} ; {Op_code.NEG}");
                     break;
 
                 case Token.Type.PLUS:
                     to_IR(current_AST_node.sub_nodes[0], null, sb, ref let_decl_counter, true);
                     if (current_AST_node.sub_nodes.Length > 1){
                         to_IR(current_AST_node.sub_nodes[1], null, sb, ref let_decl_counter, true);
-                        sb.add_instruction($"{--stack_size} ; ADD");
+                        sb.add_instruction($"{--stack_size} ; {Op_code.ADD}");
                     }
                     break;
                 case Token.Type.MINUS:
                     to_IR(current_AST_node.sub_nodes[0], null, sb, ref let_decl_counter, true);
                     if (current_AST_node.sub_nodes.Length > 1){
                         to_IR(current_AST_node.sub_nodes[1], null, sb, ref let_decl_counter, true);
-                        sb.add_instruction($"{--stack_size} ; SUB");
+                        sb.add_instruction($"{--stack_size} ; {Op_code.SUB}");
                     }
                     else
-                        sb.add_instruction($"{stack_size} ; NEG");
+                        sb.add_instruction($"{stack_size} ; {Op_code.NEG}");
                     break;
 
                 case Token.Type.EQ:
@@ -229,7 +231,7 @@ public static class Compiler{
                             throw new Syntax_error_exception($"On line <{eq_tok.line_number}> use of undeclared identifier <{eq_tok.id}>");
 
                         to_IR(current_AST_node.sub_nodes[1], null, sb, ref let_decl_counter, true);
-                        sb.add_instruction($"{stack_size - 1} ; MOV SP[-{stack_size - m_id_positions[eq_tok.id]}]");
+                        sb.add_instruction($"{stack_size - 1} ; {Op_code.MOV} {SP_STR}[-{stack_size - m_id_positions[eq_tok.id]}]");
                         --stack_size;
 
                         if (push_back_after_assignment)
@@ -245,14 +247,14 @@ public static class Compiler{
                         to_IR(current_AST_node.sub_nodes[0].sub_nodes[0], null, sb, ref let_decl_counter, true);
                         to_IR(current_AST_node.sub_nodes[0].sub_nodes[1], null, sb, ref let_decl_counter, true);
                         if (push_back_after_assignment){
-                            sb.add_instruction($"{++stack_size} ; PUSH SP[-2]");
-                            sb.add_instruction($"{++stack_size} ; PUSH SP[-2]");
+                            sb.add_instruction($"{++stack_size} ; {PUSH_STR} {SP_STR}[-2]");
+                            sb.add_instruction($"{++stack_size} ; {PUSH_STR} {SP_STR}[-2]");
                         }
                         to_IR(current_AST_node.sub_nodes[1], null, sb, ref let_decl_counter, true);
                         stack_size -= 3;
-                        sb.add_instruction($"{stack_size} ; DEREF_MOV");
+                        sb.add_instruction($"{stack_size} ; {Op_code.DEREF_MOV}");
                         if (push_back_after_assignment)
-                            sb.add_instruction($"{--stack_size} ; DEREF");
+                            sb.add_instruction($"{--stack_size} ; {Op_code.DEREF}");
                     }
                     break;
 
@@ -261,7 +263,7 @@ public static class Compiler{
                     if (current_AST_node.sub_nodes[1].token.type != Token.Type.LBRACKET)
                         to_IR(current_AST_node.sub_nodes[1], null, sb, ref let_decl_counter, true);
                     else{
-                        sb.add_instruction($"{stack_size} ; ALLOC_ARRAY");
+                        sb.add_instruction($"{stack_size} ; {Op_code.ALLOC_ARRAY}");
                         to_IR(current_AST_node.sub_nodes[1].sub_nodes[1], null, sb, ref let_decl_counter, true);
                     }
                     Token let_decl_tok = current_AST_node.sub_nodes[0].token;
@@ -270,30 +272,30 @@ public static class Compiler{
                     ++let_decl_counter;
                     break;
 
-                case Token.Type.BOOL:  sb.add_instruction($"{stack_size} ; TO_BOOL");  break;
-                case Token.Type.CHAR:  sb.add_instruction($"{stack_size} ; TO_CHAR");  break;
-                case Token.Type.INT:   sb.add_instruction($"{stack_size} ; TO_INT");   break;
-                case Token.Type.FLOAT: sb.add_instruction($"{stack_size} ; TO_FLOAT"); break;
-                case Token.Type.STR:   sb.add_instruction($"{stack_size} ; TO_STR");   break;
+                case Token.Type.BOOL:  sb.add_instruction($"{stack_size} ; {Op_code.TO_BOOL}");  break;
+                case Token.Type.CHAR:  sb.add_instruction($"{stack_size} ; {Op_code.TO_CHAR}");  break;
+                case Token.Type.INT:   sb.add_instruction($"{stack_size} ; {Op_code.TO_INT}");   break;
+                case Token.Type.FLOAT: sb.add_instruction($"{stack_size} ; {Op_code.TO_FLOAT}"); break;
+                case Token.Type.STR:   sb.add_instruction($"{stack_size} ; {Op_code.TO_STR}");   break;
 
                 case Token.Type.PRINT:
                     to_IR(current_AST_node.sub_nodes[0], null, sb, ref let_decl_counter, true);
-                    sb.add_instruction($"{--stack_size} ; PRINT");
+                    sb.add_instruction($"{--stack_size} ; {Op_code.PRINT}");
                     break;
                 case Token.Type.SCAN:
                     to_IR(current_AST_node.sub_nodes[0], null, sb, ref let_decl_counter, true);
-                    sb.add_instruction($"{stack_size} ; SCAN");
+                    sb.add_instruction($"{stack_size} ; {Op_code.SCAN}");
                     break;
 
                 case Token.Type.ARRAY_SIZE:
                     to_IR(current_AST_node.sub_nodes[0], null, sb, ref let_decl_counter, true);
-                    sb.add_instruction($"{stack_size} ; ARRAY_SIZE");
+                    sb.add_instruction($"{stack_size} ; {Op_code.ARRAY_SIZE}");
                     break;
                 case Token.Type.RAND:
-                    sb.add_instruction($"{++stack_size} ; RAND");
+                    sb.add_instruction($"{++stack_size} ; {Op_code.RAND}");
                     break;
                 case Token.Type.POLL_CHAR:
-                    sb.add_instruction($"{++stack_size} ; POLL_CHAR");
+                    sb.add_instruction($"{++stack_size} ; {Op_code.POLL_CHAR}");
                     break;
 
                 case Token.Type.IF:
@@ -307,11 +309,11 @@ public static class Compiler{
                         int if_let_decl_counter = 0;
                         to_IR(current_AST_node.sub_nodes[1], null, if_else_sb, ref if_let_decl_counter, false);
                         while (if_let_decl_counter-- > 0){
-                            if_else_sb.add_instruction($"{--stack_size} ; POP");
+                            if_else_sb.add_instruction($"{--stack_size} ; {Op_code.POP}");
                             m_id_positions.RemoveAt(m_id_positions.Count - 1);
                         }
                     }
-                    sb.add_instruction($"{stack_size} ; JMPZ {if_else_sb.count_instructions() + Convert.ToInt32(has_else_after)}");
+                    sb.add_instruction($"{stack_size} ; {Op_code.JMPZ} {if_else_sb.count_instructions() + Convert.ToInt32(has_else_after)}");
                     sb.Append(if_else_sb);
 
                     if (has_else_after){
@@ -326,13 +328,15 @@ public static class Compiler{
                                 false
                             );
                             while (else_let_decl_counter-- > 0){
-                                if_else_sb.add_instruction($"{--stack_size} ; POP");
+                                if_else_sb.add_instruction($"{--stack_size} ; {Op_code.POP}");
                                 m_id_positions.RemoveAt(m_id_positions.Count - 1);
                             }
                         }
-                        sb.add_instruction($"{stack_size} ; JMP {if_else_sb.count_instructions()}");
+                        sb.add_instruction($"{stack_size} ; {Op_code.JMP} {if_else_sb.count_instructions()}");
                         sb.Append(if_else_sb);
                     }
+                    break;
+                case Token.Type.ELSE:
                     break;
                 case Token.Type.WHILE:
                     StringBuilder while_condition_sb = new();
@@ -345,21 +349,24 @@ public static class Compiler{
                         int while_let_decl_counter = 0;
                         to_IR(current_AST_node.sub_nodes[1], null, while_sb, ref while_let_decl_counter, false);
                         while (while_let_decl_counter-- > 0){
-                            while_sb.add_instruction($"{--stack_size} ; POP");
+                            while_sb.add_instruction($"{--stack_size} ; {Op_code.POP}");
                             m_id_positions.RemoveAt(m_id_positions.Count - 1);
                         }
                     }
 
-                    while_condition_sb.add_instruction($"{stack_size} ; JMPZ {while_sb.count_instructions() + 1}");
+                    while_condition_sb.add_instruction($"{stack_size} ; {Op_code.JMPZ} {while_sb.count_instructions() + 1}");
                     sb.Append(while_condition_sb);
                     sb.Append(while_sb);
-                    sb.add_instruction($"{stack_size} ; JMP -{while_condition_sb.count_instructions() + while_sb.count_instructions() - 2}");
+                    sb.add_instruction($"{stack_size} ; {Op_code.JMP} -{while_condition_sb.count_instructions() + while_sb.count_instructions() - 2}");
                     break;
 
                 case Token.Type.RETURN:
                     to_IR(current_AST_node.sub_nodes[0], null, sb, ref let_decl_counter, true);
-                    sb.add_instruction($"{--stack_size} ; RET");
+                    sb.add_instruction($"{--stack_size} ; {Op_code.RET}");
                     break;
+
+                default:
+                    throw new NotImplementedException($"Case for <{current_AST_node.token.type}> is not implemented");
             }
         }
     }
@@ -377,7 +384,7 @@ public static class Compiler{
         state.to_IR(AST[^1], null, sb, ref let_decl_counter, false);
 
         for (int i = state.stack_size; i-- > 0;)
-            sb.add_instruction($"{i} ; POP");
+            sb.add_instruction($"{i} ; {Op_code.POP}");
 
         return sb.ToString();
     }
@@ -392,24 +399,24 @@ public static class Compiler{
             int space_idx = instruction.IndexOf(' ');
             (string lhs, string rhs) = (space_idx >= 0) ? (instruction[..space_idx], instruction[(space_idx + 1)..]) : (instruction, "");
             switch (lhs){
-                case "PUSH":
-                    if (rhs != "ARGV" && rhs != "FALSE" && rhs != "TRUE"){
-                        if (rhs.StartsWith("\""))
+                case PUSH_STR:
+                    if (rhs != ARGV_STR && rhs != FALSE_STR && rhs != TRUE_STR){
+                        if (rhs.StartsWith('"'))
                             instruction_byte_count += (sizeof(int) + Encoding.UTF8.GetBytes(rhs.get_string_literal()).Length);
                         else{
                             instruction_byte_count += (
                                 (rhs.StartsWith('\''))
                                     ? sizeof(char)
-                                    : (rhs.StartsWith("SP") || rhs.IndexOf('.') < 0)
+                                    : (rhs.StartsWith(SP_STR) || rhs.IndexOf('.') < 0)
                                         ? sizeof(int)
                                         : sizeof(float)
                             );
                         }
                     }
                     break;
-                case "MOV":
-                case "JMP":
-                case "JMPZ":
+                case nameof(Op_code.MOV):
+                case nameof(Op_code.JMP):
+                case nameof(Op_code.JMPZ):
                     instruction_byte_count += sizeof(int);
                     break;
             }
@@ -426,24 +433,24 @@ public static class Compiler{
             (string lhs, string rhs) = (space_idx >= 0) ? (instruction[..space_idx], instruction[(space_idx + 1)..]) : (instruction, "");
             byte[] as_bytes;
             switch (lhs){
-                case "PUSH":
-                    if (rhs.StartsWith("SP")){
+                case PUSH_STR:
+                    if (rhs.StartsWith(SP_STR)){
                         as_bytes = BitConverter.GetBytes(int.Parse(rhs[3..^1]));
                         bytecode.Add((byte)Op_code.PUSH_FROM_SP);
                         bytecode.AddRange(as_bytes);
                     }
-                    else if (rhs == "ARGV")
+                    else if (rhs == ARGV_STR)
                         bytecode.Add((byte)Op_code.PUSH_ARGV);
-                    else if (rhs == "FALSE")
+                    else if (rhs == FALSE_STR)
                         bytecode.Add((byte)Op_code.PUSH_FALSE);
-                    else if (rhs == "TRUE")
+                    else if (rhs == TRUE_STR)
                         bytecode.Add((byte)Op_code.PUSH_TRUE);
                     else if (rhs.StartsWith('\'')){
                         as_bytes = BitConverter.GetBytes(rhs.get_char_literal());
                         bytecode.Add((byte)Op_code.PUSH_CHAR);
                         bytecode.AddRange(as_bytes);
                     }
-                    else if (rhs.StartsWith("\"")){
+                    else if (rhs.StartsWith('"')){
                         as_bytes = Encoding.UTF8.GetBytes(rhs.get_string_literal());
                         bytecode.Add((byte)Op_code.PUSH_STR);
                         bytecode.AddRange(BitConverter.GetBytes(as_bytes.Length));
@@ -461,63 +468,63 @@ public static class Compiler{
                     }
                     break;
 
-                case "POP": bytecode.Add((byte)Op_code.POP); break;
-                case "RET": bytecode.Add((byte)Op_code.RET); break;
+                case nameof(Op_code.POP): bytecode.Add((byte)Op_code.POP); break;
+                case nameof(Op_code.RET): bytecode.Add((byte)Op_code.RET); break;
 
-                case "MOV":
+                case nameof(Op_code.MOV):
                     as_bytes = BitConverter.GetBytes(int.Parse(rhs[3..^1]));
                     bytecode.Add((byte)Op_code.MOV);
                     bytecode.AddRange(as_bytes);
                     break;
-                case "DEREF_MOV":
+                case nameof(Op_code.DEREF_MOV):
                     bytecode.Add((byte)Op_code.DEREF_MOV);
                     break;
 
-                case "JMP":
-                case "JMPZ":
+                case nameof(Op_code.JMP):
+                case nameof(Op_code.JMPZ):
                     int jmp_count = int.Parse(rhs);
                     int jmp_byte_count = (jmp_count >= 0)
                         ? count_bytes_in_instructions(instructions.AsSpan()[(i + 1)..][..(jmp_count - 1)]) - 1
                         : -(count_bytes_in_instructions(instructions.AsSpan()[(i + jmp_count)..][..(1 - jmp_count)]) + 1)
                     ;
                     as_bytes = BitConverter.GetBytes(jmp_byte_count);
-                    bytecode.Add((lhs == "JMP") ? (byte)Op_code.JMP : (byte)Op_code.JMPZ);
+                    bytecode.Add((lhs == nameof(Op_code.JMP)) ? (byte)Op_code.JMP : (byte)Op_code.JMPZ);
                     bytecode.AddRange(as_bytes);
                     break;
 
-                case "PRINT":       bytecode.Add((byte)Op_code.PRINT);       break;
-                case "SCAN":        bytecode.Add((byte)Op_code.SCAN);        break;
-                case "ARRAY_SIZE":  bytecode.Add((byte)Op_code.ARRAY_SIZE);  break;
-                case "RAND":        bytecode.Add((byte)Op_code.RAND);        break;
-                case "POLL_CHAR":   bytecode.Add((byte)Op_code.POLL_CHAR);   break;
-                case "TO_BOOL":     bytecode.Add((byte)Op_code.TO_BOOL);     break;
-                case "TO_CHAR":     bytecode.Add((byte)Op_code.TO_CHAR);     break;
-                case "TO_INT":      bytecode.Add((byte)Op_code.TO_INT);      break;
-                case "TO_FLOAT":    bytecode.Add((byte)Op_code.TO_FLOAT);    break;
-                case "TO_STR":      bytecode.Add((byte)Op_code.TO_STR);      break;
-                case "ALLOC_ARRAY": bytecode.Add((byte)Op_code.ALLOC_ARRAY); break;
-                case "CMP_EQ":      bytecode.Add((byte)Op_code.CMP_EQ);      break;
-                case "CMP_NEQ":     bytecode.Add((byte)Op_code.CMP_NEQ);     break;
-                case "CMP_LE":      bytecode.Add((byte)Op_code.CMP_LE);      break;
-                case "CMP_LEQ":     bytecode.Add((byte)Op_code.CMP_LEQ);     break;
-                case "CMP_GE":      bytecode.Add((byte)Op_code.CMP_GE);      break;
-                case "CMP_GEQ":     bytecode.Add((byte)Op_code.CMP_GEQ);     break;
-                case "ADD":         bytecode.Add((byte)Op_code.ADD);         break;
-                case "SUB":         bytecode.Add((byte)Op_code.SUB);         break;
-                case "MUL":         bytecode.Add((byte)Op_code.MUL);         break;
-                case "DIV":         bytecode.Add((byte)Op_code.DIV);         break;
-                case "MOD":         bytecode.Add((byte)Op_code.MOD);         break;
-                case "POW":         bytecode.Add((byte)Op_code.POW);         break;
-                case "SHL":         bytecode.Add((byte)Op_code.SHL);         break;
-                case "SHR":         bytecode.Add((byte)Op_code.SHR);         break;
-                case "BAND":        bytecode.Add((byte)Op_code.BAND);        break;
-                case "BOR":         bytecode.Add((byte)Op_code.BOR);         break;
-                case "XOR":         bytecode.Add((byte)Op_code.XOR);         break;
-                case "BNEG":        bytecode.Add((byte)Op_code.BNEG);        break;
-                case "DEREF":       bytecode.Add((byte)Op_code.DEREF);       break;
+                case nameof(Op_code.PRINT):       bytecode.Add((byte)Op_code.PRINT);       break;
+                case nameof(Op_code.SCAN):        bytecode.Add((byte)Op_code.SCAN);        break;
+                case nameof(Op_code.ARRAY_SIZE):  bytecode.Add((byte)Op_code.ARRAY_SIZE);  break;
+                case nameof(Op_code.RAND):        bytecode.Add((byte)Op_code.RAND);        break;
+                case nameof(Op_code.POLL_CHAR):   bytecode.Add((byte)Op_code.POLL_CHAR);   break;
+                case nameof(Op_code.TO_BOOL):     bytecode.Add((byte)Op_code.TO_BOOL);     break;
+                case nameof(Op_code.TO_CHAR):     bytecode.Add((byte)Op_code.TO_CHAR);     break;
+                case nameof(Op_code.TO_INT):      bytecode.Add((byte)Op_code.TO_INT);      break;
+                case nameof(Op_code.TO_FLOAT):    bytecode.Add((byte)Op_code.TO_FLOAT);    break;
+                case nameof(Op_code.TO_STR):      bytecode.Add((byte)Op_code.TO_STR);      break;
+                case nameof(Op_code.ALLOC_ARRAY): bytecode.Add((byte)Op_code.ALLOC_ARRAY); break;
+                case nameof(Op_code.CMP_EQ):      bytecode.Add((byte)Op_code.CMP_EQ);      break;
+                case nameof(Op_code.CMP_NEQ):     bytecode.Add((byte)Op_code.CMP_NEQ);     break;
+                case nameof(Op_code.CMP_LE):      bytecode.Add((byte)Op_code.CMP_LE);      break;
+                case nameof(Op_code.CMP_LEQ):     bytecode.Add((byte)Op_code.CMP_LEQ);     break;
+                case nameof(Op_code.CMP_GE):      bytecode.Add((byte)Op_code.CMP_GE);      break;
+                case nameof(Op_code.CMP_GEQ):     bytecode.Add((byte)Op_code.CMP_GEQ);     break;
+                case nameof(Op_code.ADD):         bytecode.Add((byte)Op_code.ADD);         break;
+                case nameof(Op_code.SUB):         bytecode.Add((byte)Op_code.SUB);         break;
+                case nameof(Op_code.MUL):         bytecode.Add((byte)Op_code.MUL);         break;
+                case nameof(Op_code.DIV):         bytecode.Add((byte)Op_code.DIV);         break;
+                case nameof(Op_code.MOD):         bytecode.Add((byte)Op_code.MOD);         break;
+                case nameof(Op_code.POW):         bytecode.Add((byte)Op_code.POW);         break;
+                case nameof(Op_code.SHL):         bytecode.Add((byte)Op_code.SHL);         break;
+                case nameof(Op_code.SHR):         bytecode.Add((byte)Op_code.SHR);         break;
+                case nameof(Op_code.BAND):        bytecode.Add((byte)Op_code.BAND);        break;
+                case nameof(Op_code.BOR):         bytecode.Add((byte)Op_code.BOR);         break;
+                case nameof(Op_code.XOR):         bytecode.Add((byte)Op_code.XOR);         break;
+                case nameof(Op_code.BNEG):        bytecode.Add((byte)Op_code.BNEG);        break;
+                case nameof(Op_code.DEREF):       bytecode.Add((byte)Op_code.DEREF);       break;
                 // case "AND":         bytecode.Add((byte)Op_code.AND);         break;
                 // case "OR":          bytecode.Add((byte)Op_code.OR);          break;
-                case "NEG":         bytecode.Add((byte)Op_code.NEG);         break;
+                case nameof(Op_code.NEG):         bytecode.Add((byte)Op_code.NEG);         break;
             }
         }
 

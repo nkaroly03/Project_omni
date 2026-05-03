@@ -74,13 +74,3 @@
 // print("s[0]: " + s[0] + '\n');
 // print("s[1]: " + s[1] + '\n');
 // print("s[2]: " + s[2] + '\n');
-
-
-let arr: [2]str = {};
-arr[0] = "Hello";
-arr[1] = "World";
-
-for (0..array_size(arr)) |i|{
-    let str_cast: str = i;
-    print("arr[" + i + "]: " + arr[i] + '\n');
-}
