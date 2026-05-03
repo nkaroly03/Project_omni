@@ -1,0 +1,112 @@
+src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\test.omni
+
+    1 ; PUSH 0
+    1 ; TO_FLOAT
+    2 ; PUSH TRUE
+    1 ; JMPZ 103
+    2 ; PUSH 0
+    2 ; TO_INT
+    3 ; PUSH "Enter operation:\n\t[0] -> Add\n\t[1] -> Sub\n\t[2] -> Mul\n\t[3] -> Div\n\t[4] -> Mod\n\t[5] -> Quit\n\nOp: "
+    3 ; SCAN
+    2 ; MOV SP[-2]
+    3 ; PUSH SP[-1]
+    4 ; PUSH 0
+    3 ; CMP_LE
+    3 ; TO_BOOL
+    2 ; JMPZ 3
+    3 ; PUSH TRUE
+    3 ; JMP 5
+    3 ; PUSH SP[-1]
+    4 ; PUSH 5
+    3 ; CMP_GE
+    3 ; TO_BOOL
+    2 ; JMPZ 4
+    3 ; PUSH "Invalid operation\n"
+    2 ; PRINT
+    2 ; JMP -17
+    3 ; PUSH SP[-1]
+    4 ; PUSH 5
+    3 ; CMP_NEQ
+    2 ; JMPZ 73
+    3 ; PUSH "a: "
+    3 ; SCAN
+    3 ; TO_FLOAT
+    4 ; PUSH "b: "
+    4 ; SCAN
+    4 ; TO_FLOAT
+    5 ; PUSH FALSE
+    5 ; TO_BOOL
+    6 ; PUSH SP[-4]
+    7 ; PUSH 0
+    6 ; CMP_EQ
+    5 ; JMPZ 6
+    6 ; PUSH SP[-3]
+    7 ; PUSH SP[-3]
+    6 ; ADD
+    5 ; MOV SP[-6]
+    5 ; JMP 39
+    6 ; PUSH SP[-4]
+    7 ; PUSH 1
+    6 ; CMP_EQ
+    5 ; JMPZ 6
+    6 ; PUSH SP[-3]
+    7 ; PUSH SP[-3]
+    6 ; SUB
+    5 ; MOV SP[-6]
+    5 ; JMP 30
+    6 ; PUSH SP[-4]
+    7 ; PUSH 2
+    6 ; CMP_EQ
+    5 ; JMPZ 6
+    6 ; PUSH SP[-3]
+    7 ; PUSH SP[-3]
+    6 ; MUL
+    5 ; MOV SP[-6]
+    5 ; JMP 21
+    6 ; PUSH SP[-2]
+    7 ; PUSH 0
+    6 ; CMP_NEQ
+    5 ; JMPZ 15
+    6 ; PUSH SP[-4]
+    7 ; PUSH 3
+    6 ; CMP_EQ
+    5 ; JMPZ 6
+    6 ; PUSH SP[-3]
+    7 ; PUSH SP[-3]
+    6 ; DIV
+    5 ; MOV SP[-6]
+    5 ; JMP 5
+    6 ; PUSH SP[-3]
+    7 ; PUSH SP[-3]
+    6 ; MOD
+    5 ; MOV SP[-6]
+    5 ; JMP 3
+    6 ; PUSH TRUE
+    5 ; MOV SP[-2]
+    6 ; PUSH SP[-1]
+    6 ; TO_BOOL
+    6 ; NEG
+    5 ; JMPZ 8
+    6 ; PUSH "result: "
+    5 ; PRINT
+    6 ; PUSH SP[-5]
+    5 ; PRINT
+    6 ; PUSH "\n"
+    5 ; PRINT
+    5 ; JMP 3
+    6 ; PUSH "Arithmetic error\n"
+    5 ; PRINT
+    4 ; POP
+    3 ; POP
+    2 ; POP
+    2 ; JMP 5
+    3 ; PUSH "Stopping\n"
+    2 ; PRINT
+    3 ; PUSH SP[-2]
+    2 ; RET
+    1 ; POP
+    1 ; JMP -103
+    2 ; PUSH 0
+    1 ; RET
+    0 ; POP
+

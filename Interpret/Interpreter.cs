@@ -81,7 +81,8 @@ public static class Interpreter{
                     stack.pop();
                     break;
                 case Compiler.Op_code.DEREF_MOV:
-                    stack[^3][stack[^2]] = stack.pop();
+                    stack[^3][stack[^2]] = stack[^1];
+                    stack.pop();
                     stack.pop();
                     stack.pop();
                     break;
@@ -157,30 +158,32 @@ public static class Interpreter{
                     };
                     break;
 
-                case Compiler.Op_code.CMP_EQ:  stack[^2] = new(stack[^2] == stack.pop()); break;
-                case Compiler.Op_code.CMP_NEQ: stack[^2] = new(stack[^2] != stack.pop()); break;
-                case Compiler.Op_code.CMP_LE:  stack[^2] = new(stack[^2] <  stack.pop()); break;
-                case Compiler.Op_code.CMP_LEQ: stack[^2] = new(stack[^2] <= stack.pop()); break;
-                case Compiler.Op_code.CMP_GE:  stack[^2] = new(stack[^2] >  stack.pop()); break;
-                case Compiler.Op_code.CMP_GEQ: stack[^2] = new(stack[^2] >= stack.pop()); break;
+                case Compiler.Op_code.CMP_EQ:  stack[^2] = new(stack[^2] == stack[^1]); stack.pop(); break;
+                case Compiler.Op_code.CMP_NEQ: stack[^2] = new(stack[^2] != stack[^1]); stack.pop(); break;
+                case Compiler.Op_code.CMP_LE:  stack[^2] = new(stack[^2] <  stack[^1]); stack.pop(); break;
+                case Compiler.Op_code.CMP_LEQ: stack[^2] = new(stack[^2] <= stack[^1]); stack.pop(); break;
+                case Compiler.Op_code.CMP_GE:  stack[^2] = new(stack[^2] >  stack[^1]); stack.pop(); break;
+                case Compiler.Op_code.CMP_GEQ: stack[^2] = new(stack[^2] >= stack[^1]); stack.pop(); break;
 
-                case Compiler.Op_code.ADD:   stack[^2]  += stack.pop(); break;
-                case Compiler.Op_code.SUB:   stack[^2]  -= stack.pop(); break;
-                case Compiler.Op_code.MUL:   stack[^2]  *= stack.pop(); break;
-                case Compiler.Op_code.DIV:   stack[^2]  /= stack.pop(); break;
-                case Compiler.Op_code.MOD:   stack[^2]  %= stack.pop(); break;
-                case Compiler.Op_code.SHL:   stack[^2] <<= stack.pop(); break;
-                case Compiler.Op_code.SHR:   stack[^2] >>= stack.pop(); break;
-                case Compiler.Op_code.BAND:  stack[^2]  &= stack.pop(); break;
-                case Compiler.Op_code.BOR:   stack[^2]  |= stack.pop(); break;
-                case Compiler.Op_code.XOR:   stack[^2]  ^= stack.pop(); break;
+                case Compiler.Op_code.ADD:  stack[^2]  += stack[^1]; stack.pop(); break;
+                case Compiler.Op_code.SUB:  stack[^2]  -= stack[^1]; stack.pop(); break;
+                case Compiler.Op_code.MUL:  stack[^2]  *= stack[^1]; stack.pop(); break;
+                case Compiler.Op_code.DIV:  stack[^2]  /= stack[^1]; stack.pop(); break;
+                case Compiler.Op_code.MOD:  stack[^2]  %= stack[^1]; stack.pop(); break;
+                case Compiler.Op_code.SHL:  stack[^2] <<= stack[^1]; stack.pop(); break;
+                case Compiler.Op_code.SHR:  stack[^2] >>= stack[^1]; stack.pop(); break;
+                case Compiler.Op_code.BAND: stack[^2]  &= stack[^1]; stack.pop(); break;
+                case Compiler.Op_code.BOR:  stack[^2]  |= stack[^1]; stack.pop(); break;
+                case Compiler.Op_code.XOR:  stack[^2]  ^= stack[^1]; stack.pop(); break;
 
                 case Compiler.Op_code.DEREF:
-                    stack[^2] = stack[^2][stack.pop()];
+                    stack[^2] = stack[^2][stack[^1]];
+                    stack.pop();
                     break;
-                                            
+
                 case Compiler.Op_code.POW:
-                    stack[^2] = Value.pow(stack[^2], stack.pop());
+                    stack[^2] = Value.pow(stack[^2], stack[^1]);
+                    stack.pop();
                     break;
 
                 case Compiler.Op_code.BNEG:

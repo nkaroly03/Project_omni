@@ -236,7 +236,12 @@ public static class Compiler{
                             to_IR(current_AST_node.sub_nodes[0], null, sb, ref let_decl_counter, true);
                     }
                     else{
-                        // TODO: rvalue check?
+                        for (Node lhs = current_AST_node.sub_nodes[0].sub_nodes[0]; lhs.token.type != Token.Type.ID; lhs = lhs.sub_nodes[0]){
+                            if (lhs.token.type == Token.Type.ARGV)
+                                throw new Syntax_error_exception($"On line <{lhs.token.line_number}> <argv> is immutable");
+                            else if (lhs.token.type != Token.Type.ID && lhs.token.type != Token.Type.LBRACKET && lhs.token.type != Token.Type.EQ)
+                                throw new Syntax_error_exception($"On line <{lhs.token.line_number}> trying to assign to rvalue");
+                        }
                         to_IR(current_AST_node.sub_nodes[0].sub_nodes[0], null, sb, ref let_decl_counter, true);
                         to_IR(current_AST_node.sub_nodes[0].sub_nodes[1], null, sb, ref let_decl_counter, true);
                         if (push_back_after_assignment){
