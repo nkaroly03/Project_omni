@@ -1,5 +1,41 @@
 src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\test3.omni
 
-    1 ; PUSH 0
-    0 ; RET
+    1 ; PUSH "input: "
+    1 ; SCAN
+    1 ; TO_INT
+    2 ; PUSH SP[-1]
+    2 ; ALLOC_ARRAY
+    2 ; TO_INT
+    3 ; PUSH 0
+    3 ; TO_INT
+    4 ; PUSH SP[-1]
+    5 ; PUSH SP[-3]
+    5 ; ARRAY_SIZE
+    4 ; CMP_LE
+    3 ; JMPZ 21
+    4 ; PUSH SP[-2]
+    5 ; PUSH SP[-2]
+    4 ; DEREF
+    4 ; TO_STR
+    5 ; PUSH "arr["
+    4 ; PRINT
+    5 ; PUSH SP[-2]
+    4 ; PRINT
+    5 ; PUSH "]: "
+    6 ; PUSH SP[-2]
+    5 ; ADD
+    6 ; PUSH '\n'
+    5 ; ADD
+    4 ; PRINT
+    3 ; POP
+    4 ; PUSH SP[-1]
+    5 ; PUSH 1
+    4 ; ADD
+    3 ; MOV SP[-2]
+    3 ; JMP -24
+    2 ; POP
+    3 ; PUSH 0
+    2 ; RET
+    1 ; POP
+    0 ; POP
 

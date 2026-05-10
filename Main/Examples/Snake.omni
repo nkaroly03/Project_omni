@@ -7,7 +7,7 @@ let SNAKE_FIELD_TYPE_IDX_APPLE:      int = 2;
 let SNAKE_FIELD_TYPE_IDX_SNAKE_TAIL: int = 3;
 let SNAKE_FIELD_TYPE_IDX_SNAKE_HEAD: int = 4;
 
-let SNAKE_FIELD_TYPE_SYMBOL_STRS: [5]str = {};
+let SNAKE_FIELD_TYPE_SYMBOL_STRS: []str = [5]{};
 SNAKE_FIELD_TYPE_SYMBOL_STRS[SNAKE_FIELD_TYPE_IDX_NONE      ] = " ";
 SNAKE_FIELD_TYPE_SYMBOL_STRS[SNAKE_FIELD_TYPE_IDX_OBSTACLE  ] = "\x1b[0mX";
 SNAKE_FIELD_TYPE_SYMBOL_STRS[SNAKE_FIELD_TYPE_IDX_APPLE     ] = "\x1b[31m$";
@@ -39,8 +39,8 @@ if (argc > 0){
 let game_stop: bool = false;
 while (not game_stop){
     let snake_unused_obstacles_end_idx: int = width * height;
-    let snake_obstacles_pos_x_buf: [snake_unused_obstacles_end_idx]int = {};
-    let snake_obstacles_pos_y_buf: [snake_unused_obstacles_end_idx]int = {};
+    let snake_obstacles_pos_x_buf: []int = [snake_unused_obstacles_end_idx]{};
+    let snake_obstacles_pos_y_buf: []int = [snake_unused_obstacles_end_idx]{};
 
     for (0..height) |y|{
         for (0..width) |x|{
@@ -66,8 +66,8 @@ while (not game_stop){
     snake_unused_obstacles_end_idx = snake_unused_obstacles_end_idx - 3;
 
     let snake_parts_end_idx: int = 0;
-    let snake_parts_pos_x_buf: [width * height]int = {};
-    let snake_parts_pos_y_buf: [width * height]int = {};
+    let snake_parts_pos_x_buf: []int = [width * height]{};
+    let snake_parts_pos_y_buf: []int = [width * height]{};
 
     {
         let width_half:  int = width  / 2;
@@ -137,7 +137,7 @@ while (not game_stop){
                 snake_apple_pos_y = snake_obstacles_pos_y_buf[temp];
             }
         }
-        let snake_field: [width * height]int = {};
+        let snake_field: []int = [width * height]{};
         for (0..width * height) |i|
             snake_field[i] = SNAKE_FIELD_TYPE_IDX_NONE;
 

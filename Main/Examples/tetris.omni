@@ -16,7 +16,7 @@ let TETROMINO_ROTATION_IDX_90:  int = 1;
 let TETROMINO_ROTATION_IDX_180: int = 2;
 let TETROMINO_ROTATION_IDX_270: int = 3;
 
-let TETROMINO_SHAPE_INFO_TABLE_SIDE_LENGTHS: [8]int = {};
+let TETROMINO_SHAPE_INFO_TABLE_SIDE_LENGTHS: []int = [8]{};
 TETROMINO_SHAPE_INFO_TABLE_SIDE_LENGTHS[TETROMINO_SHAPE_IDX_SQR ] = 2;
 TETROMINO_SHAPE_INFO_TABLE_SIDE_LENGTHS[TETROMINO_SHAPE_IDX_Z0  ] = 3;
 TETROMINO_SHAPE_INFO_TABLE_SIDE_LENGTHS[TETROMINO_SHAPE_IDX_Z1  ] = 3;
@@ -26,7 +26,7 @@ TETROMINO_SHAPE_INFO_TABLE_SIDE_LENGTHS[TETROMINO_SHAPE_IDX_T   ] = 3;
 TETROMINO_SHAPE_INFO_TABLE_SIDE_LENGTHS[TETROMINO_SHAPE_IDX_I   ] = 4;
 TETROMINO_SHAPE_INFO_TABLE_SIDE_LENGTHS[TETROMINO_SHAPE_IDX_NONE] = 0;
 
-let TETROMINO_SHAPE_INFO_TABLES: [8]str = {};
+let TETROMINO_SHAPE_INFO_TABLES: []str = [8]{};
 TETROMINO_SHAPE_INFO_TABLES[TETROMINO_SHAPE_IDX_SQR] =
     "XX"
     "XX"
@@ -64,7 +64,7 @@ TETROMINO_SHAPE_INFO_TABLES[TETROMINO_SHAPE_IDX_I] =
 ;
 TETROMINO_SHAPE_INFO_TABLES[TETROMINO_SHAPE_IDX_NONE] = "";
 
-let TETROMINO_SHAPE_INFO_SYMBOL_STRS: [8]str = {};
+let TETROMINO_SHAPE_INFO_SYMBOL_STRS: []str = [8]{};
 TETROMINO_SHAPE_INFO_SYMBOL_STRS[TETROMINO_SHAPE_IDX_SQR ] = "\x1b[38;2;255;255;0m#";
 TETROMINO_SHAPE_INFO_SYMBOL_STRS[TETROMINO_SHAPE_IDX_Z0  ] = "\x1b[38;2;0;255;0m#";
 TETROMINO_SHAPE_INFO_SYMBOL_STRS[TETROMINO_SHAPE_IDX_Z1  ] = "\x1b[38;2;255;0;0m#";
@@ -78,7 +78,7 @@ TETROMINO_SHAPE_INFO_SYMBOL_STRS[TETROMINO_SHAPE_IDX_NONE] = " ";
 
 let stop_game: bool = false;
 while (not stop_game){
-    let tetris_field: [TETRIS_WIDTH * TETRIS_HEIGHT]int = {};
+    let tetris_field: []int = [TETRIS_WIDTH * TETRIS_HEIGHT]{};
     for (0..array_size(tetris_field)) |i|
         tetris_field[i] = TETROMINO_SHAPE_IDX_NONE;
 
@@ -478,7 +478,8 @@ while (not stop_game){
     let valid_user_input: bool = false;
     while (not valid_user_input){
         let user_input: char = poll_char();
-        valid_user_input = (user_input == 'Y' or user_input == 'y' or user_input == 'N' or user_input == 'n');
-        stop_game = (user_input == 'N' or user_input == 'n');
+        user_input = user_input - ((user_input >= 'a' and user_input <= 'z') * ('a' - 'A'));
+        valid_user_input = (user_input == 'Y' or user_input == 'N');
+        stop_game = (user_input == 'N');
     }
 }

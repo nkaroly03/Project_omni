@@ -140,7 +140,7 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\Tetris.omni
     20 ; PUSH SP[-1]
     20 ; TO_BOOL
     20 ; NEG
-    19 ; JMPZ 1711
+    19 ; JMPZ 1708
     20 ; PUSH SP[-19]
     21 ; PUSH SP[-19]
     20 ; MUL
@@ -1794,9 +1794,28 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\Tetris.omni
     33 ; PUSH SP[-1]
     33 ; TO_BOOL
     33 ; NEG
-    32 ; JMPZ 43
+    32 ; JMPZ 40
     33 ; POLL_CHAR
     33 ; TO_CHAR
+    34 ; PUSH SP[-1]
+    35 ; PUSH SP[-2]
+    36 ; PUSH 'a'
+    35 ; CMP_GEQ
+    35 ; TO_BOOL
+    35 ; NEG
+    34 ; JMPZ 3
+    35 ; PUSH FALSE
+    35 ; JMP 5
+    35 ; PUSH SP[-2]
+    36 ; PUSH 'z'
+    35 ; CMP_LEQ
+    35 ; TO_BOOL
+    36 ; PUSH 'a'
+    37 ; PUSH 'A'
+    36 ; SUB
+    35 ; MUL
+    34 ; SUB
+    33 ; MOV SP[-2]
     34 ; PUSH SP[-1]
     35 ; PUSH 'Y'
     34 ; CMP_EQ
@@ -1805,38 +1824,16 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\Tetris.omni
     34 ; PUSH TRUE
     34 ; JMP 5
     34 ; PUSH SP[-1]
-    35 ; PUSH 'y'
-    34 ; CMP_EQ
-    34 ; TO_BOOL
-    33 ; JMPZ 3
-    34 ; PUSH TRUE
-    34 ; JMP 5
-    34 ; PUSH SP[-1]
     35 ; PUSH 'N'
-    34 ; CMP_EQ
-    34 ; TO_BOOL
-    33 ; JMPZ 3
-    34 ; PUSH TRUE
-    34 ; JMP 5
-    34 ; PUSH SP[-1]
-    35 ; PUSH 'n'
     34 ; CMP_EQ
     34 ; TO_BOOL
     33 ; MOV SP[-3]
     34 ; PUSH SP[-1]
     35 ; PUSH 'N'
     34 ; CMP_EQ
-    34 ; TO_BOOL
-    33 ; JMPZ 3
-    34 ; PUSH TRUE
-    34 ; JMP 5
-    34 ; PUSH SP[-1]
-    35 ; PUSH 'n'
-    34 ; CMP_EQ
-    34 ; TO_BOOL
     33 ; MOV SP[-16]
     32 ; POP
-    32 ; JMP -45
+    32 ; JMP -42
     31 ; POP
     30 ; POP
     29 ; POP
@@ -1850,7 +1847,7 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\Tetris.omni
     21 ; POP
     20 ; POP
     19 ; POP
-    19 ; JMP -1713
+    19 ; JMP -1710
     20 ; PUSH 0
     19 ; RET
     18 ; POP

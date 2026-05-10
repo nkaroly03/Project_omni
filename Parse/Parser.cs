@@ -181,9 +181,10 @@ public static class Parser{
                         node1.m_sub_nodes[1].m_sub_nodes.Add(self.parse_arithm_expr(0.0f));
                     }
                     else{
-                        node1.m_sub_nodes[1].m_sub_nodes.Add(self.parse_arithm_expr(0.0f));
-                        if ((tok = self.Pop()).type != Token.Type.RBRACKET)
+                        if (self.Count == 0 || (tok = self.Pop()).type != Token.Type.RBRACKET)
                             throw new Syntax_error_exception($"On line <{tok.line_number}> <[> must be closed by <]>");
+
+                        Token arr_type;
 
                         if (
                             self.Count == 0 ||
@@ -194,10 +195,20 @@ public static class Parser{
                         )
                             throw new Syntax_error_exception($"On line <{tok.line_number}> <]> must be followed by a valid type");
 
-                        node1.m_sub_nodes[1].m_sub_nodes.Add(new(){token = tok});
+                        arr_type = tok;
 
                         if (self.Count == 0 || (tok = self.Pop()).type != Token.Type.EQ)
                             throw new Syntax_error_exception($"On line <{tok.line_number}> type must be followed by <=>");
+
+                        if (self.Count == 0 || (tok = self.Pop()).type != Token.Type.LBRACKET)
+                            throw new Syntax_error_exception($"On line <{tok.line_number}> <=> must be followed by <[>");
+
+                        node1.m_sub_nodes[1].m_sub_nodes.Add(self.parse_arithm_expr(0.0f));
+                        node1.m_sub_nodes[1].m_sub_nodes.Add(new(){token = arr_type});
+                        
+                        if ((tok = self.Pop()).type != Token.Type.RBRACKET)
+                            throw new Syntax_error_exception($"On line <{tok.line_number}> <[> must be closed by <]>");
+
                         if (self.Count == 0 || (tok = self.Pop()).type != Token.Type.LBRACE)
                             throw new Syntax_error_exception($"On line <{tok.line_number}> <=> must be followed by <{{>");
                         // TODO: implement init list?

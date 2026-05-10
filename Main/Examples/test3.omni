@@ -43,7 +43,7 @@
 // print("\ns1: " + s1 + '\n');
 // print("\ns2: " + s2 + '\n');
 
-// let s: [3]str = {};
+// let s: []str = [3]{};
 // s[0] = "Hello";
 // s[1] = "World";
 // s[2] = "Ok";
@@ -64,7 +64,7 @@
 // 
 // print("s1: " + s1 + '\n');
 
-// let s: [3]str = {};
+// let s: []str = [3]{};
 // s[0] = "Hello";
 // s[1] = "World";
 // s[2] = "Ok";
