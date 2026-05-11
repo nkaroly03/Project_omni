@@ -2,6 +2,7 @@
 using Interpret;
 using Lex;
 using Parse;
+using Primitive;
 
 string[] argv = Environment.GetCommandLineArgs();
 

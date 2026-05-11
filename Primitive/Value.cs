@@ -1,4 +1,4 @@
-﻿namespace Interpret;
+﻿namespace Primitive;
 
 using System.Diagnostics;
 using System.Text;
@@ -107,9 +107,9 @@ public sealed class Value : IEquatable<Value>, IComparable<Value>{
     public static bool operator> (Value v1, Value v2) =>  v1.CompareTo(v2) >  0;
     public static bool operator>=(Value v1, Value v2) =>  v1.CompareTo(v2) >= 0;
 
-    public static Value get_argv(string[] argv) => new(argv.Select((s) => new StringBuilder(s)).ToArray());
+    public static Value get_argv(IEnumerable<string> argv) => new(argv.Select((s) => new StringBuilder(s)).ToArray());
 
-    public object data{ get; private set; } // TODO: make into internal/modifiy Interpret.Interpreter's MOV case? reason: (s[0] = (s = "Test")[2])
+    public object data{ get; private set; }
 
     public Value(bool data)            => this.data = data;
     public Value(char data)            => this.data = data;
@@ -175,7 +175,40 @@ public sealed class Value : IEquatable<Value>, IComparable<Value>{
 
     public override bool Equals(object? obj) => Equals(obj as Value);
     public override int GetHashCode() => data.GetHashCode();
-    public override string ToString() => data.ToString()!; // TODO: modifiy for array printing?
+    public override string ToString(){
+        if (data.GetType().IsArray){
+            StringBuilder result = new();
+            result.Append('[');
+            switch (data){
+                case bool[] b_arr:
+                    foreach (bool b in b_arr)
+                        result.Append($"{b}, ");
+                    break;
+                case char[] c_arr:
+                    foreach (char c in c_arr)
+                        result.Append($"'{c}', ");
+                    break;
+                case int[] i_arr:
+                    foreach (int i in i_arr)
+                        result.Append($"{i}, ");
+                    break;
+                case float[] f_arr:
+                    foreach (float f in f_arr)
+                        result.Append($"{f}, ");
+                    break;
+                case StringBuilder[] sb_arr:
+                    foreach (StringBuilder sb in sb_arr)
+                        result.Append($"\"{sb.ToString()}\", ");
+                    break;
+                default:
+                    throw new UnreachableException();
+            }
+            result.Length -= (Convert.ToInt32(result[^1] == ' ') * 2);
+            result.Append(']');
+            return result.ToString();
+        }
+        return data.ToString()!;
+    }
 
     public bool Equals(Value? other){
         if (other is null)

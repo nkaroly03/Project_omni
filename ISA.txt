@@ -10,7 +10,7 @@ Instructions:
     RET:         returns SP[-1], then pops the stack (for completeness, but is unnecessary)
 
     MOV [arg]:   calculates <arg> = SP[-1], where <arg> is an element on the stack, then pops the stack
-    DEREF_MOV:   calculates SP[-3][SP[-2]] = SP[-1], where arg is an int literal, then pops the stack thrice,
+    DEREF_MOV:   calculates SP[-3][SP[-2]] = SP[-1], then pops the stack thrice,
 
     JMP  [arg]:  jumps unconditionally <arg> number of instructions
     JMPZ [arg]:  jumps <arg> number of instructions if SP[-1] is 0, then pops the stack in either case

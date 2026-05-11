@@ -5,6 +5,7 @@
     <ProjectReference Include="..\Parse\Parse.csproj" />
     <ProjectReference Include="..\Interpret\Interpret.csproj" />
     <ProjectReference Include="..\Compile\Compile.csproj" />
+    <ProjectReference Include="..\Primitive\Primitive.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

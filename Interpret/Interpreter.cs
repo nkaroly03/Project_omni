@@ -1,6 +1,7 @@
 namespace Interpret;
 
 using Compile;
+using Primitive;
 using System.Diagnostics;
 using System.Text;
 

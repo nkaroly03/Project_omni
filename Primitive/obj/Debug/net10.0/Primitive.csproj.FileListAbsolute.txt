@@ -1,0 +1,12 @@
+C:\Users\giganibba840\Desktop\C#\Project_omni\Primitive\bin\Debug\net10.0\Primitive.deps.json
+C:\Users\giganibba840\Desktop\C#\Project_omni\Primitive\bin\Debug\net10.0\Primitive.dll
+C:\Users\giganibba840\Desktop\C#\Project_omni\Primitive\bin\Debug\net10.0\Primitive.pdb
+C:\Users\giganibba840\Desktop\C#\Project_omni\Primitive\obj\Debug\net10.0\Primitive.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\giganibba840\Desktop\C#\Project_omni\Primitive\obj\Debug\net10.0\Primitive.AssemblyInfoInputs.cache
+C:\Users\giganibba840\Desktop\C#\Project_omni\Primitive\obj\Debug\net10.0\Primitive.AssemblyInfo.cs
+C:\Users\giganibba840\Desktop\C#\Project_omni\Primitive\obj\Debug\net10.0\Primitive.csproj.CoreCompileInputs.cache
+C:\Users\giganibba840\Desktop\C#\Project_omni\Primitive\obj\Debug\net10.0\Primitive.sourcelink.json
+C:\Users\giganibba840\Desktop\C#\Project_omni\Primitive\obj\Debug\net10.0\Primitive.dll
+C:\Users\giganibba840\Desktop\C#\Project_omni\Primitive\obj\Debug\net10.0\refint\Primitive.dll
+C:\Users\giganibba840\Desktop\C#\Project_omni\Primitive\obj\Debug\net10.0\Primitive.pdb
+C:\Users\giganibba840\Desktop\C#\Project_omni\Primitive\obj\Debug\net10.0\ref\Primitive.dll

@@ -92,32 +92,13 @@ public static class Lexer{
         if (!path.EndsWith(".omni"))
             throw new ArgumentOutOfRangeException("Bad file extension");
 
-        string file_lines = File.ReadAllText(path);
-
-        if (!((Func<bool>)(() => {
-            bool quote_is_closed = true;
-            bool was_escaped = false;
-            foreach (char c in file_lines){
-                if (!was_escaped){
-                    if (c == '\\')
-                        was_escaped = true;
-                    else if (c == '"')
-                        quote_is_closed = !quote_is_closed;
-                }
-                else
-                    was_escaped = false;
-            }
-            return quote_is_closed;
-        }))())
-            throw new Syntax_error_exception($"Unclosed string literal");
-
         int lparen_count = 0, rparen_count = 0, lbracket_count = 0, rbracket_count = 0, lbrace_count = 0, rbrace_count = 0;
 
         int line_idx = 0;
         foreach (
             string line in
             Regex.Split(
-                file_lines,
+                File.ReadAllText(path),
                 "(" +
                     @"/\*/(?:\r\n|\r|\n|.)*?/\*/|(?://.*)?(?:\r\n|\r|\n)|""(?:[^""\\]|\\.)*?""|'(?:[^'\\]|\\.)*?'|" +
                     @"\.\.|\*\*|[:;()\[\]{}+*/%&|^~-]|<<|>>|!=|[<>=]=?|" +
@@ -213,13 +194,16 @@ public static class Lexer{
                         }
                         else if (line.Count((c) => c == '.') == 1 && line[0] != '.' && line.All((c) => char.IsDigit(c) || c == '.'))
                             return Token.Type.FLOAT_LIT;
-                        else if (line[0] == '\''){
-                            if (Regex.Unescape(line[1..^1]).Length != 1)
+                        else if (line.StartsWith('\'')){
+                            if (Regex.Unescape(line[1..^1]).Length != 1 || line.AsSpan()[1..^1].IndexOf(Environment.NewLine) >= 0)
                                 throw new Syntax_error_exception($"On line <{line_idx + 1}> found invalid char literal");
                             return Token.Type.CHAR_LIT;
                         }
-                        else if (line[0] == '"')
+                        else if (line.StartsWith('"')){
+                            if (line.AsSpan()[1..^1].IndexOf(Environment.NewLine) >= 0)
+                                throw new Syntax_error_exception($"On line <{line_idx + 1}> found invalid str literal");
                             return Token.Type.STR_LIT;
+                        }
                         else if (!char.IsDigit(line[0]) && line.All((c) => char.IsAsciiLetter(c) || char.IsDigit(c) || c == '_'))
                             return Token.Type.ID;
                         else
