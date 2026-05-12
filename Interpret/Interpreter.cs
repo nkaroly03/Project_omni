@@ -150,8 +150,8 @@ public static class Interpreter{
                         Compiler.Op_code.TO_FLOAT => new(new float[alloc_size]),
                         Compiler.Op_code.TO_STR   => new(((Func<StringBuilder[]>)(() => {
                             StringBuilder[] sb_arr = new StringBuilder[alloc_size];
-                            for (int i = 0; i < sb_arr.Length; ++i)
-                                sb_arr[i] = new();
+                            foreach (ref StringBuilder sb in sb_arr.AsSpan())
+                                sb = new();
                             return sb_arr;
                         }))()),
 

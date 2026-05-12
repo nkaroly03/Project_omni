@@ -107,7 +107,7 @@ public static class Lexer{
                     @"\bprint\b|\bscan\b|\barray_size\b|\brand\b|\bpoll_char\b|" +
                     @"\bif\b|\belse\b|\bwhile\b|\bfor\b|\breturn\b" +
                 ")"
-            ).Select((s) => s.Trim(' ')).Where((s) => s.Length > 0).ToArray()
+            ).Select((s) => s.Trim(' ')).Where((s) => s.Length > 0)
         ){
             // Console.WriteLine($"tok: {System.Text.RegularExpressions.Regex.Escape(line)} | tok.Length: {line.Length}");
             if (line != Environment.NewLine && !line.StartsWith("//") && !line.StartsWith("/*/")){

@@ -3,7 +3,120 @@
 using System.Diagnostics;
 using System.Text;
 
+public static class Primitive_extensions{
+    extension(Value.Type_info self){
+        public bool  bool_is_set() => (self & Value.Type_info.BOOL)  == Value.Type_info.BOOL;
+        public bool  char_is_set() => (self & Value.Type_info.CHAR)  == Value.Type_info.CHAR;
+        public bool   int_is_set() => (self & Value.Type_info.INT)   == Value.Type_info.INT;
+        public bool float_is_set() => (self & Value.Type_info.FLOAT) == Value.Type_info.FLOAT;
+        public bool   str_is_set() => (self & Value.Type_info.STR)   == Value.Type_info.STR;
+        public bool array_is_set() => (self & Value.Type_info.ARRAY) == Value.Type_info.ARRAY;
+
+        public bool int_like_is_set() => self.bool_is_set() || self.char_is_set() || self.int_is_set();
+    }
+
+    extension(Value.Unary_op self){
+        public bool is_bitwise() => self == Value.Unary_op.BNEG;
+
+        public bool is_valid_op(Value.Type_info val) => self switch{
+            Value.Unary_op.PLUS or Value.Unary_op.MINUS => !val.array_is_set() && (val.int_like_is_set() || val.float_is_set()),
+            Value.Unary_op.BNEG                         => !val.array_is_set() && val.int_like_is_set(),
+
+            _ => throw new UnreachableException(),
+        };
+    }
+    extension(Value.Binary_op self){
+        public bool is_bitwise() => (int)self >= (int)Value.Binary_op.SHL && (int)self <= (int)Value.Binary_op.XOR;
+        public bool is_comparison() => (int)self >= (int)Value.Binary_op.CMP_EQ && (int)self <= (int)Value.Binary_op.CMP_GEQ;
+
+        public bool is_valid_op(Value.Type_info lhs, Value.Type_info rhs){
+            if (rhs.array_is_set())
+                return false;
+
+            if (self == Value.Binary_op.SUBSCRIPT)
+                return ((lhs.array_is_set() || lhs.str_is_set()) && rhs.int_like_is_set());
+
+            if (lhs.array_is_set())
+                return false;
+
+            if (self == Value.Binary_op.ASSIGNMENT)
+                return true;
+
+            if (lhs.str_is_set() || rhs.str_is_set()){
+                return 
+                    (self == Value.Binary_op.ADD && (lhs.char_is_set() || lhs.str_is_set()) && (rhs.char_is_set() || rhs.str_is_set())) ||
+                    (self.is_comparison() && lhs.str_is_set() && rhs.str_is_set())
+                ;
+            }
+
+            if (self.is_bitwise())
+                return lhs.int_like_is_set() && rhs.int_like_is_set();
+
+            return true;
+        }
+
+        public Value.Type_info get_result_type(Value.Type_info lhs, Value.Type_info rhs){
+            if (!self.is_valid_op(lhs, rhs))
+                return Value.Type_info.INVALID;
+
+            if (self.is_comparison())
+                return Value.Type_info.BOOL;
+
+            if (self == Value.Binary_op.SUBSCRIPT)
+                return (lhs.array_is_set()) ? lhs & ~Value.Type_info.ARRAY : Value.Type_info.CHAR;
+
+            if (self == Value.Binary_op.ASSIGNMENT)
+                return lhs;
+
+            return lhs switch{
+                Value.Type_info.BOOL                         => rhs,
+                Value.Type_info.CHAR                         => (rhs == Value.Type_info.BOOL) ? lhs : rhs,
+                Value.Type_info.INT                          => (rhs == Value.Type_info.BOOL || rhs == Value.Type_info.CHAR) ? lhs : rhs,
+                Value.Type_info.FLOAT or Value.Type_info.STR => lhs,
+
+                _ => throw new UnreachableException(),
+            };
+        }
+    }
+}
+
 public sealed class Value : IEquatable<Value>, IComparable<Value>{
+    [Flags] public enum Type_info{
+        INVALID = 0,
+        BOOL    = 1,
+        CHAR    = 2,
+        INT     = 4,
+        FLOAT   = 8,
+        STR     = 16,
+        ARRAY   = 32
+    }
+
+    public enum Unary_op{ PLUS, MINUS, BNEG }
+    public enum Binary_op{
+        CMP_EQ,
+        CMP_NEQ,
+        CMP_LE,
+        CMP_LEQ,
+        CMP_GE,
+        CMP_GEQ,
+
+        SUBSCRIPT,
+        ASSIGNMENT,
+
+        ADD,
+        SUB,
+        MUL,
+        DIV,
+        MOD,
+        POW,
+
+        SHL,
+        SHR,
+        BAND,
+        BOR,
+        XOR
+    }
+
     static Value arithm_op(Value v1, Value v2, Action<Value, Value> op){
         if (v1.data.GetType().IsArray || v2.data.GetType().IsArray)
             throw new ArgumentOutOfRangeException("Trying to use arithmetic operation on array(s)");

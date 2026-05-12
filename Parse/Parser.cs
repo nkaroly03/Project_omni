@@ -362,10 +362,10 @@ public static class Parser{
     }
 
     public static ReadOnlySpan<Node> build_AST(ReadOnlySpan<Token> tokens){
-        Token[] token_array = tokens.ToArray();
-        Array.Reverse(token_array);
+        Stack<Token> token_stack = new(tokens.Length);
+        for (int i = tokens.Length; i-- > 0;)
+            token_stack.Push(tokens[i]);
 
-        Stack<Token> token_stack = new(token_array);
         List<Node> nodes = new(); 
 
         while (((Func<bool>)(() => {
