@@ -21,7 +21,8 @@
       "Compile/1.0.0": {
         "dependencies": {
           "Lex": "1.0.0",
-          "Parse": "1.0.0"
+          "Parse": "1.0.0",
+          "Primitive": "1.0.0"
         },
         "runtime": {
           "Compile.dll": {

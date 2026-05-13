@@ -25,8 +25,8 @@ public static class Parser{
     extension(Token.Type self){
         static (float, float) BINDING_POWERS_UNARY => (11.1f, 11.0f);
 
-        bool is_atom() => (int)self >= (int)Token.Type.ID && (int)self <= (int)Token.Type.STR_LIT;
-        bool is_operation() => (int)self >= (int)Token.Type.EQUALS && (int)self <= (int)Token.Type.EQ;
+        bool is_atom() => self >= Token.Type.ID && self <= Token.Type.STR_LIT;
+        bool is_operation() => self >= Token.Type.EQUALS && self <= Token.Type.EQ;
 
         (float, float) binding_powers() => self switch{
             Token.Type.ASTERISK2                                           => (12.1f, 12.0f),

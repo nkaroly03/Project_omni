@@ -16,18 +16,22 @@ public static class Primitive_extensions{
     }
 
     extension(Value.Unary_op self){
+        public bool is_logical() => self == Value.Unary_op.NOT;
         public bool is_bitwise() => self == Value.Unary_op.BNEG;
 
         public bool is_valid_op(Value.Type_info val) => self switch{
-            Value.Unary_op.PLUS or Value.Unary_op.MINUS => !val.array_is_set() && (val.int_like_is_set() || val.float_is_set()),
-            Value.Unary_op.BNEG                         => !val.array_is_set() && val.int_like_is_set(),
+            Value.Unary_op.PLUS or Value.Unary_op.MINUS or Value.Unary_op.NOT => !val.array_is_set() && (val.int_like_is_set() || val.float_is_set()),
+            Value.Unary_op.BNEG                                               => !val.array_is_set() && val.int_like_is_set(),
 
             _ => throw new UnreachableException(),
         };
+
+        public Value.Type_info get_result_type(Value.Type_info val) => (self.is_valid_op(val)) ? ((self.is_logical()) ? Value.Type_info.BOOL : val) : Value.Type_info.INVALID;
     }
     extension(Value.Binary_op self){
-        public bool is_bitwise() => (int)self >= (int)Value.Binary_op.SHL && (int)self <= (int)Value.Binary_op.XOR;
-        public bool is_comparison() => (int)self >= (int)Value.Binary_op.CMP_EQ && (int)self <= (int)Value.Binary_op.CMP_GEQ;
+        public bool is_comparison() => self >= Value.Binary_op.CMP_EQ && self <= Value.Binary_op.CMP_GEQ;
+        public bool is_bitwise() => self >= Value.Binary_op.SHL && self <= Value.Binary_op.XOR;
+        public bool is_logical() => self == Value.Binary_op.AND || self == Value.Binary_op.OR;
 
         public bool is_valid_op(Value.Type_info lhs, Value.Type_info rhs){
             if (rhs.array_is_set())
@@ -44,8 +48,10 @@ public static class Primitive_extensions{
 
             if (lhs.str_is_set() || rhs.str_is_set()){
                 return 
-                    (self == Value.Binary_op.ADD && (lhs.char_is_set() || lhs.str_is_set()) && (rhs.char_is_set() || rhs.str_is_set())) ||
-                    (self.is_comparison() && lhs.str_is_set() && rhs.str_is_set())
+                    !self.is_logical() && (
+                        (self == Value.Binary_op.ADD && (lhs.char_is_set() || lhs.str_is_set()) && (rhs.char_is_set() || rhs.str_is_set())) ||
+                        (self.is_comparison() && lhs.str_is_set() && rhs.str_is_set())
+                    )
                 ;
             }
 
@@ -59,7 +65,7 @@ public static class Primitive_extensions{
             if (!self.is_valid_op(lhs, rhs))
                 return Value.Type_info.INVALID;
 
-            if (self.is_comparison())
+            if (self.is_comparison() || self.is_logical())
                 return Value.Type_info.BOOL;
 
             if (self == Value.Binary_op.SUBSCRIPT)
@@ -91,7 +97,7 @@ public sealed class Value : IEquatable<Value>, IComparable<Value>{
         ARRAY   = 32
     }
 
-    public enum Unary_op{ PLUS, MINUS, BNEG }
+    public enum Unary_op{ PLUS, MINUS, BNEG, NOT }
     public enum Binary_op{
         CMP_EQ,
         CMP_NEQ,
@@ -101,6 +107,7 @@ public sealed class Value : IEquatable<Value>, IComparable<Value>{
         CMP_GEQ,
 
         SUBSCRIPT,
+
         ASSIGNMENT,
 
         ADD,
@@ -114,7 +121,10 @@ public sealed class Value : IEquatable<Value>, IComparable<Value>{
         SHR,
         BAND,
         BOR,
-        XOR
+        XOR,
+
+        AND,
+        OR
     }
 
     static Value arithm_op(Value v1, Value v2, Action<Value, Value> op){

@@ -2,6 +2,8 @@
 
 using Lex;
 using Parse;
+using Primitive;
+using System.Diagnostics;
 using System.Text;
 
 public static class Compiler{
@@ -84,24 +86,30 @@ public static class Compiler{
     }
 
     sealed class State{
-        OrderedDictionary<string, int> m_id_positions = new();
-        List<int> m_let_decl_counts = [0];
-        bool m_push_back_after_assignment = false;
-        public StringBuilder sb{ get; private set; } = new();
-        public int stack_size{ get; private set; }
+        readonly record struct Id_info{
+            public required readonly int stack_idx{ get; init; }
+            public required readonly Value.Type_info type_info{ get; init; }
+        }
+
+        OrderedDictionary<string, Id_info> m_id_positions = new();
+        List<int> m_let_decl_counts                       = [0];
+        bool m_push_back_after_assignment                 = false;
+        public StringBuilder sb{ get; private set; }      = new();
+        public int stack_size{ get; private set; }        = 0;
 
         public void to_IR(Node current_AST_node, Node? next_AST_node){
+            StringBuilder current_sb = sb;
             bool current_push_back_after_assignment = m_push_back_after_assignment;
             m_push_back_after_assignment = true;
 
-            StringBuilder current_sb = sb;
-
             switch (current_AST_node.token.type){
                 case Token.Type.ID:
-                    if (!m_id_positions.ContainsKey(current_AST_node.token.id))
+                    if (m_id_positions.TryGetValue(current_AST_node.token.id, out Id_info id_info)){
+                        ++stack_size;
+                        current_sb.add_instruction($"{stack_size} ; {PUSH_SYMBOL} {SP_SYMBOL}[-{stack_size - id_info.stack_idx - 1}]");
+                    }
+                    else
                         throw new Syntax_error_exception($"On line <{current_AST_node.token.line_number}> use of undeclared identifier <{current_AST_node.token.id}>");
-                    ++stack_size;
-                    current_sb.add_instruction($"{stack_size} ; {PUSH_SYMBOL} {SP_SYMBOL}[-{stack_size - m_id_positions[current_AST_node.token.id] - 1}]");
                     break;
                 case Token.Type.ARGV:
                     current_sb.add_instruction($"{++stack_size} ; {PUSH_SYMBOL} {ARGV_SYMBOL}");
@@ -176,7 +184,7 @@ public static class Compiler{
                         // Token.Type.AND             => "AND",
                         // Token.Type.OR              => "OR",
                         
-                        _ => throw new System.Diagnostics.UnreachableException(),
+                        _ => throw new UnreachableException(),
                     }}");
                     break;
 
@@ -235,13 +243,13 @@ public static class Compiler{
                     if (eq_tok.type != Token.Type.LBRACKET){
                         if (eq_tok.type == Token.Type.ARGV)
                             throw new Syntax_error_exception($"On line <{eq_tok.line_number}> <argv> is immutable");
-                        else if (eq_tok.type != Token.Type.ID)
+                        if (eq_tok.type != Token.Type.ID)
                             throw new Syntax_error_exception($"On line <{eq_tok.line_number}> trying to assign to rvalue");
-                        else if (!m_id_positions.ContainsKey(eq_tok.id))
+                        if (!m_id_positions.ContainsKey(eq_tok.id))
                             throw new Syntax_error_exception($"On line <{eq_tok.line_number}> use of undeclared identifier <{eq_tok.id}>");
 
                         to_IR(current_AST_node.sub_nodes[1], null);
-                        current_sb.add_instruction($"{stack_size - 1} ; {nameof(Op_code.MOV)} {SP_SYMBOL}[-{stack_size - m_id_positions[eq_tok.id]}]");
+                        current_sb.add_instruction($"{stack_size - 1} ; {nameof(Op_code.MOV)} {SP_SYMBOL}[-{stack_size - m_id_positions[eq_tok.id].stack_idx}]");
                         --stack_size;
 
                         if (current_push_back_after_assignment)
@@ -251,7 +259,7 @@ public static class Compiler{
                         for (Node lhs = current_AST_node.sub_nodes[0].sub_nodes[0]; lhs.token.type != Token.Type.ID; lhs = lhs.sub_nodes[0]){
                             if (lhs.token.type == Token.Type.ARGV)
                                 throw new Syntax_error_exception($"On line <{lhs.token.line_number}> <argv> is immutable");
-                            else if (lhs.token.type != Token.Type.ID && lhs.token.type != Token.Type.LBRACKET && lhs.token.type != Token.Type.EQ)
+                            if (lhs.token.type != Token.Type.ID && lhs.token.type != Token.Type.LBRACKET && lhs.token.type != Token.Type.EQ)
                                 throw new Syntax_error_exception($"On line <{lhs.token.line_number}> trying to assign to rvalue");
                         }
                         to_IR(current_AST_node.sub_nodes[0].sub_nodes[0], null);
@@ -269,24 +277,28 @@ public static class Compiler{
                     break;
 
                 case Token.Type.LET_DECL:
-                    to_IR(current_AST_node.sub_nodes[1].sub_nodes[0], null);
-                    if (current_AST_node.sub_nodes[1].token.type != Token.Type.LBRACKET)
-                        to_IR(current_AST_node.sub_nodes[1], null);
-                    else{
+                    Value.Type_info let_decl_type_info = Value.Type_info.INVALID;
+                    Node type_node = current_AST_node.sub_nodes[1];
+                    to_IR(type_node.sub_nodes[0], null);
+                    if (type_node.token.type == Token.Type.LBRACKET){
+                        let_decl_type_info |= Value.Type_info.ARRAY;
                         current_sb.add_instruction($"{stack_size} ; {nameof(Op_code.ALLOC_ARRAY)}");
-                        to_IR(current_AST_node.sub_nodes[1].sub_nodes[1], null);
+                        type_node = type_node.sub_nodes[1];
+                    }
+                    switch (type_node.token.type){
+                        case Token.Type.BOOL:  current_sb.add_instruction($"{stack_size} ; {nameof(Op_code.TO_BOOL)}");  let_decl_type_info |= Value.Type_info.BOOL;  break;
+                        case Token.Type.CHAR:  current_sb.add_instruction($"{stack_size} ; {nameof(Op_code.TO_CHAR)}");  let_decl_type_info |= Value.Type_info.CHAR;  break;
+                        case Token.Type.INT:   current_sb.add_instruction($"{stack_size} ; {nameof(Op_code.TO_INT)}");   let_decl_type_info |= Value.Type_info.INT;   break;
+                        case Token.Type.FLOAT: current_sb.add_instruction($"{stack_size} ; {nameof(Op_code.TO_FLOAT)}"); let_decl_type_info |= Value.Type_info.FLOAT; break;
+                        case Token.Type.STR:   current_sb.add_instruction($"{stack_size} ; {nameof(Op_code.TO_STR)}");   let_decl_type_info |= Value.Type_info.STR;   break;
+
+                        default: throw new UnreachableException();
                     }
                     Token let_decl_tok = current_AST_node.sub_nodes[0].token;
-                    if (!m_id_positions.TryAdd(let_decl_tok.id, m_id_positions.Count))
+                    if (!m_id_positions.TryAdd(let_decl_tok.id, new(){stack_idx = m_id_positions.Count, type_info = let_decl_type_info}))
                         throw new Syntax_error_exception($"On line <{let_decl_tok.line_number}> identifier <{let_decl_tok.id}> is already in use");
                     ++m_let_decl_counts[^1];
                     break;
-
-                case Token.Type.BOOL:  current_sb.add_instruction($"{stack_size} ; {nameof(Op_code.TO_BOOL)}");  break;
-                case Token.Type.CHAR:  current_sb.add_instruction($"{stack_size} ; {nameof(Op_code.TO_CHAR)}");  break;
-                case Token.Type.INT:   current_sb.add_instruction($"{stack_size} ; {nameof(Op_code.TO_INT)}");   break;
-                case Token.Type.FLOAT: current_sb.add_instruction($"{stack_size} ; {nameof(Op_code.TO_FLOAT)}"); break;
-                case Token.Type.STR:   current_sb.add_instruction($"{stack_size} ; {nameof(Op_code.TO_STR)}");   break;
 
                 case Token.Type.PRINT:
                     to_IR(current_AST_node.sub_nodes[0], null);
@@ -379,8 +391,8 @@ public static class Compiler{
                     throw new NotImplementedException($"Case for <{current_AST_node.token.type}> is not implemented");
             }
 
-            sb = current_sb;
             m_push_back_after_assignment = current_push_back_after_assignment;
+            sb = current_sb;
         }
     }
 

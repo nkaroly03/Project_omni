@@ -24,6 +24,16 @@
         "runtime": {
           "bin/placeholder/Parse.dll": {}
         }
+      },
+      "Primitive/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v10.0",
+        "compile": {
+          "bin/placeholder/Primitive.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Primitive.dll": {}
+        }
       }
     }
   },
@@ -37,12 +47,18 @@
       "type": "project",
       "path": "../Parse/Parse.csproj",
       "msbuildProject": "../Parse/Parse.csproj"
+    },
+    "Primitive/1.0.0": {
+      "type": "project",
+      "path": "../Primitive/Primitive.csproj",
+      "msbuildProject": "../Primitive/Primitive.csproj"
     }
   },
   "projectFileDependencyGroups": {
     "net10.0": [
       "Lex >= 1.0.0",
-      "Parse >= 1.0.0"
+      "Parse >= 1.0.0",
+      "Primitive >= 1.0.0"
     ]
   },
   "packageFolders": {
@@ -77,6 +93,9 @@
             },
             "C:\\Users\\giganibba840\\Desktop\\C#\\Project_omni\\Parse\\Parse.csproj": {
               "projectPath": "C:\\Users\\giganibba840\\Desktop\\C#\\Project_omni\\Parse\\Parse.csproj"
+            },
+            "C:\\Users\\giganibba840\\Desktop\\C#\\Project_omni\\Primitive\\Primitive.csproj": {
+              "projectPath": "C:\\Users\\giganibba840\\Desktop\\C#\\Project_omni\\Primitive\\Primitive.csproj"
             }
           }
         }

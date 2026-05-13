@@ -34,36 +34,36 @@ File.WriteAllBytes($"{out_dir_name}/{file_name}.bc", bytecode);
 
 Console.WriteLine($"\nreturn value: {Interpreter.run(bytecode, Value.get_argv(argv[2..]))}");
 
-// for (Value.Binary_op op = Value.Binary_op.CMP_EQ; (int)op <= (int)Value.Binary_op.XOR; op = (Value.Binary_op)((int)op + 1)){
-    // Console.WriteLine(op);
-// 
-    // Console.WriteLine($"\t{op.get_result_type(Value.Type_info.BOOL, Value.Type_info.BOOL)}");
-    // Console.WriteLine($"\t{op.get_result_type(Value.Type_info.BOOL, Value.Type_info.CHAR)}");
-    // Console.WriteLine($"\t{op.get_result_type(Value.Type_info.BOOL, Value.Type_info.INT)}");
-    // Console.WriteLine($"\t{op.get_result_type(Value.Type_info.BOOL, Value.Type_info.FLOAT)}");
-    // Console.WriteLine($"\t{op.get_result_type(Value.Type_info.BOOL, Value.Type_info.STR)}");
-// 
-    // Console.WriteLine($"\t{op.get_result_type(Value.Type_info.CHAR, Value.Type_info.BOOL)}");
-    // Console.WriteLine($"\t{op.get_result_type(Value.Type_info.CHAR, Value.Type_info.CHAR)}");
-    // Console.WriteLine($"\t{op.get_result_type(Value.Type_info.CHAR, Value.Type_info.INT)}");
-    // Console.WriteLine($"\t{op.get_result_type(Value.Type_info.CHAR, Value.Type_info.FLOAT)}");
-    // Console.WriteLine($"\t{op.get_result_type(Value.Type_info.CHAR, Value.Type_info.STR)}");
-// 
-    // Console.WriteLine($"\t{op.get_result_type(Value.Type_info.INT, Value.Type_info.BOOL)}");
-    // Console.WriteLine($"\t{op.get_result_type(Value.Type_info.INT, Value.Type_info.CHAR)}");
-    // Console.WriteLine($"\t{op.get_result_type(Value.Type_info.INT, Value.Type_info.INT)}");
-    // Console.WriteLine($"\t{op.get_result_type(Value.Type_info.INT, Value.Type_info.FLOAT)}");
-    // Console.WriteLine($"\t{op.get_result_type(Value.Type_info.INT, Value.Type_info.STR)}");
-// 
-    // Console.WriteLine($"\t{op.get_result_type(Value.Type_info.FLOAT, Value.Type_info.BOOL)}");
-    // Console.WriteLine($"\t{op.get_result_type(Value.Type_info.FLOAT, Value.Type_info.CHAR)}");
-    // Console.WriteLine($"\t{op.get_result_type(Value.Type_info.FLOAT, Value.Type_info.INT)}");
-    // Console.WriteLine($"\t{op.get_result_type(Value.Type_info.FLOAT, Value.Type_info.FLOAT)}");
-    // Console.WriteLine($"\t{op.get_result_type(Value.Type_info.FLOAT, Value.Type_info.STR)}");
-// 
-    // Console.WriteLine($"\t{op.get_result_type(Value.Type_info.STR, Value.Type_info.BOOL)}");
-    // Console.WriteLine($"\t{op.get_result_type(Value.Type_info.STR, Value.Type_info.CHAR)}");
-    // Console.WriteLine($"\t{op.get_result_type(Value.Type_info.STR, Value.Type_info.INT)}");
-    // Console.WriteLine($"\t{op.get_result_type(Value.Type_info.STR, Value.Type_info.FLOAT)}");
-    // Console.WriteLine($"\t{op.get_result_type(Value.Type_info.STR, Value.Type_info.STR)}");
-// }
+for (Value.Binary_op op = Value.Binary_op.CMP_EQ; op <= Value.Binary_op.OR; ++op){
+    Console.WriteLine(op);
+
+    Console.WriteLine($"\t{op.get_result_type(Value.Type_info.BOOL, Value.Type_info.BOOL)}");
+    Console.WriteLine($"\t{op.get_result_type(Value.Type_info.BOOL, Value.Type_info.CHAR)}");
+    Console.WriteLine($"\t{op.get_result_type(Value.Type_info.BOOL, Value.Type_info.INT)}");
+    Console.WriteLine($"\t{op.get_result_type(Value.Type_info.BOOL, Value.Type_info.FLOAT)}");
+    Console.WriteLine($"\t{op.get_result_type(Value.Type_info.BOOL, Value.Type_info.STR)}");
+
+    Console.WriteLine($"\t{op.get_result_type(Value.Type_info.CHAR, Value.Type_info.BOOL)}");
+    Console.WriteLine($"\t{op.get_result_type(Value.Type_info.CHAR, Value.Type_info.CHAR)}");
+    Console.WriteLine($"\t{op.get_result_type(Value.Type_info.CHAR, Value.Type_info.INT)}");
+    Console.WriteLine($"\t{op.get_result_type(Value.Type_info.CHAR, Value.Type_info.FLOAT)}");
+    Console.WriteLine($"\t{op.get_result_type(Value.Type_info.CHAR, Value.Type_info.STR)}");
+
+    Console.WriteLine($"\t{op.get_result_type(Value.Type_info.INT, Value.Type_info.BOOL)}");
+    Console.WriteLine($"\t{op.get_result_type(Value.Type_info.INT, Value.Type_info.CHAR)}");
+    Console.WriteLine($"\t{op.get_result_type(Value.Type_info.INT, Value.Type_info.INT)}");
+    Console.WriteLine($"\t{op.get_result_type(Value.Type_info.INT, Value.Type_info.FLOAT)}");
+    Console.WriteLine($"\t{op.get_result_type(Value.Type_info.INT, Value.Type_info.STR)}");
+
+    Console.WriteLine($"\t{op.get_result_type(Value.Type_info.FLOAT, Value.Type_info.BOOL)}");
+    Console.WriteLine($"\t{op.get_result_type(Value.Type_info.FLOAT, Value.Type_info.CHAR)}");
+    Console.WriteLine($"\t{op.get_result_type(Value.Type_info.FLOAT, Value.Type_info.INT)}");
+    Console.WriteLine($"\t{op.get_result_type(Value.Type_info.FLOAT, Value.Type_info.FLOAT)}");
+    Console.WriteLine($"\t{op.get_result_type(Value.Type_info.FLOAT, Value.Type_info.STR)}");
+
+    Console.WriteLine($"\t{op.get_result_type(Value.Type_info.STR, Value.Type_info.BOOL)}");
+    Console.WriteLine($"\t{op.get_result_type(Value.Type_info.STR, Value.Type_info.CHAR)}");
+    Console.WriteLine($"\t{op.get_result_type(Value.Type_info.STR, Value.Type_info.INT)}");
+    Console.WriteLine($"\t{op.get_result_type(Value.Type_info.STR, Value.Type_info.FLOAT)}");
+    Console.WriteLine($"\t{op.get_result_type(Value.Type_info.STR, Value.Type_info.STR)}");
+}

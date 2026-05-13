@@ -3,6 +3,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Parse\Parse.csproj" />
     <ProjectReference Include="..\Lex\Lex.csproj" />
+    <ProjectReference Include="..\Primitive\Primitive.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
