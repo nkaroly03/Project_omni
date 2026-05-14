@@ -102,6 +102,7 @@ public static class Compiler{
 
         OrderedDictionary<string, Id_info> m_id_positions = new();
         List<int> m_let_decl_counts                       = [0];
+        List<Type_info> m_type_info_stack;
         bool m_push_back_after_assignment                 = false;
         Type_info m_last_expr_type_info                   = Type_info.INVALID;
         public StringBuilder sb{ get; private set; }      = new();
@@ -250,36 +251,32 @@ public static class Compiler{
 
                 case Token.Type.AND:
                 case Token.Type.OR:
+                    StringBuilder lhs_and_or_sb = sb = new();
                     to_IR(current_AST_node.sub_nodes[0], null);
-                    lhs_type_info = m_last_expr_type_info;
-
                     --stack_size;
-                    StringBuilder and_or_sb = sb = new();
-
+                    StringBuilder rhs_and_or_sb = sb = new();
                     to_IR(current_AST_node.sub_nodes[1], null);
-                    rhs_type_info = m_last_expr_type_info;
 
-                    m_last_expr_type_info = Binary_op.AND.get_result_type(lhs_type_info, m_last_expr_type_info);
-                    throw_on_invalid_binary_operation(current_AST_node, lhs_type_info, rhs_type_info);
-
-                    if (current_sb.ToString()[(current_sb.ToString().LastIndexOf(';') + 1)..].Trim() != nameof(Op_code.TO_BOOL))
-                        current_sb.add_instruction($"{stack_size} ; {nameof(Op_code.TO_BOOL)}");
+                    if (lhs_and_or_sb.ToString()[(lhs_and_or_sb.ToString().LastIndexOf(';') + 1)..].Trim() != nameof(Op_code.TO_BOOL))
+                        lhs_and_or_sb.add_instruction($"{stack_size} ; {nameof(Op_code.TO_BOOL)}");
 
                     if (current_AST_node.token.type == Token.Type.AND){
-                        current_sb.add_instruction($"{stack_size} ; {nameof(Op_code.NEG)}");
-                        current_sb.add_instruction($"{stack_size - 1} ; {nameof(Op_code.JMPZ)} 3");
-                        current_sb.add_instruction($"{stack_size} ; {PUSH_SYMBOL} {FALSE_SYMBOL}");
+                        lhs_and_or_sb.add_instruction($"{stack_size} ; {nameof(Op_code.NEG)}");
+                        lhs_and_or_sb.add_instruction($"{stack_size - 1} ; {nameof(Op_code.JMPZ)} 3");
+                        lhs_and_or_sb.add_instruction($"{stack_size} ; {PUSH_SYMBOL} {FALSE_SYMBOL}");
                     }
                     else{
-                        current_sb.add_instruction($"{stack_size - 1} ; {nameof(Op_code.JMPZ)} 3");
-                        current_sb.add_instruction($"{stack_size} ; {PUSH_SYMBOL} {TRUE_SYMBOL}");
+                        lhs_and_or_sb.add_instruction($"{stack_size - 1} ; {nameof(Op_code.JMPZ)} 3");
+                        lhs_and_or_sb.add_instruction($"{stack_size} ; {PUSH_SYMBOL} {TRUE_SYMBOL}");
                     }
 
-                    current_sb.add_instruction($"{stack_size} ; {nameof(Op_code.JMP)} {and_or_sb.count_instructions() + 1}");
-                    current_sb.Append(and_or_sb);
+                    lhs_and_or_sb.add_instruction($"{stack_size} ; {nameof(Op_code.JMP)} {rhs_and_or_sb.count_instructions()}");
 
-                    if (current_sb.ToString()[(current_sb.ToString().LastIndexOf(';') + 1)..].Trim() != nameof(Op_code.TO_BOOL))
-                        current_sb.add_instruction($"{stack_size} ; {nameof(Op_code.TO_BOOL)}");
+                    if (rhs_and_or_sb.ToString()[(rhs_and_or_sb.ToString().LastIndexOf(';') + 1)..].Trim() != nameof(Op_code.TO_BOOL))
+                        rhs_and_or_sb.add_instruction($"{stack_size} ; {nameof(Op_code.TO_BOOL)}");
+
+                    current_sb.Append(lhs_and_or_sb);
+                    current_sb.Append(rhs_and_or_sb);
                     break;
                 case Token.Type.NOT:
                     to_IR(current_AST_node.sub_nodes[0], null);

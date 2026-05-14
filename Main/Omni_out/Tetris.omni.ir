@@ -317,7 +317,7 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\Tetris.omni
     37 ; TO_BOOL
     36 ; JMPZ 3
     37 ; PUSH TRUE
-    37 ; JMP 5
+    37 ; JMP 4
     37 ; PUSH SP[-5]
     38 ; PUSH 's'
     37 ; CMP_EQ
@@ -334,7 +334,7 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\Tetris.omni
     37 ; TO_BOOL
     36 ; JMPZ 3
     37 ; PUSH TRUE
-    37 ; JMP 5
+    37 ; JMP 4
     37 ; PUSH SP[-5]
     38 ; PUSH 'a'
     37 ; CMP_EQ
@@ -351,7 +351,7 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\Tetris.omni
     37 ; TO_BOOL
     36 ; JMPZ 3
     37 ; PUSH TRUE
-    37 ; JMP 5
+    37 ; JMP 4
     37 ; PUSH SP[-5]
     38 ; PUSH 'd'
     37 ; CMP_EQ
@@ -479,28 +479,28 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\Tetris.omni
     46 ; TO_BOOL
     45 ; JMPZ 3
     46 ; PUSH TRUE
-    46 ; JMP 5
+    46 ; JMP 4
     46 ; PUSH SP[-2]
     47 ; PUSH SP[-46]
     46 ; CMP_GEQ
     46 ; TO_BOOL
     45 ; JMPZ 3
     46 ; PUSH TRUE
-    46 ; JMP 5
+    46 ; JMP 4
     46 ; PUSH SP[-1]
     47 ; PUSH 0
     46 ; CMP_LE
     46 ; TO_BOOL
     45 ; JMPZ 3
     46 ; PUSH TRUE
-    46 ; JMP 5
+    46 ; JMP 4
     46 ; PUSH SP[-1]
     47 ; PUSH SP[-45]
     46 ; CMP_GEQ
     46 ; TO_BOOL
     45 ; JMPZ 3
     46 ; PUSH TRUE
-    46 ; JMP 11
+    46 ; JMP 10
     46 ; PUSH SP[-26]
     47 ; PUSH SP[-2]
     48 ; PUSH SP[-47]
@@ -689,28 +689,28 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\Tetris.omni
     46 ; TO_BOOL
     45 ; JMPZ 3
     46 ; PUSH TRUE
-    46 ; JMP 5
+    46 ; JMP 4
     46 ; PUSH SP[-2]
     47 ; PUSH SP[-46]
     46 ; CMP_GEQ
     46 ; TO_BOOL
     45 ; JMPZ 3
     46 ; PUSH TRUE
-    46 ; JMP 5
+    46 ; JMP 4
     46 ; PUSH SP[-1]
     47 ; PUSH 0
     46 ; CMP_LE
     46 ; TO_BOOL
     45 ; JMPZ 3
     46 ; PUSH TRUE
-    46 ; JMP 5
+    46 ; JMP 4
     46 ; PUSH SP[-1]
     47 ; PUSH SP[-45]
     46 ; CMP_GEQ
     46 ; TO_BOOL
     45 ; JMPZ 3
     46 ; PUSH TRUE
-    46 ; JMP 11
+    46 ; JMP 10
     46 ; PUSH SP[-26]
     47 ; PUSH SP[-2]
     48 ; PUSH SP[-47]
@@ -889,28 +889,28 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\Tetris.omni
     46 ; TO_BOOL
     45 ; JMPZ 3
     46 ; PUSH TRUE
-    46 ; JMP 5
+    46 ; JMP 4
     46 ; PUSH SP[-2]
     47 ; PUSH SP[-46]
     46 ; CMP_GEQ
     46 ; TO_BOOL
     45 ; JMPZ 3
     46 ; PUSH TRUE
-    46 ; JMP 5
+    46 ; JMP 4
     46 ; PUSH SP[-1]
     47 ; PUSH 0
     46 ; CMP_LE
     46 ; TO_BOOL
     45 ; JMPZ 3
     46 ; PUSH TRUE
-    46 ; JMP 5
+    46 ; JMP 4
     46 ; PUSH SP[-1]
     47 ; PUSH SP[-45]
     46 ; CMP_GEQ
     46 ; TO_BOOL
     45 ; JMPZ 3
     46 ; PUSH TRUE
-    46 ; JMP 11
+    46 ; JMP 10
     46 ; PUSH SP[-26]
     47 ; PUSH SP[-2]
     48 ; PUSH SP[-47]
@@ -1106,7 +1106,7 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\Tetris.omni
     35 ; NEG
     34 ; JMPZ 3
     35 ; PUSH FALSE
-    35 ; JMP 5
+    35 ; JMP 4
     35 ; PUSH SP[-1]
     36 ; PUSH SP[-34]
     35 ; CMP_LE
@@ -1170,7 +1170,7 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\Tetris.omni
     37 ; NEG
     36 ; JMPZ 3
     37 ; PUSH FALSE
-    37 ; JMP 5
+    37 ; JMP 4
     37 ; PUSH SP[-2]
     38 ; PUSH SP[-36]
     37 ; CMP_LE
@@ -1484,28 +1484,28 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\Tetris.omni
     43 ; TO_BOOL
     42 ; JMPZ 3
     43 ; PUSH TRUE
-    43 ; JMP 5
+    43 ; JMP 4
     43 ; PUSH SP[-2]
     44 ; PUSH SP[-43]
     43 ; CMP_GEQ
     43 ; TO_BOOL
     42 ; JMPZ 3
     43 ; PUSH TRUE
-    43 ; JMP 5
+    43 ; JMP 4
     43 ; PUSH SP[-1]
     44 ; PUSH 0
     43 ; CMP_LE
     43 ; TO_BOOL
     42 ; JMPZ 3
     43 ; PUSH TRUE
-    43 ; JMP 5
+    43 ; JMP 4
     43 ; PUSH SP[-1]
     44 ; PUSH SP[-42]
     43 ; CMP_GEQ
     43 ; TO_BOOL
     42 ; JMPZ 3
     43 ; PUSH TRUE
-    43 ; JMP 11
+    43 ; JMP 10
     43 ; PUSH SP[-23]
     44 ; PUSH SP[-2]
     45 ; PUSH SP[-44]
@@ -1805,7 +1805,7 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\Tetris.omni
     35 ; NEG
     34 ; JMPZ 3
     35 ; PUSH FALSE
-    35 ; JMP 5
+    35 ; JMP 4
     35 ; PUSH SP[-2]
     36 ; PUSH 'z'
     35 ; CMP_LEQ
@@ -1822,7 +1822,7 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\Tetris.omni
     34 ; TO_BOOL
     33 ; JMPZ 3
     34 ; PUSH TRUE
-    34 ; JMP 5
+    34 ; JMP 4
     34 ; PUSH SP[-1]
     35 ; PUSH 'N'
     34 ; CMP_EQ

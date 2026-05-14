@@ -281,7 +281,7 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\Snake.omni
     28 ; NEG
     27 ; JMPZ 3
     28 ; PUSH FALSE
-    28 ; JMP 7
+    28 ; JMP 6
     28 ; POLL_CHAR
     27 ; MOV SP[-2]
     28 ; PUSH SP[-1]
@@ -297,7 +297,7 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\Snake.omni
     29 ; NEG
     28 ; JMPZ 3
     29 ; PUSH FALSE
-    29 ; JMP 5
+    29 ; JMP 4
     29 ; PUSH SP[-2]
     30 ; PUSH 'z'
     29 ; CMP_LEQ
@@ -352,7 +352,7 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\Snake.omni
     29 ; NEG
     28 ; JMPZ 3
     29 ; PUSH FALSE
-    29 ; JMP 9
+    29 ; JMP 8
     29 ; PUSH SP[-7]
     30 ; PUSH SP[-2]
     29 ; DEREF
@@ -397,7 +397,7 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\Snake.omni
     29 ; NEG
     28 ; JMPZ 3
     29 ; PUSH FALSE
-    29 ; JMP 9
+    29 ; JMP 8
     29 ; PUSH SP[-10]
     30 ; PUSH SP[-2]
     29 ; DEREF
@@ -428,7 +428,7 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\Snake.omni
     28 ; NEG
     27 ; JMPZ 3
     28 ; PUSH FALSE
-    28 ; JMP 7
+    28 ; JMP 6
     28 ; PUSH SP[-5]
     29 ; PUSH SP[-8]
     30 ; PUSH 0
@@ -438,7 +438,7 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\Snake.omni
     28 ; NEG
     27 ; JMPZ 3
     28 ; PUSH FALSE
-    28 ; JMP 7
+    28 ; JMP 6
     28 ; PUSH SP[-4]
     29 ; PUSH SP[-7]
     30 ; PUSH 0
@@ -806,21 +806,21 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\Snake.omni
     30 ; TO_BOOL
     29 ; JMPZ 3
     30 ; PUSH TRUE
-    30 ; JMP 5
+    30 ; JMP 4
     30 ; PUSH SP[-1]
     31 ; PUSH 'y'
     30 ; CMP_EQ
     30 ; TO_BOOL
     29 ; JMPZ 3
     30 ; PUSH TRUE
-    30 ; JMP 5
+    30 ; JMP 4
     30 ; PUSH SP[-1]
     31 ; PUSH 'N'
     30 ; CMP_EQ
     30 ; TO_BOOL
     29 ; JMPZ 3
     30 ; PUSH TRUE
-    30 ; JMP 5
+    30 ; JMP 4
     30 ; PUSH SP[-1]
     31 ; PUSH 'n'
     30 ; CMP_EQ
@@ -832,7 +832,7 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\Snake.omni
     30 ; TO_BOOL
     29 ; JMPZ 3
     30 ; PUSH TRUE
-    30 ; JMP 5
+    30 ; JMP 4
     30 ; PUSH SP[-1]
     31 ; PUSH 'n'
     30 ; CMP_EQ

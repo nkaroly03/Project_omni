@@ -14,7 +14,7 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\test4.omni
     5 ; NEG
     4 ; JMPZ 3
     5 ; PUSH FALSE
-    5 ; JMP 9
+    5 ; JMP 8
     5 ; PUSH ARGV
     6 ; PUSH 0
     5 ; DEREF

@@ -13,16 +13,6 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\test3.omni
     1 ; DEREF_MOV
     2 ; PUSH SP[-1]
     3 ; PUSH 0
-    4 ; PUSH SP[-2]
-    5 ; PUSH SP[-2]
-    6 ; PUSH "Test"
-    3 ; DEREF_MOV
-    2 ; DEREF
-    3 ; PUSH 0
-    4 ; PUSH 'A'
-    1 ; DEREF_MOV
-    2 ; PUSH SP[-1]
-    3 ; PUSH 0
     2 ; DEREF
     3 ; PUSH SP[-2]
     4 ; PUSH 1
