@@ -4,55 +4,61 @@ using System.Diagnostics;
 using System.Text;
 
 public static class Primitive_extensions{
-    extension(Value.Type_info self){
-        public bool  bool_is_set() => (self & Value.Type_info.BOOL)  == Value.Type_info.BOOL;
-        public bool  char_is_set() => (self & Value.Type_info.CHAR)  == Value.Type_info.CHAR;
-        public bool   int_is_set() => (self & Value.Type_info.INT)   == Value.Type_info.INT;
-        public bool float_is_set() => (self & Value.Type_info.FLOAT) == Value.Type_info.FLOAT;
-        public bool   str_is_set() => (self & Value.Type_info.STR)   == Value.Type_info.STR;
-        public bool array_is_set() => (self & Value.Type_info.ARRAY) == Value.Type_info.ARRAY;
+    extension(Type_info self){
+        public bool  bool_is_set() => (self & Type_info.BOOL)  == Type_info.BOOL;
+        public bool  char_is_set() => (self & Type_info.CHAR)  == Type_info.CHAR;
+        public bool   int_is_set() => (self & Type_info.INT)   == Type_info.INT;
+        public bool float_is_set() => (self & Type_info.FLOAT) == Type_info.FLOAT;
+        public bool   str_is_set() => (self & Type_info.STR)   == Type_info.STR;
+        public bool array_is_set() => (self & Type_info.ARRAY) == Type_info.ARRAY;
 
         public bool int_like_is_set() => self.bool_is_set() || self.char_is_set() || self.int_is_set();
+
+        public string get_str_repr(){
+            string s = "";
+            if (self.array_is_set())
+                s += "[]";
+            s += (self & ~Type_info.ARRAY).ToString().ToLower();
+            return s;
+        }
     }
 
-    extension(Value.Unary_op self){
-        public bool is_logical() => self == Value.Unary_op.NOT;
-        public bool is_bitwise() => self == Value.Unary_op.BNEG;
+    extension(Unary_op self){
+        public bool is_logical() => self == Unary_op.NOT;
+        public bool is_bitwise() => self == Unary_op.BNEG;
 
-        public bool is_valid_op(Value.Type_info val) => self switch{
-            Value.Unary_op.PLUS or Value.Unary_op.MINUS or Value.Unary_op.NOT => !val.array_is_set() && (val.int_like_is_set() || val.float_is_set()),
-            Value.Unary_op.BNEG                                               => !val.array_is_set() && val.int_like_is_set(),
+        public bool is_valid_op(Type_info val) => self switch{
+            Unary_op.PLUS or Unary_op.MINUS or Unary_op.NOT => !val.array_is_set() && (val.int_like_is_set() || val.float_is_set()),
+            Unary_op.BNEG                                   => !val.array_is_set() && val.int_like_is_set(),
 
             _ => throw new UnreachableException(),
         };
 
-        public Value.Type_info get_result_type(Value.Type_info val) => (self.is_valid_op(val)) ? ((self.is_logical()) ? Value.Type_info.BOOL : val) : Value.Type_info.INVALID;
+        public Type_info get_result_type(Type_info val) => (self.is_valid_op(val)) ? ((self.is_logical()) ? Type_info.BOOL : val) : Type_info.INVALID;
     }
-    extension(Value.Binary_op self){
-        public bool is_comparison() => self >= Value.Binary_op.CMP_EQ && self <= Value.Binary_op.CMP_GEQ;
-        public bool is_bitwise() => self >= Value.Binary_op.SHL && self <= Value.Binary_op.XOR;
-        public bool is_logical() => self == Value.Binary_op.AND || self == Value.Binary_op.OR;
+    extension(Binary_op self){
+        public bool is_comparison() => self >= Binary_op.CMP_EQ && self <= Binary_op.CMP_GEQ;
+        public bool is_bitwise() => self >= Binary_op.SHL && self <= Binary_op.XOR;
+        public bool is_logical() => self == Binary_op.AND || self == Binary_op.OR;
 
-        public bool is_valid_op(Value.Type_info lhs, Value.Type_info rhs){
+        public bool is_valid_op(Type_info lhs, Type_info rhs){
             if (rhs.array_is_set())
                 return false;
 
-            if (self == Value.Binary_op.SUBSCRIPT)
+            if (self == Binary_op.SUBSCRIPT)
                 return ((lhs.array_is_set() || lhs.str_is_set()) && rhs.int_like_is_set());
 
             if (lhs.array_is_set())
                 return false;
 
-            if (self == Value.Binary_op.ASSIGNMENT)
+            if (self == Binary_op.ASSIGNMENT)
                 return true;
 
             if (lhs.str_is_set() || rhs.str_is_set()){
-                return 
-                    !self.is_logical() && (
-                        (self == Value.Binary_op.ADD && (lhs.char_is_set() || lhs.str_is_set()) && (rhs.char_is_set() || rhs.str_is_set())) ||
-                        (self.is_comparison() && lhs.str_is_set() && rhs.str_is_set())
-                    )
-                ;
+                return !self.is_logical() && (
+                    (self == Binary_op.ADD && (lhs.char_is_set() || lhs.str_is_set()) && (rhs.char_is_set() || rhs.str_is_set())) ||
+                    (self.is_comparison() && lhs.str_is_set() && rhs.str_is_set())
+                );
             }
 
             if (self.is_bitwise())
@@ -61,24 +67,24 @@ public static class Primitive_extensions{
             return true;
         }
 
-        public Value.Type_info get_result_type(Value.Type_info lhs, Value.Type_info rhs){
+        public Type_info get_result_type(Type_info lhs, Type_info rhs){
             if (!self.is_valid_op(lhs, rhs))
-                return Value.Type_info.INVALID;
+                return Type_info.INVALID;
 
             if (self.is_comparison() || self.is_logical())
-                return Value.Type_info.BOOL;
+                return Type_info.BOOL;
 
-            if (self == Value.Binary_op.SUBSCRIPT)
-                return (lhs.array_is_set()) ? lhs & ~Value.Type_info.ARRAY : Value.Type_info.CHAR;
+            if (self == Binary_op.SUBSCRIPT)
+                return (lhs.array_is_set()) ? lhs & ~Type_info.ARRAY : Type_info.CHAR;
 
-            if (self == Value.Binary_op.ASSIGNMENT)
+            if (self == Binary_op.ASSIGNMENT)
                 return lhs;
 
             return lhs switch{
-                Value.Type_info.BOOL                         => rhs,
-                Value.Type_info.CHAR                         => (rhs == Value.Type_info.BOOL) ? lhs : rhs,
-                Value.Type_info.INT                          => (rhs == Value.Type_info.BOOL || rhs == Value.Type_info.CHAR) ? lhs : rhs,
-                Value.Type_info.FLOAT or Value.Type_info.STR => lhs,
+                Type_info.BOOL                   => rhs,
+                Type_info.CHAR                   => (rhs == Type_info.BOOL) ? lhs : rhs,
+                Type_info.INT                    => (rhs == Type_info.BOOL || rhs == Type_info.CHAR) ? lhs : rhs,
+                Type_info.FLOAT or Type_info.STR => lhs,
 
                 _ => throw new UnreachableException(),
             };
@@ -86,47 +92,47 @@ public static class Primitive_extensions{
     }
 }
 
+[Flags] public enum Type_info{
+    INVALID = 0,
+    BOOL    = 1,
+    CHAR    = 2,
+    INT     = 4,
+    FLOAT   = 8,
+    STR     = 16,
+    ARRAY   = 32
+}
+
+public enum Unary_op{ PLUS, MINUS, BNEG, NOT }
+public enum Binary_op{
+    CMP_EQ,
+    CMP_NEQ,
+    CMP_LE,
+    CMP_LEQ,
+    CMP_GE,
+    CMP_GEQ,
+
+    SUBSCRIPT,
+
+    ASSIGNMENT,
+
+    ADD,
+    SUB,
+    MUL,
+    DIV,
+    MOD,
+    POW,
+
+    SHL,
+    SHR,
+    BAND,
+    BOR,
+    XOR,
+
+    AND,
+    OR
+}
+
 public sealed class Value : IEquatable<Value>, IComparable<Value>{
-    [Flags] public enum Type_info{
-        INVALID = 0,
-        BOOL    = 1,
-        CHAR    = 2,
-        INT     = 4,
-        FLOAT   = 8,
-        STR     = 16,
-        ARRAY   = 32
-    }
-
-    public enum Unary_op{ PLUS, MINUS, BNEG, NOT }
-    public enum Binary_op{
-        CMP_EQ,
-        CMP_NEQ,
-        CMP_LE,
-        CMP_LEQ,
-        CMP_GE,
-        CMP_GEQ,
-
-        SUBSCRIPT,
-
-        ASSIGNMENT,
-
-        ADD,
-        SUB,
-        MUL,
-        DIV,
-        MOD,
-        POW,
-
-        SHL,
-        SHR,
-        BAND,
-        BOR,
-        XOR,
-
-        AND,
-        OR
-    }
-
     static Value arithm_op(Value v1, Value v2, Action<Value, Value> op){
         if (v1.data.GetType().IsArray || v2.data.GetType().IsArray)
             throw new ArgumentOutOfRangeException("Trying to use arithmetic operation on array(s)");

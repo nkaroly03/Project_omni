@@ -10,9 +10,7 @@ public static class Interpreter{
     extension(List<Value> self){
         Value pop(){
             Value temp = self[^1];
-
             self.RemoveAt(self.Count - 1);
-
             return temp;
         }
     }
