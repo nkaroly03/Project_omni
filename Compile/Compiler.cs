@@ -253,31 +253,27 @@ public static class Compiler{
                 case Token.Type.OR:
                     StringBuilder lhs_and_or_sb = sb = new();
                     to_IR(current_AST_node.sub_nodes[0], null);
+
                     --stack_size;
+
                     StringBuilder rhs_and_or_sb = sb = new();
                     to_IR(current_AST_node.sub_nodes[1], null);
 
                     if (lhs_and_or_sb.ToString()[(lhs_and_or_sb.ToString().LastIndexOf(';') + 1)..].Trim() != nameof(Op_code.TO_BOOL))
                         lhs_and_or_sb.add_instruction($"{stack_size} ; {nameof(Op_code.TO_BOOL)}");
-
-                    if (current_AST_node.token.type == Token.Type.AND){
-                        lhs_and_or_sb.add_instruction($"{stack_size} ; {nameof(Op_code.NEG)}");
-                        lhs_and_or_sb.add_instruction($"{stack_size - 1} ; {nameof(Op_code.JMPZ)} 3");
-                        lhs_and_or_sb.add_instruction($"{stack_size} ; {PUSH_SYMBOL} {FALSE_SYMBOL}");
-                    }
-                    else{
-                        lhs_and_or_sb.add_instruction($"{stack_size - 1} ; {nameof(Op_code.JMPZ)} 3");
-                        lhs_and_or_sb.add_instruction($"{stack_size} ; {PUSH_SYMBOL} {TRUE_SYMBOL}");
-                    }
-
-                    lhs_and_or_sb.add_instruction($"{stack_size} ; {nameof(Op_code.JMP)} {rhs_and_or_sb.count_instructions()}");
-
                     if (rhs_and_or_sb.ToString()[(rhs_and_or_sb.ToString().LastIndexOf(';') + 1)..].Trim() != nameof(Op_code.TO_BOOL))
                         rhs_and_or_sb.add_instruction($"{stack_size} ; {nameof(Op_code.TO_BOOL)}");
+
+                    lhs_and_or_sb.add_instruction($"{++stack_size} ; {PUSH_SYMBOL} {SP_SYMBOL}[-1]");
+                    if (current_AST_node.token.type == Token.Type.OR)
+                        lhs_and_or_sb.add_instruction($"{stack_size} ; {nameof(Op_code.NEG)}");
+                    lhs_and_or_sb.add_instruction($"{--stack_size} ; {nameof(Op_code.JMPZ)} {rhs_and_or_sb.count_instructions()}");
+                    lhs_and_or_sb.add_instruction($"{stack_size - 1} ; {nameof(Op_code.POP)}");
 
                     current_sb.Append(lhs_and_or_sb);
                     current_sb.Append(rhs_and_or_sb);
                     break;
+
                 case Token.Type.NOT:
                     to_IR(current_AST_node.sub_nodes[0], null);
                     lhs_type_info = m_last_expr_type_info;

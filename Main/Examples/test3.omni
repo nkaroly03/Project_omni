@@ -75,7 +75,13 @@
 // print("s[1]: " + s[1] + '\n');
 // print("s[2]: " + s[2] + '\n');
 
-let arr: []str = [2]{};
-arr[0] = "Hello ";
-arr[1] = "World!";
-print(arr[0] + arr[1] + '\n');
+// let arr: []str = [2]{};
+// arr[0] = "Hello ";
+// arr[1] = "World!";
+// print(arr[0] + arr[1] + '\n');
+
+// if ((false and true) or (scan("Input: ") + "" == "" and true)){
+    // print("false and scan(\"Input: \")\n");
+// }
+
+print(true and false);
