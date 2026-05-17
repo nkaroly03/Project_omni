@@ -3,7 +3,7 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\test.omni
     1 ; PUSH 0
     1 ; TO_FLOAT
     2 ; PUSH TRUE
-    1 ; JMPZ 103
+    1 ; JMPZ 104
     2 ; PUSH 0
     2 ; TO_INT
     3 ; PUSH "Enter operation:\n\t[0] -> Add\n\t[1] -> Sub\n\t[2] -> Mul\n\t[3] -> Div\n\t[4] -> Mod\n\t[5] -> Quit\n\nOp: "
@@ -13,9 +13,10 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\test.omni
     4 ; PUSH 0
     3 ; CMP_LE
     3 ; TO_BOOL
-    2 ; JMPZ 3
-    3 ; PUSH TRUE
-    3 ; JMP 4
+    4 ; PUSH SP[-1]
+    4 ; NEG
+    3 ; JMPZ 5
+    2 ; POP
     3 ; PUSH SP[-1]
     4 ; PUSH 5
     3 ; CMP_GE
@@ -23,7 +24,7 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\test.omni
     2 ; JMPZ 4
     3 ; PUSH "Invalid operation\n"
     2 ; PRINT
-    2 ; JMP -17
+    2 ; JMP -18
     3 ; PUSH SP[-1]
     4 ; PUSH 5
     3 ; CMP_NEQ
@@ -105,7 +106,7 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\test.omni
     3 ; PUSH SP[-2]
     2 ; RET
     1 ; POP
-    1 ; JMP -103
+    1 ; JMP -104
     2 ; PUSH 0
     1 ; RET
     0 ; POP

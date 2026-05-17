@@ -279,7 +279,7 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\Snake.omni
     28 ; PUSH SP[-2]
     28 ; TO_BOOL
     29 ; PUSH SP[-1]
-    28 ; JMPZ 6
+    28 ; JMPZ 7
     27 ; POP
     28 ; POLL_CHAR
     27 ; MOV SP[-2]
@@ -294,7 +294,7 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\Snake.omni
     29 ; CMP_GEQ
     29 ; TO_BOOL
     30 ; PUSH SP[-1]
-    29 ; JMPZ 4
+    29 ; JMPZ 5
     28 ; POP
     29 ; PUSH SP[-2]
     30 ; PUSH 'z'
@@ -348,7 +348,7 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\Snake.omni
     29 ; CMP_EQ
     29 ; TO_BOOL
     30 ; PUSH SP[-1]
-    29 ; JMPZ 8
+    29 ; JMPZ 9
     28 ; POP
     29 ; PUSH SP[-7]
     30 ; PUSH SP[-2]
@@ -392,7 +392,7 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\Snake.omni
     29 ; CMP_EQ
     29 ; TO_BOOL
     30 ; PUSH SP[-1]
-    29 ; JMPZ 8
+    29 ; JMPZ 9
     28 ; POP
     29 ; PUSH SP[-10]
     30 ; PUSH SP[-2]
@@ -422,7 +422,7 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\Snake.omni
     28 ; PUSH SP[-2]
     28 ; TO_BOOL
     29 ; PUSH SP[-1]
-    28 ; JMPZ 6
+    28 ; JMPZ 7
     27 ; POP
     28 ; PUSH SP[-5]
     29 ; PUSH SP[-8]
@@ -431,7 +431,7 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\Snake.omni
     28 ; CMP_EQ
     28 ; TO_BOOL
     29 ; PUSH SP[-1]
-    28 ; JMPZ 6
+    28 ; JMPZ 7
     27 ; POP
     28 ; PUSH SP[-4]
     29 ; PUSH SP[-7]
@@ -800,7 +800,7 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\Snake.omni
     30 ; TO_BOOL
     31 ; PUSH SP[-1]
     31 ; NEG
-    30 ; JMPZ 4
+    30 ; JMPZ 5
     29 ; POP
     30 ; PUSH SP[-1]
     31 ; PUSH 'y'
@@ -808,7 +808,7 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\Snake.omni
     30 ; TO_BOOL
     31 ; PUSH SP[-1]
     31 ; NEG
-    30 ; JMPZ 4
+    30 ; JMPZ 5
     29 ; POP
     30 ; PUSH SP[-1]
     31 ; PUSH 'N'
@@ -816,7 +816,7 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\Snake.omni
     30 ; TO_BOOL
     31 ; PUSH SP[-1]
     31 ; NEG
-    30 ; JMPZ 4
+    30 ; JMPZ 5
     29 ; POP
     30 ; PUSH SP[-1]
     31 ; PUSH 'n'
@@ -829,7 +829,7 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\Snake.omni
     30 ; TO_BOOL
     31 ; PUSH SP[-1]
     31 ; NEG
-    30 ; JMPZ 4
+    30 ; JMPZ 5
     29 ; POP
     30 ; PUSH SP[-1]
     31 ; PUSH 'n'

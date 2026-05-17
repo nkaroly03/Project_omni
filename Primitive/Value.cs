@@ -363,7 +363,7 @@ public sealed class Value : IEquatable<Value>, IComparable<Value>{
 
         if (data is StringBuilder || other.data is StringBuilder){
             if (data is StringBuilder sb1 && other.data is StringBuilder sb2)
-                return sb1.ToString().CompareTo(sb2.ToString());
+                return string.Compare(sb1.ToString(), sb2.ToString(), StringComparison.Ordinal);
             throw new ArgumentOutOfRangeException("Trying to compare a string to a non-string");
         }
 

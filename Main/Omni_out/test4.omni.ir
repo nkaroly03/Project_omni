@@ -11,10 +11,9 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\test4.omni
     5 ; PUSH ARGV
     5 ; ARRAY_SIZE
     5 ; TO_BOOL
-    5 ; NEG
-    4 ; JMPZ 3
-    5 ; PUSH FALSE
-    5 ; JMP 8
+    6 ; PUSH SP[-1]
+    5 ; JMPZ 9
+    4 ; POP
     5 ; PUSH ARGV
     6 ; PUSH 0
     5 ; DEREF

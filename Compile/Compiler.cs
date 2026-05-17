@@ -20,6 +20,9 @@ public static class Compiler{
         string get_string_literal() => System.Text.RegularExpressions.Regex.Unescape(self[1..^1]);
     }
 
+    static void pop<T>(this List<T> self) => self.RemoveAt(self.Count - 1);
+    static void pop<T, U>(this OrderedDictionary<T, U> self) where T : notnull => self.RemoveAt(self.Count - 1);
+
     const string SP_SYMBOL    = "SP";
     const string PUSH_SYMBOL  = "PUSH";
     const string FALSE_SYMBOL = nameof(Token.type.FALSE);
@@ -100,24 +103,24 @@ public static class Compiler{
             return ret;
         }
 
-        OrderedDictionary<string, Id_info> m_id_positions = new();
+        OrderedDictionary<string, Id_info> m_id_infos     = new();
         List<int> m_let_decl_counts                       = [0];
-        List<Type_info> m_type_info_stack;
+        List<Type_info> m_type_info_stack                 = new();
         bool m_push_back_after_assignment                 = false;
-        Type_info m_last_expr_type_info                   = Type_info.INVALID;
+
         public StringBuilder sb{ get; private set; }      = new();
-        public int stack_size{ get; private set; }        = 0;
+        public int stack_size => m_type_info_stack.Count;
 
         void throw_on_invalid_unary_operation(Node node, Type_info type){
-            if (m_last_expr_type_info == Type_info.INVALID)
+            if (m_type_info_stack[^1] == Type_info.INVALID)
                 throw new Syntax_error_exception($"On line <{node.token.line_number}> invalid operation <{node.token.id}> on <{type.get_str_repr()}>");
         }
         void throw_on_invalid_binary_operation(Node node, Type_info lhs, Type_info rhs){
-            if (m_last_expr_type_info == Type_info.INVALID)
+            if (m_type_info_stack[^1] == Type_info.INVALID)
                 throw new Syntax_error_exception($"On line <{node.token.line_number}> invalid operation <{node.token.id}> between <{lhs.get_str_repr()}> and <{rhs.get_str_repr()}>");
         }
         void throw_on_invalid_binary_operation(int line_number, string op_str, Type_info lhs, Type_info rhs){
-            if (m_last_expr_type_info == Type_info.INVALID)
+            if (m_type_info_stack[^1] == Type_info.INVALID)
                 throw new Syntax_error_exception($"On line <{line_number}> invalid operation <{op_str}> between <{lhs.get_str_repr()}> and <{rhs.get_str_repr()}>");
         }
 
@@ -131,39 +134,38 @@ public static class Compiler{
 
             switch (current_AST_node.token.type){
                 case Token.Type.ID:
-                    if (m_id_positions.TryGetValue(current_AST_node.token.id, out id_info)){
-                        ++stack_size;
+                    if (m_id_infos.TryGetValue(current_AST_node.token.id, out id_info)){
+                        m_type_info_stack.Add(id_info.type_info);
                         current_sb.add_instruction($"{stack_size} ; {PUSH_SYMBOL} {SP_SYMBOL}[-{stack_size - id_info.stack_idx - 1}]");
-                        m_last_expr_type_info = id_info.type_info;
                     }
                     else
                         throw new Syntax_error_exception($"On line <{current_AST_node.token.line_number}> use of undeclared identifier <{current_AST_node.token.id}>");
                     break;
                 case Token.Type.ARGV:
-                    current_sb.add_instruction($"{++stack_size} ; {PUSH_SYMBOL} {ARGV_SYMBOL}");
-                    m_last_expr_type_info = Type_info.ARRAY | Type_info.STR;
+                    m_type_info_stack.Add(Type_info.ARRAY | Type_info.STR);
+                    current_sb.add_instruction($"{stack_size} ; {PUSH_SYMBOL} {ARGV_SYMBOL}");
                     break;
                 case Token.Type.FALSE:
-                    current_sb.add_instruction($"{++stack_size} ; {PUSH_SYMBOL} {FALSE_SYMBOL}");
-                    m_last_expr_type_info = Type_info.BOOL;
+                    m_type_info_stack.Add(Type_info.BOOL);
+                    current_sb.add_instruction($"{stack_size} ; {PUSH_SYMBOL} {FALSE_SYMBOL}");
                     break;
                 case Token.Type.TRUE:
-                    current_sb.add_instruction($"{++stack_size} ; {PUSH_SYMBOL} {TRUE_SYMBOL}");
-                    m_last_expr_type_info = Type_info.BOOL;
+                    m_type_info_stack.Add(Type_info.BOOL);
+                    current_sb.add_instruction($"{stack_size} ; {PUSH_SYMBOL} {TRUE_SYMBOL}");
                     break;
                 case Token.Type.CHAR_LIT:
                 case Token.Type.INT_LIT:
                 case Token.Type.FLOAT_LIT:
                 case Token.Type.STR_LIT:
-                    current_sb.add_instruction($"{++stack_size} ; {PUSH_SYMBOL} {current_AST_node.token.id}");
-                    m_last_expr_type_info = current_AST_node.token.type switch{
+                    m_type_info_stack.Add(current_AST_node.token.type switch{
                         Token.Type.CHAR_LIT  => Type_info.CHAR,
                         Token.Type.INT_LIT   => Type_info.INT,
                         Token.Type.FLOAT_LIT => Type_info.FLOAT,
                         Token.Type.STR_LIT   => Type_info.STR,
 
                         _ => throw new UnreachableException(),
-                    };
+                    });
+                    current_sb.add_instruction($"{stack_size} ; {PUSH_SYMBOL} {current_AST_node.token.id}");
                     break;
 
                 case Token.Type.LBRACE:
@@ -179,10 +181,11 @@ public static class Compiler{
                     }
 
                     while (m_let_decl_counts[^1]-- > 0){
-                        block_sb.add_instruction($"{--stack_size} ; {nameof(Op_code.POP)}");
-                        m_id_positions.RemoveAt(m_id_positions.Count - 1);
+                        m_type_info_stack.pop();
+                        block_sb.add_instruction($"{stack_size} ; {nameof(Op_code.POP)}");
+                        m_id_infos.pop();
                     }
-                    m_let_decl_counts.RemoveAt(m_let_decl_counts.Count - 1);
+                    m_let_decl_counts.pop();
                     current_sb.Append(block_sb);
                     break;
 
@@ -204,70 +207,78 @@ public static class Compiler{
                 case Token.Type.LBRACKET:
                 // case Token.Type.AND:
                 // case Token.Type.OR:
-                    Binary_op binary_op = default;
-                    
-                    to_IR(current_AST_node.sub_nodes[0], null);
-                    lhs_type_info = m_last_expr_type_info;
-
-                    to_IR(current_AST_node.sub_nodes[1], null);
-                    rhs_type_info = m_last_expr_type_info;
-
-                    current_sb.add_instruction($"{--stack_size} ; {current_AST_node.token.type switch{
-                        Token.Type.EQUALS          => comma_assignment_op(ref binary_op, Binary_op.CMP_EQ,    nameof(Op_code.CMP_EQ)),
-                        Token.Type.NOT_EQUALS      => comma_assignment_op(ref binary_op, Binary_op.CMP_NEQ,   nameof(Op_code.CMP_NEQ)),
-                        Token.Type.LESS_THAN       => comma_assignment_op(ref binary_op, Binary_op.CMP_LE,    nameof(Op_code.CMP_LE)),
-                        Token.Type.LESS_THAN_EQ    => comma_assignment_op(ref binary_op, Binary_op.CMP_LEQ,   nameof(Op_code.CMP_LEQ)),
-                        Token.Type.GREATER_THAN    => comma_assignment_op(ref binary_op, Binary_op.CMP_GE,    nameof(Op_code.CMP_GE)),
-                        Token.Type.GREATER_THAN_EQ => comma_assignment_op(ref binary_op, Binary_op.CMP_GEQ,   nameof(Op_code.CMP_GEQ)),
-                        Token.Type.ASTERISK1       => comma_assignment_op(ref binary_op, Binary_op.MUL,       nameof(Op_code.MUL)),
-                        Token.Type.ASTERISK2       => comma_assignment_op(ref binary_op, Binary_op.POW,       nameof(Op_code.POW)),
-                        Token.Type.SLASH           => comma_assignment_op(ref binary_op, Binary_op.DIV,       nameof(Op_code.DIV)),
-                        Token.Type.PERCENT         => comma_assignment_op(ref binary_op, Binary_op.MOD,       nameof(Op_code.MOD)),
-                        Token.Type.SHIFT_LEFT      => comma_assignment_op(ref binary_op, Binary_op.SHL,       nameof(Op_code.SHL)),
-                        Token.Type.SHIFT_RIGHT     => comma_assignment_op(ref binary_op, Binary_op.SHR,       nameof(Op_code.SHR)),
-                        Token.Type.AMPERSAND       => comma_assignment_op(ref binary_op, Binary_op.BAND,      nameof(Op_code.BAND)),
-                        Token.Type.PIPE            => comma_assignment_op(ref binary_op, Binary_op.BOR,       nameof(Op_code.BOR)),
-                        Token.Type.CARET           => comma_assignment_op(ref binary_op, Binary_op.XOR,       nameof(Op_code.XOR)),
-                        Token.Type.LBRACKET        => comma_assignment_op(ref binary_op, Binary_op.SUBSCRIPT, nameof(Op_code.DEREF)),
+                    (Binary_op binary_op, string op_code_str) = current_AST_node.token.type switch{
+                        Token.Type.EQUALS          => (Binary_op.CMP_EQ,    nameof(Op_code.CMP_EQ)),
+                        Token.Type.NOT_EQUALS      => (Binary_op.CMP_NEQ,   nameof(Op_code.CMP_NEQ)),
+                        Token.Type.LESS_THAN       => (Binary_op.CMP_LE,    nameof(Op_code.CMP_LE)),
+                        Token.Type.LESS_THAN_EQ    => (Binary_op.CMP_LEQ,   nameof(Op_code.CMP_LEQ)),
+                        Token.Type.GREATER_THAN    => (Binary_op.CMP_GE,    nameof(Op_code.CMP_GE)),
+                        Token.Type.GREATER_THAN_EQ => (Binary_op.CMP_GEQ,   nameof(Op_code.CMP_GEQ)),
+                        Token.Type.ASTERISK1       => (Binary_op.MUL,       nameof(Op_code.MUL)),
+                        Token.Type.ASTERISK2       => (Binary_op.POW,       nameof(Op_code.POW)),
+                        Token.Type.SLASH           => (Binary_op.DIV,       nameof(Op_code.DIV)),
+                        Token.Type.PERCENT         => (Binary_op.MOD,       nameof(Op_code.MOD)),
+                        Token.Type.SHIFT_LEFT      => (Binary_op.SHL,       nameof(Op_code.SHL)),
+                        Token.Type.SHIFT_RIGHT     => (Binary_op.SHR,       nameof(Op_code.SHR)),
+                        Token.Type.AMPERSAND       => (Binary_op.BAND,      nameof(Op_code.BAND)),
+                        Token.Type.PIPE            => (Binary_op.BOR,       nameof(Op_code.BOR)),
+                        Token.Type.CARET           => (Binary_op.XOR,       nameof(Op_code.XOR)),
+                        Token.Type.LBRACKET        => (Binary_op.SUBSCRIPT, nameof(Op_code.DEREF)),
                         // Token.Type.AND             => "AND",
                         // Token.Type.OR              => "OR",
                         
                         _ => throw new UnreachableException(),
-                    }}");
+                    };
+                    
+                    to_IR(current_AST_node.sub_nodes[0], null);
+                    to_IR(current_AST_node.sub_nodes[1], null);
 
-                    m_last_expr_type_info = binary_op.get_result_type(lhs_type_info, m_last_expr_type_info);
+                    lhs_type_info = m_type_info_stack[^2];
+                    rhs_type_info = m_type_info_stack[^1];
+
+                    m_type_info_stack[^2] = binary_op.get_result_type(lhs_type_info, rhs_type_info);
+                    m_type_info_stack.pop();
                     throw_on_invalid_binary_operation(current_AST_node, lhs_type_info, rhs_type_info);
+
+                    current_sb.add_instruction($"{stack_size} ; {op_code_str}");
                     break;
 
                 case Token.Type.TILDE:
                     to_IR(current_AST_node.sub_nodes[0], null);
-                    lhs_type_info = m_last_expr_type_info;
+                    lhs_type_info = m_type_info_stack[^1];
+
+                    m_type_info_stack[^1] = Unary_op.BNEG.get_result_type(lhs_type_info);
+                    throw_on_invalid_unary_operation(current_AST_node, lhs_type_info);
 
                     current_sb.add_instruction($"{stack_size} ; {nameof(Op_code.BNEG)}");
-
-                    m_last_expr_type_info = Unary_op.BNEG.get_result_type(lhs_type_info);
-                    throw_on_invalid_unary_operation(current_AST_node, lhs_type_info);
                     break;
 
                 case Token.Type.AND:
                 case Token.Type.OR:
                     StringBuilder lhs_and_or_sb = sb = new();
                     to_IR(current_AST_node.sub_nodes[0], null);
+                    lhs_type_info = m_type_info_stack[^1];
 
-                    --stack_size;
+                    m_type_info_stack.pop();
 
                     StringBuilder rhs_and_or_sb = sb = new();
                     to_IR(current_AST_node.sub_nodes[1], null);
+                    rhs_type_info = m_type_info_stack[^1];
+
+                    m_type_info_stack[^1] = Binary_op.AND.get_result_type(lhs_type_info, rhs_type_info);
+                    throw_on_invalid_binary_operation(current_AST_node, lhs_type_info, rhs_type_info);
 
                     if (lhs_and_or_sb.ToString()[(lhs_and_or_sb.ToString().LastIndexOf(';') + 1)..].Trim() != nameof(Op_code.TO_BOOL))
                         lhs_and_or_sb.add_instruction($"{stack_size} ; {nameof(Op_code.TO_BOOL)}");
                     if (rhs_and_or_sb.ToString()[(rhs_and_or_sb.ToString().LastIndexOf(';') + 1)..].Trim() != nameof(Op_code.TO_BOOL))
                         rhs_and_or_sb.add_instruction($"{stack_size} ; {nameof(Op_code.TO_BOOL)}");
 
-                    lhs_and_or_sb.add_instruction($"{++stack_size} ; {PUSH_SYMBOL} {SP_SYMBOL}[-1]");
+                    m_type_info_stack.Add(Type_info.BOOL);
+                    lhs_and_or_sb.add_instruction($"{stack_size} ; {PUSH_SYMBOL} {SP_SYMBOL}[-1]");
                     if (current_AST_node.token.type == Token.Type.OR)
                         lhs_and_or_sb.add_instruction($"{stack_size} ; {nameof(Op_code.NEG)}");
-                    lhs_and_or_sb.add_instruction($"{--stack_size} ; {nameof(Op_code.JMPZ)} {rhs_and_or_sb.count_instructions()}");
+                    m_type_info_stack.pop();
+                    lhs_and_or_sb.add_instruction($"{stack_size} ; {nameof(Op_code.JMPZ)} {rhs_and_or_sb.count_instructions()}");
                     lhs_and_or_sb.add_instruction($"{stack_size - 1} ; {nameof(Op_code.POP)}");
 
                     current_sb.Append(lhs_and_or_sb);
@@ -276,51 +287,53 @@ public static class Compiler{
 
                 case Token.Type.NOT:
                     to_IR(current_AST_node.sub_nodes[0], null);
-                    lhs_type_info = m_last_expr_type_info;
+                    lhs_type_info = m_type_info_stack[^1];
+
+                    m_type_info_stack[^1] = Unary_op.NOT.get_result_type(lhs_type_info);
+                    throw_on_invalid_unary_operation(current_AST_node, lhs_type_info);
 
                     current_sb.add_instruction($"{stack_size} ; {nameof(Op_code.TO_BOOL)}");
                     current_sb.add_instruction($"{stack_size} ; {nameof(Op_code.NEG)}");
-
-                    m_last_expr_type_info = Unary_op.NOT.get_result_type(m_last_expr_type_info);
-                    throw_on_invalid_unary_operation(current_AST_node, lhs_type_info);
                     break;
 
                 case Token.Type.PLUS:
                     to_IR(current_AST_node.sub_nodes[0], null);
-                    lhs_type_info = m_last_expr_type_info;
+                    lhs_type_info = m_type_info_stack[^1];
 
                     if (current_AST_node.sub_nodes.Length > 1){
                         to_IR(current_AST_node.sub_nodes[1], null);
-                        rhs_type_info = m_last_expr_type_info;
+                        rhs_type_info = m_type_info_stack[^1];
 
-                        current_sb.add_instruction($"{--stack_size} ; {nameof(Op_code.ADD)}");
-
-                        m_last_expr_type_info = Binary_op.ADD.get_result_type(lhs_type_info, m_last_expr_type_info);
+                        m_type_info_stack[^2] = Binary_op.ADD.get_result_type(lhs_type_info, rhs_type_info);
+                        m_type_info_stack.pop();
                         throw_on_invalid_binary_operation(current_AST_node, lhs_type_info, rhs_type_info);
+
+                        current_sb.add_instruction($"{stack_size} ; {nameof(Op_code.ADD)}");
                     }
                     else{
-                        m_last_expr_type_info = Unary_op.PLUS.get_result_type(m_last_expr_type_info);
+                        m_type_info_stack[^1] = Unary_op.PLUS.get_result_type(lhs_type_info);
                         throw_on_invalid_unary_operation(current_AST_node, lhs_type_info);
                     }
                     break;
                 case Token.Type.MINUS:
                     to_IR(current_AST_node.sub_nodes[0], null);
-                    lhs_type_info = m_last_expr_type_info;
+                    lhs_type_info = m_type_info_stack[^1];
 
                     if (current_AST_node.sub_nodes.Length > 1){
                         to_IR(current_AST_node.sub_nodes[1], null);
-                        rhs_type_info = m_last_expr_type_info;
+                        rhs_type_info = m_type_info_stack[^1];
 
-                        current_sb.add_instruction($"{--stack_size} ; {nameof(Op_code.SUB)}");
-
-                        m_last_expr_type_info = Binary_op.SUB.get_result_type(lhs_type_info, m_last_expr_type_info);
+                        m_type_info_stack[^2] = Binary_op.SUB.get_result_type(lhs_type_info, rhs_type_info);
+                        m_type_info_stack.pop();
                         throw_on_invalid_binary_operation(current_AST_node, lhs_type_info, rhs_type_info);
+
+                        current_sb.add_instruction($"{stack_size} ; {nameof(Op_code.SUB)}");
                     }
                     else{
-                        current_sb.add_instruction($"{stack_size} ; {nameof(Op_code.NEG)}");
-
-                        m_last_expr_type_info = Unary_op.MINUS.get_result_type(m_last_expr_type_info);
+                        m_type_info_stack[^1] = Unary_op.MINUS.get_result_type(lhs_type_info);
                         throw_on_invalid_unary_operation(current_AST_node, lhs_type_info);
+
+                        current_sb.add_instruction($"{stack_size} ; {nameof(Op_code.NEG)}");
                     }
                     break;
 
@@ -331,61 +344,64 @@ public static class Compiler{
                             throw new Syntax_error_exception($"On line <{eq_node_lhs.token.line_number}> <argv> is immutable");
                         if (eq_node_lhs.token.type != Token.Type.ID)
                             throw new Syntax_error_exception($"On line <{eq_node_lhs.token.line_number}> trying to assign to rvalue");
-                        if (!m_id_positions.TryGetValue(eq_node_lhs.token.id, out id_info))
+                        if (!m_id_infos.TryGetValue(eq_node_lhs.token.id, out id_info))
                             throw new Syntax_error_exception($"On line <{eq_node_lhs.token.line_number}> use of undeclared identifier <{eq_node_lhs.token.id}>");
 
                         to_IR(current_AST_node.sub_nodes[1], null);
                         lhs_type_info = id_info.type_info;
-                        rhs_type_info = m_last_expr_type_info;
+                        rhs_type_info = m_type_info_stack[^1];
 
-                        m_last_expr_type_info = Binary_op.ASSIGNMENT.get_result_type(lhs_type_info, rhs_type_info);
+                        m_type_info_stack[^1] = Binary_op.ASSIGNMENT.get_result_type(lhs_type_info, rhs_type_info);
                         throw_on_invalid_binary_operation(current_AST_node, lhs_type_info, rhs_type_info);
 
-                        current_sb.add_instruction($"{stack_size - 1} ; {nameof(Op_code.MOV)} {SP_SYMBOL}[-{stack_size - id_info.stack_idx}]");
-                        --stack_size;
+                        m_type_info_stack.pop();
+                        current_sb.add_instruction($"{stack_size} ; {nameof(Op_code.MOV)} {SP_SYMBOL}[-{stack_size - id_info.stack_idx + 1}]");
 
-                        if (current_push_back_after_assignment){
+                        if (current_push_back_after_assignment)
                             to_IR(eq_node_lhs, null);
-                            m_last_expr_type_info = lhs_type_info;
-                        }
-                        else
-                            m_last_expr_type_info = Type_info.INVALID;
                     }
                     else{
-                        for (Node lhs = current_AST_node.sub_nodes[0].sub_nodes[0]; lhs.token.type != Token.Type.ID; lhs = lhs.sub_nodes[0]){
+                        for (Node lhs = eq_node_lhs.sub_nodes[0]; lhs.token.type != Token.Type.ID; lhs = lhs.sub_nodes[0]){
                             if (lhs.token.type == Token.Type.ARGV)
                                 throw new Syntax_error_exception($"On line <{lhs.token.line_number}> <argv> is immutable");
                             if (lhs.token.type != Token.Type.ID && lhs.token.type != Token.Type.LBRACKET && lhs.token.type != Token.Type.EQ)
                                 throw new Syntax_error_exception($"On line <{lhs.token.line_number}> trying to assign to rvalue");
                         }
 
-                        to_IR(current_AST_node.sub_nodes[0].sub_nodes[0], null);
-                        lhs_type_info = m_last_expr_type_info;
+                        to_IR(eq_node_lhs.sub_nodes[0], null);
+                        to_IR(eq_node_lhs.sub_nodes[1], null);
 
-                        to_IR(current_AST_node.sub_nodes[0].sub_nodes[1], null);
-                        rhs_type_info = m_last_expr_type_info;
+                        lhs_type_info = m_type_info_stack[^2];
+                        rhs_type_info = m_type_info_stack[^1];
 
-                        m_last_expr_type_info = Binary_op.SUBSCRIPT.get_result_type(lhs_type_info, rhs_type_info);
+                        Type_info array_type = m_type_info_stack[^1] = Binary_op.SUBSCRIPT.get_result_type(lhs_type_info, rhs_type_info);
                         throw_on_invalid_binary_operation(current_AST_node.token.line_number, "[]", lhs_type_info, rhs_type_info);
+                        m_type_info_stack[^1] = rhs_type_info;
 
                         if (current_push_back_after_assignment){
-                            current_sb.add_instruction($"{++stack_size} ; {PUSH_SYMBOL} {SP_SYMBOL}[-2]");
-                            current_sb.add_instruction($"{++stack_size} ; {PUSH_SYMBOL} {SP_SYMBOL}[-2]");
+                            m_type_info_stack.Add(lhs_type_info);
+                            current_sb.add_instruction($"{stack_size} ; {PUSH_SYMBOL} {SP_SYMBOL}[-2]");
+                            m_type_info_stack.Add(rhs_type_info);
+                            current_sb.add_instruction($"{stack_size} ; {PUSH_SYMBOL} {SP_SYMBOL}[-2]");
                         }
 
-                        lhs_type_info = m_last_expr_type_info;
+                        lhs_type_info = array_type;
                         to_IR(current_AST_node.sub_nodes[1], null);
-                        rhs_type_info = m_last_expr_type_info;
+                        rhs_type_info = m_type_info_stack[^1];
 
-                        m_last_expr_type_info = Binary_op.ASSIGNMENT.get_result_type(lhs_type_info, rhs_type_info);
+                        m_type_info_stack[^1] = Binary_op.ASSIGNMENT.get_result_type(lhs_type_info, rhs_type_info);
                         throw_on_invalid_binary_operation(current_AST_node, lhs_type_info, rhs_type_info);
 
-                        stack_size -= 3;
+                        m_type_info_stack.pop();
+                        m_type_info_stack.pop();
+                        m_type_info_stack.pop();
+
                         current_sb.add_instruction($"{stack_size} ; {nameof(Op_code.DEREF_MOV)}");
-                        if (current_push_back_after_assignment)
-                            current_sb.add_instruction($"{--stack_size} ; {nameof(Op_code.DEREF)}");
-                        else
-                            m_last_expr_type_info = Type_info.INVALID;
+                        if (current_push_back_after_assignment){
+                            m_type_info_stack[^2] = array_type;
+                            m_type_info_stack.pop();
+                            current_sb.add_instruction($"{stack_size} ; {nameof(Op_code.DEREF)}");
+                        }
                     }
                     break;
 
@@ -394,7 +410,6 @@ public static class Compiler{
                     Node type_node = current_AST_node.sub_nodes[1];
 
                     to_IR(type_node.sub_nodes[0], null);
-                    m_last_expr_type_info = Type_info.INVALID;
 
                     if (type_node.token.type == Token.Type.LBRACKET){
                         let_decl_type_info |= Type_info.ARRAY;
@@ -412,115 +427,116 @@ public static class Compiler{
                     }}"); 
 
                     Token let_decl_tok = current_AST_node.sub_nodes[0].token;
-                    if (!m_id_positions.TryAdd(let_decl_tok.id, new(){stack_idx = m_id_positions.Count, type_info = let_decl_type_info}))
+                    if (!m_id_infos.TryAdd(let_decl_tok.id, new(){stack_idx = m_id_infos.Count, type_info = let_decl_type_info}))
                         throw new Syntax_error_exception($"On line <{let_decl_tok.line_number}> identifier <{let_decl_tok.id}> is already in use");
+                    m_type_info_stack[^1] = let_decl_type_info;
                     ++m_let_decl_counts[^1];
                     break;
 
                 case Token.Type.PRINT:
                     to_IR(current_AST_node.sub_nodes[0], null);
-                    current_sb.add_instruction($"{--stack_size} ; {nameof(Op_code.PRINT)}");
-                    m_last_expr_type_info = Type_info.INVALID;
+                    m_type_info_stack.pop();
+                    current_sb.add_instruction($"{stack_size} ; {nameof(Op_code.PRINT)}");
                     break;
                 case Token.Type.SCAN:
                     to_IR(current_AST_node.sub_nodes[0], null);
+                    m_type_info_stack[^1] = Type_info.STR;
                     current_sb.add_instruction($"{stack_size} ; {nameof(Op_code.SCAN)}");
-                    m_last_expr_type_info = Type_info.STR;
                     break;
 
                 case Token.Type.ARRAY_SIZE:
                     to_IR(current_AST_node.sub_nodes[0], null);
-                    current_sb.add_instruction($"{stack_size} ; {nameof(Op_code.ARRAY_SIZE)}");
-                    if (!m_last_expr_type_info.array_is_set() && !m_last_expr_type_info.str_is_set())
+                    if (!m_type_info_stack[^1].array_is_set() && !m_type_info_stack[^1].str_is_set())
                         throw new Syntax_error_exception($"On line <{current_AST_node.token.line_number}> trying to use <array_size> on non-array like expression");
-                    m_last_expr_type_info = Type_info.INT;
+                    m_type_info_stack[^1] = Type_info.INT;
+                    current_sb.add_instruction($"{stack_size} ; {nameof(Op_code.ARRAY_SIZE)}");
                     break;
                 case Token.Type.RAND:
-                    current_sb.add_instruction($"{++stack_size} ; {nameof(Op_code.RAND)}");
-                    m_last_expr_type_info = Type_info.INT;
+                    m_type_info_stack.Add(Type_info.INT);
+                    current_sb.add_instruction($"{stack_size} ; {nameof(Op_code.RAND)}");
                     break;
                 case Token.Type.POLL_CHAR:
-                    current_sb.add_instruction($"{++stack_size} ; {nameof(Op_code.POLL_CHAR)}");
-                    m_last_expr_type_info = Type_info.CHAR;
+                    m_type_info_stack.Add(Type_info.CHAR);
+                    current_sb.add_instruction($"{stack_size} ; {nameof(Op_code.POLL_CHAR)}");
                     break;
 
                 case Token.Type.IF:
+                    StringBuilder if_condition_sb = sb = new();
                     to_IR(current_AST_node.sub_nodes[0], null);
-                    if (m_last_expr_type_info.array_is_set() || m_last_expr_type_info.str_is_set())
-                        throw new Syntax_error_exception($"On line <{current_AST_node.token.line_number}> trying to use <{m_last_expr_type_info.get_str_repr()}> as a bool");
+                    if (m_type_info_stack[^1].array_is_set() || m_type_info_stack[^1].str_is_set())
+                        throw new Syntax_error_exception($"On line <{current_AST_node.token.line_number}> trying to use <{m_type_info_stack[^1].get_str_repr()}> as a bool");
+                    current_sb.Append(if_condition_sb);
 
                     m_push_back_after_assignment = false;
-                    m_last_expr_type_info = Type_info.INVALID;
-                    --stack_size;
+                    m_type_info_stack.pop();
 
-                    StringBuilder if_else_sb = sb = new();
+                    StringBuilder if_block_sb = sb = new();
                     bool has_else_after = (next_AST_node is not null && next_AST_node.token.type == Token.Type.ELSE);
 
                     if (current_AST_node.sub_nodes.Length > 1){
                         m_let_decl_counts.Add(0);
                         to_IR(current_AST_node.sub_nodes[1], null);
                         while (m_let_decl_counts[^1]-- > 0){
-                            if_else_sb.add_instruction($"{--stack_size} ; {nameof(Op_code.POP)}");
-                            m_id_positions.RemoveAt(m_id_positions.Count - 1);
+                            m_type_info_stack.pop();
+                            if_block_sb.add_instruction($"{stack_size} ; {nameof(Op_code.POP)}");
+                            m_id_infos.pop();
                         }
-                        m_let_decl_counts.RemoveAt(m_let_decl_counts.Count - 1);
+                        m_let_decl_counts.pop();
                     }
-                    current_sb.add_instruction($"{stack_size} ; {nameof(Op_code.JMPZ)} {if_else_sb.count_instructions() + Convert.ToInt32(has_else_after)}");
-                    current_sb.Append(if_else_sb);
+
+                    current_sb.add_instruction($"{stack_size} ; {nameof(Op_code.JMPZ)} {if_block_sb.count_instructions() + Convert.ToInt32(has_else_after)}");
+                    current_sb.Append(if_block_sb);
 
                     if (has_else_after){
-                        if_else_sb.Clear();
-
-                        m_last_expr_type_info = Type_info.INVALID;
-
+                        StringBuilder else_block_sb = sb = new();
                         if (next_AST_node!.sub_nodes.Length > 0){
                             m_let_decl_counts.Add(0);
                             to_IR(next_AST_node.sub_nodes[0], (next_AST_node!.sub_nodes.Length > 1) ? next_AST_node!.sub_nodes[1] : null);
                             while (m_let_decl_counts[^1]-- > 0){
-                                if_else_sb.add_instruction($"{--stack_size} ; {nameof(Op_code.POP)}");
-                                m_id_positions.RemoveAt(m_id_positions.Count - 1);
+                                m_type_info_stack.pop();
+                                else_block_sb.add_instruction($"{stack_size} ; {nameof(Op_code.POP)}");
+                                m_id_infos.pop();
                             }
-                            m_let_decl_counts.RemoveAt(m_let_decl_counts.Count - 1);
+                            m_let_decl_counts.pop();
                         }
-                        current_sb.add_instruction($"{stack_size} ; {nameof(Op_code.JMP)} {if_else_sb.count_instructions()}");
-                        current_sb.Append(if_else_sb);
+                        current_sb.add_instruction($"{stack_size} ; {nameof(Op_code.JMP)} {else_block_sb.count_instructions()}");
+                        current_sb.Append(else_block_sb);
                     }
                     break;
                 case Token.Type.ELSE:
                     break;
                 case Token.Type.WHILE:
                     StringBuilder while_condition_sb = sb = new();
-
                     to_IR(current_AST_node.sub_nodes[0], null);
-                    if (m_last_expr_type_info.array_is_set() || m_last_expr_type_info.str_is_set())
-                        throw new Syntax_error_exception($"On line <{current_AST_node.token.line_number}> trying to use <{m_last_expr_type_info.get_str_repr()}> as a bool");
+                    if (m_type_info_stack[^1].array_is_set() || m_type_info_stack[^1].str_is_set())
+                        throw new Syntax_error_exception($"On line <{current_AST_node.token.line_number}> trying to use <{m_type_info_stack[^1].get_str_repr()}> as a bool");
 
                     m_push_back_after_assignment = false;
-                    m_last_expr_type_info = Type_info.INVALID;
-                    --stack_size;
+                    m_type_info_stack.pop();
                     
-                    StringBuilder while_sb = sb = new();
+                    StringBuilder while_block_sb = sb = new();
 
                     if (current_AST_node.sub_nodes.Length > 1){
                         m_let_decl_counts.Add(0);
                         to_IR(current_AST_node.sub_nodes[1], null);
                         while (m_let_decl_counts[^1]-- > 0){
-                            while_sb.add_instruction($"{--stack_size} ; {nameof(Op_code.POP)}");
-                            m_id_positions.RemoveAt(m_id_positions.Count - 1);
+                            m_type_info_stack.pop();
+                            while_block_sb.add_instruction($"{stack_size} ; {nameof(Op_code.POP)}");
+                            m_id_infos.pop();
                         }
-                        m_let_decl_counts.RemoveAt(m_let_decl_counts.Count - 1);
+                        m_let_decl_counts.pop();
                     }
 
-                    while_condition_sb.add_instruction($"{stack_size} ; {nameof(Op_code.JMPZ)} {while_sb.count_instructions() + 1}");
+                    while_condition_sb.add_instruction($"{stack_size} ; {nameof(Op_code.JMPZ)} {while_block_sb.count_instructions() + 1}");
                     current_sb.Append(while_condition_sb);
-                    current_sb.Append(while_sb);
-                    current_sb.add_instruction($"{stack_size} ; {nameof(Op_code.JMP)} -{while_condition_sb.count_instructions() + while_sb.count_instructions() - 2}");
+                    current_sb.Append(while_block_sb);
+                    current_sb.add_instruction($"{stack_size} ; {nameof(Op_code.JMP)} -{while_condition_sb.count_instructions() + while_block_sb.count_instructions() - 2}");
                     break;
 
                 case Token.Type.RETURN:
                     to_IR(current_AST_node.sub_nodes[0], null);
-                    current_sb.add_instruction($"{--stack_size} ; {nameof(Op_code.RET)}");
-                    m_last_expr_type_info = Type_info.INVALID;
+                    m_type_info_stack.pop();
+                    current_sb.add_instruction($"{stack_size} ; {nameof(Op_code.RET)}");
                     break;
 
                 default:

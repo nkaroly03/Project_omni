@@ -84,4 +84,9 @@
     // print("false and scan(\"Input: \")\n");
 // }
 
-print(true and false);
+print("Hello" == "hello"); print('\n');
+print("Hello" != "hello"); print('\n');
+print("Hello" <  "hello"); print('\n');
+print("Hello" <= "hello"); print('\n');
+print("Hello" >  "hello"); print('\n');
+print("Hello" >= "hello"); print('\n');

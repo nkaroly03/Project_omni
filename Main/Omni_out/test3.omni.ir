@@ -1,12 +1,40 @@
 src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\test3.omni
 
-    1 ; PUSH TRUE
-    1 ; TO_BOOL
-    2 ; PUSH SP[-1]
-    1 ; JMPZ 3
-    0 ; POP
-    1 ; PUSH FALSE
-    1 ; TO_BOOL
+    1 ; PUSH "Hello"
+    2 ; PUSH "hello"
+    1 ; CMP_EQ
+    0 ; PRINT
+    1 ; PUSH '\n'
+    0 ; PRINT
+    1 ; PUSH "Hello"
+    2 ; PUSH "hello"
+    1 ; CMP_NEQ
+    0 ; PRINT
+    1 ; PUSH '\n'
+    0 ; PRINT
+    1 ; PUSH "Hello"
+    2 ; PUSH "hello"
+    1 ; CMP_LE
+    0 ; PRINT
+    1 ; PUSH '\n'
+    0 ; PRINT
+    1 ; PUSH "Hello"
+    2 ; PUSH "hello"
+    1 ; CMP_LEQ
+    0 ; PRINT
+    1 ; PUSH '\n'
+    0 ; PRINT
+    1 ; PUSH "Hello"
+    2 ; PUSH "hello"
+    1 ; CMP_GE
+    0 ; PRINT
+    1 ; PUSH '\n'
+    0 ; PRINT
+    1 ; PUSH "Hello"
+    2 ; PUSH "hello"
+    1 ; CMP_GEQ
+    0 ; PRINT
+    1 ; PUSH '\n'
     0 ; PRINT
     1 ; PUSH 0
     0 ; RET
