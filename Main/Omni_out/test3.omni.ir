@@ -36,6 +36,10 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\test3.omni
     0 ; PRINT
     1 ; PUSH '\n'
     0 ; PRINT
-    1 ; PUSH 0
-    0 ; RET
+    1 ; PUSH 3.14
+    1 ; ALLOC_ARRAY
+    1 ; TO_INT
+    2 ; PUSH 0
+    1 ; RET
+    0 ; POP
 

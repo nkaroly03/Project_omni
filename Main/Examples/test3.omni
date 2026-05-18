@@ -90,3 +90,5 @@ print("Hello" <  "hello"); print('\n');
 print("Hello" <= "hello"); print('\n');
 print("Hello" >  "hello"); print('\n');
 print("Hello" >= "hello"); print('\n');
+
+let arr: []int = [3.14]{};

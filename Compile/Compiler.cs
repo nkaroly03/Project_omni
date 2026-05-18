@@ -412,6 +412,11 @@ public static class Compiler{
                     to_IR(type_node.sub_nodes[0], null);
 
                     if (type_node.token.type == Token.Type.LBRACKET){
+                        if (m_type_info_stack[^1].array_is_set() || !m_type_info_stack[^1].int_like_is_set()){
+                            throw new Syntax_error_exception(
+                                $"On line <{type_node.token.line_number}> trying to allocate an array with non int-like value <{m_type_info_stack[^1].get_str_repr()}>"
+                            );
+                        }
                         let_decl_type_info |= Type_info.ARRAY;
                         current_sb.add_instruction($"{stack_size} ; {nameof(Op_code.ALLOC_ARRAY)}");
                         type_node = type_node.sub_nodes[1];

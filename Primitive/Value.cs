@@ -253,9 +253,10 @@ public sealed class Value : IEquatable<Value>, IComparable<Value>{
     public Value(StringBuilder[] data) => this.data = data;
 
     public Value(Value other) => data = other.data switch{
+        StringBuilder sb => new StringBuilder(sb.ToString()),
+
         bool   or char   or int   or float   or
         bool[] or char[] or int[] or float[] or StringBuilder[] => other.data,
-        StringBuilder sb => new StringBuilder(sb.ToString()),
 
         _ => throw new UnreachableException(),
     };

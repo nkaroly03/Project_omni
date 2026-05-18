@@ -73,7 +73,7 @@ public static class Interpreter{
                         float         => new(stack[^1].to_float()),
                         StringBuilder => new(stack[^1].to_string()),
 
-                        bool[] or char[] or int[] or float[] or StringBuilder[] => throw new ArgumentOutOfRangeException("Trying to reassign an array"),
+                        bool[] or char[] or int[] or float[] or StringBuilder[] => throw new UnreachableException("Trying to reassign an array"),
 
                         _ => throw new UnreachableException(),
                     };
@@ -116,7 +116,7 @@ public static class Interpreter{
                         float[]          f_arr => new( f_arr.Length),
                         StringBuilder[] sb_arr => new(sb_arr.Length),
 
-                        _ => throw new ArgumentOutOfRangeException("Trying to get the size of a non-array type"),
+                        _ => throw new UnreachableException("Trying to get the size of a non-array type"),
                     };
                     break;
                 case Op_code.RAND:
@@ -139,8 +139,7 @@ public static class Interpreter{
                 case Op_code.TO_STR:   stack[^1] = new(stack[^1].to_string()); break;
 
                 case Op_code.ALLOC_ARRAY:
-                    if (stack[^1].data is not (bool or char or int))
-                        throw new ArgumentOutOfRangeException("Trying to allocate an array of non-integer size");
+                    Debug.Assert(stack[^1].data is (bool or char or int), "Trying to allocate an array of non-integer size");
                     int alloc_size = stack[^1].to_int();
                     stack[^1] = (Op_code)bytecode[pc++] switch{
                         Op_code.TO_BOOL  => new(new bool [alloc_size]),
@@ -200,6 +199,10 @@ public static class Interpreter{
                     // break;
                 case Op_code.NEG:
                     stack[^1] = -stack[^1];
+                    break;
+
+                default:
+                    Debug.Assert(false, "unreachable");
                     break;
             }
             // foreach (Value v in stack)

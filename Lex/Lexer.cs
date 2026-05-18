@@ -182,14 +182,24 @@ public static class Lexer{
                     "return"     => Token.Type.RETURN,
 
                     _ => ((Func<Token.Type>)(() => {
-                        if (line.All((c) => char.IsDigit(c)))
+                        string msg = $"On line <{line_idx + 1}> <{line}> must be in the range [{int.MinValue},{int.MaxValue})";
+                        if (line.All((c) => char.IsDigit(c))){
+                            if (!int.TryParse(line, out _))
+                                throw new Syntax_error_exception(msg);
                             return Token.Type.INT_LIT;
+                        }
                         else if ((line.StartsWith("0x") || line.StartsWith("0X")) && line[2..].All((c) => char.IsAsciiHexDigit(c))){
-                            token_id = int.Parse(line[2..], NumberStyles.AllowHexSpecifier).ToString();
+                            if (int.TryParse(line[2..], NumberStyles.AllowHexSpecifier, CultureInfo.InvariantCulture, out int val))
+                                token_id = val.ToString();
+                            else
+                                throw new Syntax_error_exception(msg);
                             return Token.Type.INT_LIT;
                         }
                         else if ((line.StartsWith("0b") || line.StartsWith("0B")) && line[2..].All((c) => c == '0' || c == '1')){
-                            token_id = int.Parse(line[2..], NumberStyles.AllowBinarySpecifier).ToString();
+                            if (int.TryParse(line[2..], NumberStyles.AllowBinarySpecifier, CultureInfo.InvariantCulture, out int val))
+                                token_id = val.ToString();
+                            else
+                                throw new Syntax_error_exception(msg);
                             return Token.Type.INT_LIT;
                         }
                         else if (line.Count((c) => c == '.') == 1 && line[0] != '.' && line.All((c) => char.IsDigit(c) || c == '.'))
