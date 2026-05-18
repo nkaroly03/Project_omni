@@ -91,4 +91,12 @@ print("Hello" <= "hello"); print('\n');
 print("Hello" >  "hello"); print('\n');
 print("Hello" >= "hello"); print('\n');
 
-let arr: []int = [3.14]{};
+let i: int = 0;
+while ((i = i + 1) - 1 < 10)
+    if (i <= 2)
+        print("if\n");
+    else if (i < 0)
+        print("else if\n");
+    else
+        print("else\n");
+

@@ -123,7 +123,7 @@ public static class Parser{
             return lhs;
         }
 
-        (Node, Node?) parse_expr(bool loop_was_parsed){
+        (Node, Node?) parse_expr(){
             (Node node1, Node? node2) = (new(), null);
 
             Token tok = self.Pop();
@@ -145,7 +145,7 @@ public static class Parser{
                     if (self.Count == 0)
                         throw new Syntax_error_exception($"On line <{tok.line_number}> found missing token(s)");
                     while (self.Peek().type != Token.Type.RBRACE){
-                        (Node n1, Node? n2) = self.parse_expr(false);
+                        (Node n1, Node? n2) = self.parse_expr();
                         node1.m_sub_nodes.Add(n1);
                         if (n2 is not null)
                             node1.m_sub_nodes.Add(n2);
@@ -253,7 +253,7 @@ public static class Parser{
                         throw new Syntax_error_exception($"On line <{tok.line_number}> found missing token(s)");
                     tok = self.Peek();
                     if (tok.type != Token.Type.SEMICOLON){
-                        (Node n1, Node? n2) = self.parse_expr(is_while);
+                        (Node n1, Node? n2) = self.parse_expr();
                         node1.m_sub_nodes.Add(n1);
                         if (n2 is not null)
                             node1.m_sub_nodes.Add(n2);
@@ -261,10 +261,10 @@ public static class Parser{
                     else
                         self.Pop();
 
-                    if (!loop_was_parsed && self.Count > 0 && self.Peek().type == Token.Type.ELSE){
+                    if (self.Count > 0 && self.Peek().type == Token.Type.ELSE){
                         tok = self.Pop();
                         if (is_while)
-                            throw new Syntax_error_exception($"On line <{tok.line_number}> while statement is followed by else statement");
+                            throw new Syntax_error_exception($"On line <{tok.line_number}> <while> statement is followed by <else> statement");
 
                         node2 = new(){token = tok};
 
@@ -273,7 +273,7 @@ public static class Parser{
 
                         tok = self.Peek();
                         if (tok.type != Token.Type.SEMICOLON){
-                            (Node n1, Node? n2) = self.parse_expr(false);
+                            (Node n1, Node? n2) = self.parse_expr();
                             node2.m_sub_nodes.Add(n1);
                             if (n2 is not null)
                                 node2.m_sub_nodes.Add(n2);
@@ -319,7 +319,7 @@ public static class Parser{
                         throw new Syntax_error_exception($"On line <{tok.line_number}> found missing token(s)");
                     tok = self.Peek();
                     if (tok.type != Token.Type.SEMICOLON){
-                        (Node n1, Node? n2) = self.parse_expr(true);
+                        (Node n1, Node? n2) = self.parse_expr();
                         for_block.m_sub_nodes.Add(n1);
                         if (n2 is not null)
                             for_block.m_sub_nodes.Add(n2);
@@ -373,7 +373,7 @@ public static class Parser{
                 token_stack.Pop();
             return token_stack.Count > 0;
         }))()){
-            (Node n1, Node? n2) = token_stack.parse_expr(false);
+            (Node n1, Node? n2) = token_stack.parse_expr();
             nodes.Add(n1);
             if (n2 is not null)
                 nodes.Add(n2);

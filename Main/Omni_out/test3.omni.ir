@@ -36,9 +36,35 @@ src: C:\Users\giganibba840\Desktop\C#\Project_omni\Main\Examples\test3.omni
     0 ; PRINT
     1 ; PUSH '\n'
     0 ; PRINT
-    1 ; PUSH 3.14
-    1 ; ALLOC_ARRAY
+    1 ; PUSH 0
     1 ; TO_INT
+    2 ; PUSH SP[-1]
+    3 ; PUSH 1
+    2 ; ADD
+    1 ; MOV SP[-2]
+    2 ; PUSH SP[-1]
+    3 ; PUSH 1
+    2 ; SUB
+    3 ; PUSH 10
+    2 ; CMP_LE
+    1 ; JMPZ 18
+    2 ; PUSH SP[-1]
+    3 ; PUSH 2
+    2 ; CMP_LEQ
+    1 ; JMPZ 4
+    2 ; PUSH "if\n"
+    1 ; PRINT
+    1 ; JMP 10
+    2 ; PUSH SP[-1]
+    3 ; PUSH 0
+    2 ; CMP_LE
+    1 ; JMPZ 4
+    2 ; PUSH "else if\n"
+    1 ; PRINT
+    1 ; JMP 3
+    2 ; PUSH "else\n"
+    1 ; PRINT
+    1 ; JMP -26
     2 ; PUSH 0
     1 ; RET
     0 ; POP

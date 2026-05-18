@@ -523,7 +523,7 @@ public static class Compiler{
 
                     if (current_AST_node.sub_nodes.Length > 1){
                         m_let_decl_counts.Add(0);
-                        to_IR(current_AST_node.sub_nodes[1], null);
+                        to_IR(current_AST_node.sub_nodes[1], (current_AST_node.sub_nodes.Length > 2) ? current_AST_node.sub_nodes[2] : null);
                         while (m_let_decl_counts[^1]-- > 0){
                             m_type_info_stack.pop();
                             while_block_sb.add_instruction($"{stack_size} ; {nameof(Op_code.POP)}");
